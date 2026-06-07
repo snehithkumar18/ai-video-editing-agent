@@ -90,16 +90,16 @@ export async function processAssembleVideo(job: Job): Promise<{ finalVideoUrl: s
     // 6. Save timelineJson to projects table
     await supabase
       .from('projects')
-      .update({ timeline_json: timelineJson as any })
+      .update({ timeline_json: timelineJson })
       .eq('id', projectId);
 
     // 7. Quick ffmpeg preview render: avatar video + captions burned in
     const outputPath = path.join(tmpDir, 'preview.mp4');
     
     // We only create the caption filter if there are captions and the text doesn't contain bad characters
-    const captionFilter = captionsData.map((c: any) => {
+    const captionFilter = captionsData.map((c: { word?: string; start?: number; end?: number }) => {
       // Very basic sanitize for ffmpeg drawtext filter
-      const text = c.word.replace(/'/g, "\u2019").replace(/:/g, "\\:");
+      const text = (c.word || '').replace(/'/g, "\u2019").replace(/:/g, "\\:");
       return `drawtext=text='${text}':fontsize=48:fontcolor=white:x=(w-text_w)/2:y=h-th-80:enable='between(t\\,${c.start}\\,${c.end})'`;
     }).join(',');
 

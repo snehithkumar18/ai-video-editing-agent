@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk';
 import { VoiceProfile } from '../types';
+import logger from '@/lib/logger';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -80,21 +81,21 @@ export async function generateSpeech(text: string, voiceProfile: VoiceProfile): 
     const buffer = await generateSpeechKokoro(text, voiceProfile.sample_url);
     return { audioBuffer: buffer, providerUsed: 'kokoro' };
   } catch (error) {
-    console.warn('Provider 1 Kokoro failed, falling back to OpenVoice', error);
+    logger.warn('Provider 1 Kokoro failed, falling back to OpenVoice', error);
   }
 
   try {
     const buffer = await generateSpeechOpenVoice(text, voiceProfile.sample_url);
     return { audioBuffer: buffer, providerUsed: 'openvoice' };
   } catch (error) {
-    console.warn('Provider 2 OpenVoice failed, falling back to Fish Audio', error);
+    logger.warn('Provider 2 OpenVoice failed, falling back to Fish Audio', error);
   }
 
   try {
     const buffer = await generateSpeechFishAudio(text, voiceProfile.provider_voice_id || voiceProfile.sample_url);
     return { audioBuffer: buffer, providerUsed: 'fish_audio' };
   } catch (error) {
-    console.warn('Provider 3 Fish Audio failed, falling back to ElevenLabs', error);
+    logger.warn('Provider 3 Fish Audio failed, falling back to ElevenLabs', error);
   }
 
   const buffer = await generateSpeechElevenLabs(text, voiceProfile.provider_voice_id!);

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Check, Zap } from 'lucide-react';
 import { PLANS } from '@/lib/stripe';
+import logger from '@/lib/logger';
 
 interface PricingCardsProps {
   currentPlanId: string;
@@ -32,7 +33,7 @@ export default function PricingCards({ currentPlanId }: PricingCardsProps) {
         throw new Error('No checkout URL returned');
       }
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       alert('Failed to start checkout. Please try again.');
     } finally {
       setIsLoading(null);

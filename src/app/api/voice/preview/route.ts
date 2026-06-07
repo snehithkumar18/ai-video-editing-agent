@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { generateSpeech } from '@/lib/services/voiceService';
 import { uploadBuffer, generateKey } from '@/lib/services/storageService';
 import { VoiceProfile } from '@/lib/types';
+import { z } from 'zod';
 import logger from '@/lib/logger';
 
 export async function POST(request: Request) {
@@ -14,7 +15,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { voiceId, text = "This is a preview of my voice. I hope you like it!" } = await request.json();
+    const bodySchema = z.object({
+      voiceId: z.string().uuid('voiceId is required'),
+      text: z.string().min(1).max(1000).default("This is a preview of my voice. I hope you like it!"),
+    });
+
+    const body = await request.json();
+    const parsedBody = bodySchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', details: parsedBody.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { voiceId, text } = parsedBody.data;
 
     const { data: voiceProfile, error: fetchError } = await supabase
       .from('voice_profiles')
@@ -35,7 +51,8 @@ export async function POST(request: Request) {
     await supabase
       .from('voice_profiles')
       .update({ preview_url: previewUrl })
-      .eq('id', voiceId);
+      .eq('id', voiceId)
+      .eq('user_id', user.id);
 
     return NextResponse.json({ success: true, data: { previewUrl } });
   } catch (error) {

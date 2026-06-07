@@ -9,6 +9,12 @@ import logger from '@/lib/logger';
 
 const isRedisConfigured = !!process.env.UPSTASH_REDIS_REST_URL;
 
+type MockFlow = {
+  data: {
+    projectId?: string;
+  };
+};
+
 const connection = isRedisConfigured
   ? new Redis(process.env.UPSTASH_REDIS_REST_URL!, {
       password: process.env.UPSTASH_REDIS_REST_TOKEN!,
@@ -20,9 +26,12 @@ const connection = isRedisConfigured
 const flowProducer = isRedisConfigured
   ? new FlowProducer({ connection: connection! })
   : ({
-      add: async (flow: any) => {
+      add: async (flow: MockFlow) => {
         logger.info('[Mock FlowProducer] Adding flow:', flow);
         const projectId = flow.data.projectId;
+        if (!projectId) {
+          throw new Error('projectId is required for mock flow jobs');
+        }
         
         setTimeout(async () => {
           try {
@@ -123,7 +132,7 @@ const flowProducer = isRedisConfigured
         
         return { id: 'mock-flow-' + Date.now() };
       }
-    } as any);
+    });
 
 
 // Rate limit: 5 video generation requests per hour per user

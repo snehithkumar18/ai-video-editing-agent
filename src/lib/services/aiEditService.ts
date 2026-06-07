@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk'
 import { AIEditResponse, ReplaceBRollOp, AddBRollOp } from '@/lib/types/aiEdit'
+import logger from '@/lib/logger'
 
 const isGroqConfigured = !!process.env.GROQ_API_KEY;
 const groq = isGroqConfigured ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
@@ -158,7 +159,7 @@ Return the JSON operations to fulfill this request.`
           searchOp.newAssetUrl = file.link
         }
       } catch (err) {
-        console.error('Failed to fetch from Pexels API in aiEditService:', err)
+        logger.error('Failed to fetch from Pexels API in aiEditService:', err)
         // If Pexels fails, operation will be skipped or handled gracefully in applyOperations
       }
     }

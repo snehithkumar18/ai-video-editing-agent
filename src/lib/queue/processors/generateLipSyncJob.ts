@@ -2,6 +2,7 @@ import { Job } from 'bullmq';
 import { createClient } from '@/lib/supabase/admin';
 import { uploadFromUrl } from '@/lib/services/storageService';
 import Replicate from 'replicate';
+import logger from '@/lib/logger';
 
 const replicate = new Replicate({ auth: process.env.REPLICATE_API_KEY });
 
@@ -34,7 +35,7 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
     ) as string;
     outputUrl = output;
   } catch (error) {
-    console.warn('LatentSync failed, falling back to SadTalker', error);
+    logger.warn('LatentSync failed, falling back to SadTalker', error);
     const output = await replicate.run(
       "cjwbw/sadtalker:3aa3dac9353cc4d6bd62a8f95957bd844003b401ca4e4a9b33baa574c549d376",
       { 
@@ -65,7 +66,7 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
     const enhancedKey = `project-assets/${projectId}/lipsync_enhanced_${Date.now()}.mp4`;
     finalVideoUrl = await uploadFromUrl(enhanced, enhancedKey, 'video/mp4');
   } catch (enhanceError) {
-    console.warn('GFPGAN enhancement failed, proceeding with original lip-sync', enhanceError);
+    logger.warn('GFPGAN enhancement failed, proceeding with original lip-sync', enhanceError);
   }
 
   // 6. Save as project_asset

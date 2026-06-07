@@ -51,7 +51,9 @@ export default function VoiceUploadModal({ open, onClose, onSuccess }: VoiceUplo
     setStep('validating');
     
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextCtor = (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextCtor) throw new Error('AudioContext is not supported in this browser');
+      const audioContext = new (AudioContextCtor as { new(): AudioContext })();
       const arrayBuffer = await selectedFile.arrayBuffer();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
       

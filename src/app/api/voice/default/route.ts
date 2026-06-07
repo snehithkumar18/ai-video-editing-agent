@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { z } from 'zod';
 import logger from '@/lib/logger';
 
 export async function PATCH(request: Request) {
@@ -11,11 +12,21 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { voiceId } = await request.json();
+    const bodySchema = z.object({
+      voiceId: z.string().uuid('voiceId is required'),
+    });
 
-    if (!voiceId) {
-      return NextResponse.json({ success: false, error: 'voiceId is required' }, { status: 400 });
+    const body = await request.json();
+    const parsedBody = bodySchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', details: parsedBody.error.flatten() },
+        { status: 400 }
+      );
     }
+
+    const { voiceId } = parsedBody.data;
 
     const { data: voiceProfile, error: fetchError } = await supabase
       .from('voice_profiles')
@@ -36,7 +47,8 @@ export async function PATCH(request: Request) {
     await supabase
       .from('voice_profiles')
       .update({ is_default: true })
-      .eq('id', voiceId);
+      .eq('id', voiceId)
+      .eq('user_id', user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

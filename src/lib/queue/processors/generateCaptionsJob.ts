@@ -23,8 +23,15 @@ export async function processGenerateCaptions(job: Job): Promise<{ captionUrl: s
     timestamp_granularities: ['word']
   });
 
+  type TranscriptionWord = {
+    word: string;
+    start: number;
+    end: number;
+  };
+
   // 3. Transform to caption format
-  const captions = ((transcription as any).words || []).map((w: any) => ({
+  const words = Array.isArray(transcription.words) ? (transcription.words as TranscriptionWord[]) : [];
+  const captions = words.map((w: TranscriptionWord) => ({
     id: `caption-${w.start}`,
     word: w.word.trim(),
     start: w.start,

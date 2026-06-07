@@ -1,7 +1,9 @@
 import Stripe from 'stripe';
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { 
-  apiVersion: '2024-10-28.acacia' as any, // fallback for newest versions if types not exactly matched 
+type StripeCtorOptions = ConstructorParameters<typeof Stripe>[1];
+
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-10-28.acacia' as StripeCtorOptions['apiVersion'], // cast to the constructor option type
 });
 
 export const PLANS = {

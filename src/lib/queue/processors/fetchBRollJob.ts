@@ -1,6 +1,7 @@
 import { Job } from 'bullmq';
 import { createClient } from '@/lib/supabase/admin';
 import Groq from 'groq-sdk';
+import logger from '@/lib/logger';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -55,7 +56,7 @@ export async function processFetchBRoll(job: Job): Promise<{ clips: any[] }> {
         });
       }
     } catch (err) {
-      console.warn(`Failed to fetch B-Roll for scene: ${scene}`, err);
+      logger.warn(`Failed to fetch B-Roll for scene: ${scene}`, err);
     }
   }
 

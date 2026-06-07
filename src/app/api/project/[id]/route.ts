@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { PLATFORMS, STYLE_TEMPLATES } from '@/lib/utils/constants'
 import { z } from 'zod'
 import logger from '@/lib/logger'
 
@@ -51,11 +52,11 @@ export async function PATCH(
     }
 
     const updatesSchema = z.object({
-      title: z.string().min(1).max(100).optional(),
+      title: z.string().trim().min(1).max(100).optional(),
       script_raw: z.string().nullable().optional(),
       script_optimized: z.string().nullable().optional(),
-      platform: z.string().optional(),
-      style_template: z.string().optional(),
+      platform: z.enum(PLATFORMS).optional(),
+      style_template: z.enum(STYLE_TEMPLATES).optional(),
       voice_profile_id: z.string().uuid().nullable().optional(),
       avatar_profile_id: z.string().uuid().nullable().optional(),
       status: z.string().optional(),

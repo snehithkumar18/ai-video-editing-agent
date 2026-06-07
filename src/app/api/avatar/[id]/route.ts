@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { deleteFile } from '@/lib/services/storageService';
+import logger from '@/lib/logger';
 
 export async function DELETE(
   request: Request,
@@ -32,7 +33,7 @@ export async function DELETE(
         const key = urlObj.pathname.substring(1); 
         await deleteFile(key);
       } catch (e) {
-        console.error('Failed to delete file from R2:', e);
+        logger.error('Failed to delete file from R2:', e);
       }
     };
 
@@ -65,7 +66,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete Avatar Error:', error);
+    logger.error('Delete Avatar Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

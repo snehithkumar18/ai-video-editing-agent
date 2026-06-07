@@ -9,6 +9,7 @@ import { User, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import logger from '@/lib/logger';
 
 interface AvatarGridProps {
   initialProfiles: AvatarProfile[];
@@ -46,7 +47,7 @@ export default function AvatarGrid({ initialProfiles }: AvatarGridProps) {
               }
             }
           } catch (e) {
-            console.error('Polling error', e);
+            logger.error('Polling error', e);
           }
           return profile;
         }));

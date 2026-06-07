@@ -1,5 +1,6 @@
 import * as faceapi from '@vladmandic/face-api';
 import { Canvas, Image, ImageData, createCanvas, loadImage } from 'canvas';
+import fs from 'fs';
 import logger from '@/lib/logger';
 
 // face-api expects the node-canvas bindings to be present at runtime.
@@ -14,7 +15,24 @@ export async function loadFaceModels(): Promise<void> {
   // Models should ideally be loaded from a CDN or public URL if this runs edge/serverless,
   // but for local/Node environments, providing a path to models works.
   const modelPath = process.cwd() + '/public/models';
-
+  // Ensure the models folder exists and contains model files to provide a helpful error
+  try {
+    if (!fs.existsSync(modelPath)) {
+      const msg = `Face-api model directory not found at ${modelPath}. Please download models into public/models.`;
+      logger.error(msg);
+      throw new Error(msg);
+    }
+    const entries = fs.readdirSync(modelPath);
+    if (entries.length === 0) {
+      const msg = `Face-api model directory at ${modelPath} is empty. Please place model files there.`;
+      logger.error(msg);
+      throw new Error(msg);
+    }
+  } catch (e) {
+    // If fs calls fail for any reason, log and rethrow to surface the problem early.
+    logger.error('Error checking face model path', e);
+    throw e;
+  }
   try {
     await faceapi.nets.ssdMobilenetv1.loadFromDisk(modelPath);
     modelsLoaded = true;

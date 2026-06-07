@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { stripe, PLANS } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/admin';
+import logger from '@/lib/logger';
 import Stripe from 'stripe';
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     if (!endpointSecret) throw new Error('Missing STRIPE_WEBHOOK_SECRET');
     event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
   } catch (err: any) {
-    console.error(`Webhook Error: ${err.message}`);
+    logger.error(`Webhook Error: ${err.message}`);
     return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
@@ -103,10 +104,10 @@ export async function POST(request: Request) {
       }
       
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        logger.info(`Unhandled event type ${event.type}`);
     }
   } catch (error) {
-    console.error('Webhook handler error:', error);
+    logger.error('Webhook handler error:', error);
     // Still return 200 so Stripe doesn't retry unnecessarily if it's our internal DB issue
   }
 

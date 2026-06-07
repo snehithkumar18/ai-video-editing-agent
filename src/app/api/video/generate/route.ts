@@ -5,6 +5,7 @@ import Redis from 'ioredis';
 import { JOB_NAMES } from '@/lib/queue/videoQueue';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis as UpstashRedis } from '@upstash/redis';
+import logger from '@/lib/logger';
 
 const isRedisConfigured = !!process.env.UPSTASH_REDIS_REST_URL;
 
@@ -20,7 +21,7 @@ const flowProducer = isRedisConfigured
   ? new FlowProducer({ connection: connection! })
   : ({
       add: async (flow: any) => {
-        console.log('[Mock FlowProducer] Adding flow:', flow);
+        logger.info('[Mock FlowProducer] Adding flow:', flow);
         const projectId = flow.data.projectId;
         
         setTimeout(async () => {
@@ -114,9 +115,9 @@ const flowProducer = isRedisConfigured
               timeline_json: timelineJson
             }).eq('id', projectId);
             
-            console.log(`[Mock FlowProducer] Completed flow for project ${projectId}`);
+            logger.info(`[Mock FlowProducer] Completed flow for project ${projectId}`);
           } catch (e) {
-            console.error('Error in mock flow runner:', e);
+            logger.error('Error in mock flow runner:', e);
           }
         }, 1000);
         

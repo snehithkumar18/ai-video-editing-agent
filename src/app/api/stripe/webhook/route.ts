@@ -15,9 +15,10 @@ export async function POST(request: Request) {
   try {
     if (!endpointSecret) throw new Error('Missing STRIPE_WEBHOOK_SECRET');
     event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
-  } catch (err: any) {
-    logger.error(`Webhook Error: ${err.message}`);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Invalid webhook signature';
+    logger.error(`Webhook Error: ${message}`);
+    return new Response(`Webhook Error: ${message}`, { status: 400 });
   }
 
   const supabase = createClient();

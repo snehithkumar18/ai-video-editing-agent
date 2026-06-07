@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { PLAN_LIMITS } from '@/lib/utils/constants';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import logger from '@/lib/logger';
 
 // Rate limit: 3 voice profile creations per day per user
 const ratelimit = new Ratelimit({
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: 'Rate limit exceeded. You can create up to 3 voice profiles per day.' }, { status: 429 });
       }
     } catch (e) {
-      console.warn('Ratelimit check skipped/failed', e);
+      logger.warn('Ratelimit check skipped/failed', e);
     }
 
     const body = await request.json();
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ success: false, error: error.issues }, { status: 400 });
     }
-    console.error('Create Voice Error:', error);
+    logger.error('Create Voice Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

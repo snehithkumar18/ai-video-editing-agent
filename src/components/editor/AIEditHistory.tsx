@@ -5,6 +5,7 @@ import { X, History, RotateCcw } from 'lucide-react';
 import { useAIEditStore } from '@/store/useAIEditStore';
 import { useTimelineStore } from '@/store/useTimelineStore';
 import { toast } from 'sonner';
+import logger from '@/lib/logger';
 
 interface AIEditHistoryProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ export default function AIEditHistory({ isOpen, onClose }: AIEditHistoryProps) {
         description: `Re-run: "${promptText}"`,
       });
     } catch (err) {
-      console.error('Failed to reapply operations:', err);
+      logger.error('Failed to reapply operations:', err);
       toast.error('Failed to reapply operations to timeline.');
     }
   };

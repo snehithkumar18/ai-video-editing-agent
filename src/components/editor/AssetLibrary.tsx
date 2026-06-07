@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Search, Film, Music, UploadCloud, Plus } from 'lucide-react';
 import { useTimelineStore } from '@/store/useTimelineStore';
+import logger from '@/lib/logger';
 
 export default function AssetLibrary() {
   const [brollSearch, setBrollSearch] = useState('');
@@ -29,7 +30,7 @@ export default function AssetLibrary() {
       const data = await res.json();
       setBrollResults(data.videos || []);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       setIsSearching(false);
     }

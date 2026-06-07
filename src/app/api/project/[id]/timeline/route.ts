@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { TimelineJSON } from '@/lib/types/timeline';
 import logger from '@/lib/logger';
+import { z } from 'zod';
 
 export async function PATCH(
   request: Request,
@@ -15,11 +16,22 @@ export async function PATCH(
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { timeline } = await request.json() as { timeline: TimelineJSON };
+    const body = await request.json();
+    // Accept either { timeline } or raw timeline payload
+    const incomingTimeline = (body && body.timeline) ? body.timeline : body;
 
-    if (!timeline || !timeline.version || !timeline.duration || !timeline.tracks) {
-      return NextResponse.json({ success: false, error: 'Invalid timeline JSON format' }, { status: 400 });
+    const timelineSchema = z.object({
+      version: z.union([z.string(), z.number()]).optional(),
+      duration: z.number(),
+      tracks: z.array(z.any()),
+    });
+
+    const parsed = timelineSchema.safeParse(incomingTimeline);
+    if (!parsed.success) {
+      return NextResponse.json({ success: false, error: 'Invalid timeline JSON format', details: parsed.error.flatten() }, { status: 400 });
     }
+
+    const timeline = parsed.data as TimelineJSON;
 
     const { error } = await supabase
       .from('projects')

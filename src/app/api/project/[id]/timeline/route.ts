@@ -31,12 +31,12 @@ export async function PATCH(
       return NextResponse.json({ success: false, error: 'Invalid timeline JSON format', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const timeline = parsed.data as TimelineJSON;
+    const timeline: TimelineJSON = parsed.data as TimelineJSON;
 
     const { error } = await supabase
       .from('projects')
       .update({ 
-        timeline_json: timeline as any,
+        timeline_json: timeline,
         updated_at: new Date().toISOString()
       })
       .eq('id', params.id)

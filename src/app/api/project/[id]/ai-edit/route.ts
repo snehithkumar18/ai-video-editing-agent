@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { processAIEditPrompt } from '@/lib/services/aiEditService';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import logger from '@/lib/logger';
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL || '',
@@ -65,7 +66,7 @@ export async function POST(
         }, { status: 429 });
       }
     } catch (e) {
-      console.warn('Ratelimit check skipped/failed', e);
+      logger.warn('Ratelimit check skipped/failed', e);
     }
 
     // Call service
@@ -75,7 +76,7 @@ export async function POST(
     return NextResponse.json({ success: true, data: aiEditResponse });
 
   } catch (error) {
-    console.error('AI Edit API Route Error:', error);
+    logger.error('AI Edit API Route Error:', error);
     return NextResponse.json({ 
       success: false, 
       error: 'Could not process your request. Please try again.' 

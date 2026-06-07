@@ -1,5 +1,6 @@
 import * as faceapi from '@vladmandic/face-api';
 import { Canvas, Image, ImageData, createCanvas, loadImage } from 'canvas';
+import logger from '@/lib/logger';
 
 // @ts-ignore
 faceapi.env.monkeyPatch({ Canvas: Canvas as any, Image: Image as any, ImageData: ImageData as any });
@@ -17,7 +18,7 @@ export async function loadFaceModels(): Promise<void> {
     await faceapi.nets.ssdMobilenetv1.loadFromDisk(modelPath);
     modelsLoaded = true;
   } catch (err) {
-    console.error('Failed to load face models. Ensure models exist in public/models', err);
+    logger.error('Failed to load face models. Ensure models exist in public/models', err);
     throw err;
   }
 }

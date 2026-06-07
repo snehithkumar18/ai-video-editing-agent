@@ -1,5 +1,6 @@
 import { Job } from 'bullmq';
 import { createClient } from '@/lib/supabase/admin';
+import logger from '@/lib/logger';
 import { uploadBuffer } from '@/lib/services/storageService';
 import { TimelineJSON } from '@/lib/types/timeline';
 import ffmpeg from 'fluent-ffmpeg';
@@ -84,7 +85,7 @@ export async function processExportVideo(job: Job) {
 
     // 3. Download the avatar video
     const avatarLocalPath = path.join(workDir, 'avatar.mp4');
-    console.log(`[Export] Downloading avatar video...`);
+    logger.info(`[Export] Downloading avatar video...`);
     await downloadFile(avatarClip.assetUrl, avatarLocalPath);
     await supabase.from('projects').update({ render_progress: 15 }).eq('id', projectId);
 
@@ -92,7 +93,7 @@ export async function processExportVideo(job: Job) {
     let audioLocalPath: string | null = null;
     if (audioClip?.assetUrl) {
       audioLocalPath = path.join(workDir, 'voice.mp3');
-      console.log(`[Export] Downloading voice audio...`);
+      logger.info(`[Export] Downloading voice audio...`);
       await downloadFile(audioClip.assetUrl, audioLocalPath);
     }
     await supabase.from('projects').update({ render_progress: 25 }).eq('id', projectId);
@@ -127,7 +128,7 @@ export async function processExportVideo(job: Job) {
     const outputPath = path.join(workDir, `output.${outputExtension}`);
 
     // 8. Run FFmpeg render
-    console.log(`[Export] Starting FFmpeg render at ${quality} quality...`);
+    logger.info(`[Export] Starting FFmpeg render at ${quality} quality...`);
     await new Promise<void>((resolve, reject) => {
       let cmd = ffmpeg(avatarLocalPath);
 
@@ -183,11 +184,11 @@ export async function processExportVideo(job: Job) {
           await supabase.from('projects').update({ render_progress: Math.min(mappedProgress, 90) }).eq('id', projectId);
         })
         .on('end', () => {
-          console.log(`[Export] FFmpeg render completed.`);
+          logger.info(`[Export] FFmpeg render completed.`);
           resolve();
         })
         .on('error', (err) => {
-          console.error(`[Export] FFmpeg render failed:`, err);
+          logger.error(`[Export] FFmpeg render failed:`, err);
           reject(err);
         })
         .run();
@@ -196,7 +197,7 @@ export async function processExportVideo(job: Job) {
     await supabase.from('projects').update({ render_progress: 92 }).eq('id', projectId);
 
     // 9. Upload the rendered file to R2
-    console.log(`[Export] Uploading rendered file to R2...`);
+    logger.info(`[Export] Uploading rendered file to R2...`);
     const fileBuffer = await fsp.readFile(outputPath);
     const s3Key = `exports/${project.user_id}/${projectId}_${Date.now()}.${outputExtension}`;
     const contentType = format === 'webm' ? 'video/webm' : 'video/mp4';
@@ -221,7 +222,7 @@ export async function processExportVideo(job: Job) {
       })
       .eq('id', projectId);
 
-    console.log(`[Export] Export complete. URL: ${publicUrl}`);
+    logger.info(`[Export] Export complete. URL: ${publicUrl}`);
     return { publicUrl };
 
   } catch (error) {

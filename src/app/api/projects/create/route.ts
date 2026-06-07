@@ -14,13 +14,20 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const validatedData = createProjectSchema.parse(body)
+    const validatedData = createProjectSchema.safeParse(body)
+
+    if (!validatedData.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', details: validatedData.error.flatten() },
+        { status: 400 }
+      )
+    }
 
     const { data: newProject, error } = await supabase
       .from('projects')
       .insert({
         user_id: user.id,
-        ...validatedData
+        ...validatedData.data
       })
       .select()
       .single()
@@ -32,7 +39,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, data: newProject })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: error.errors }, { status: 400 })
+      return NextResponse.json({ success: false, error: error.issues }, { status: 400 })
     }
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
   }

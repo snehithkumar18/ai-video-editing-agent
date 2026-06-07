@@ -152,7 +152,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: 'Rate limit exceeded. You can generate up to 5 videos per hour.' }, { status: 429 });
       }
     } catch (e) {
-      console.warn('Ratelimit check skipped/failed', e);
+      logger.warn('Ratelimit check skipped/failed', e);
     }
 
     const { projectId } = await request.json();
@@ -262,7 +262,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: { message: 'Generation started', projectId } });
   } catch (error) {
-    console.error('Generate Video Error:', error);
+    logger.error('Generate Video Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

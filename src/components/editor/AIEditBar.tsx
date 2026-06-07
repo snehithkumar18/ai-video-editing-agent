@@ -7,6 +7,7 @@ import { useAIEditStore } from '@/store/useAIEditStore';
 import { TimelineOperation } from '@/lib/types/aiEdit';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import logger from '@/lib/logger';
 
 interface AIEditBarProps {
   projectId: string;
@@ -86,7 +87,7 @@ export default function AIEditBar({ projectId, onOpenHistory }: AIEditBarProps) 
         setError(result.error || 'Failed to process prompt. Please try again.');
       }
     } catch (err) {
-      console.error('Submit prompt error:', err);
+      logger.error('Submit prompt error:', err);
       setError('A network error occurred. Please try again.');
     } finally {
       setIsProcessing(false);
@@ -116,7 +117,7 @@ export default function AIEditBar({ projectId, onOpenHistory }: AIEditBarProps) 
       setPromptInput('');
       setIsFocused(false);
     } catch (err) {
-      console.error('Apply operations error:', err);
+      logger.error('Apply operations error:', err);
       toast.error('Failed to apply edits to the timeline.');
     }
   };

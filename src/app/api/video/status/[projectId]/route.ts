@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import logger from '@/lib/logger';
 
 export async function GET(
   request: Request,
@@ -34,7 +35,7 @@ export async function GET(
       } 
     });
   } catch (error) {
-    console.error('Video Status Error:', error);
+    logger.error('Video Status Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { createMockClient } from './mockClient'
 
 function getCookie(name: string) {
@@ -22,7 +23,7 @@ export function createClient() {
           }
         }
       }
-    ) as any;
+    ) as unknown as SupabaseClient;
   }
 
   return createBrowserClient(
@@ -30,4 +31,6 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 }
+
+export type { SupabaseClient }
 

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { generateSpeech } from '@/lib/services/voiceService';
 import { uploadBuffer, generateKey } from '@/lib/services/storageService';
 import { VoiceProfile } from '@/lib/types';
+import logger from '@/lib/logger';
 
 export async function POST(request: Request) {
   try {
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: { previewUrl } });
   } catch (error) {
-    console.error('Preview Voice Error:', error);
+    logger.error('Preview Voice Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
+import { z } from 'zod';
 import logger from '@/lib/logger';
 
 export async function POST(request: Request) {
@@ -12,11 +13,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { priceId } = await request.json();
+    const bodySchema = z.object({
+      priceId: z.string().min(1, 'Price ID is required'),
+    });
 
-    if (!priceId) {
-      return NextResponse.json({ success: false, error: 'Price ID is required' }, { status: 400 });
+    const body = await request.json();
+    const parsedBody = bodySchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', details: parsedBody.error.flatten() },
+        { status: 400 }
+      );
     }
+
+    const { priceId } = parsedBody.data;
 
     // Get user details to find or create customer
     const { data: userData } = await supabase

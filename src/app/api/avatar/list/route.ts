@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import logger from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -21,7 +22,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, data: avatarProfiles });
   } catch (error) {
-    console.error('List Avatars Error:', error);
+    logger.error('List Avatars Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

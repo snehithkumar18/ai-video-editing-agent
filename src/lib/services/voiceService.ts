@@ -141,7 +141,7 @@ export async function transcribeAudioForTimestamps(audioBuffer: Buffer): Promise
 
   if (!transcription.words) return [];
 
-  return transcription.words.map((w: any) => ({
+  return transcription.words.map((w: { word?: string; start?: number; end?: number }) => ({
     word: w.word,
     start: w.start,
     end: w.end,

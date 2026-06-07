@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { videoQueue } from '@/lib/queue/videoQueue';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import logger from '@/lib/logger';
 
 // Note: Ensure UPSTASH_REDIS_REST_URL and TOKEN are set correctly
 const redis = new Redis({
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: 'Rate limit exceeded. Please try again later.' }, { status: 429 });
       }
     } catch (e) {
-      console.warn("Ratelimit check skipped/failed", e);
+      logger.warn('Ratelimit check skipped/failed', e);
     }
 
     const { projectId, quality = '1080p', format = 'mp4', aspectRatio = '9:16' } = await request.json();
@@ -100,7 +101,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: { message: 'Export started', projectId } });
   } catch (error) {
-    console.error('Render Route Error:', error);
+    logger.error('Render Route Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

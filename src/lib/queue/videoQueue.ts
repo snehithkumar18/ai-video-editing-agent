@@ -24,10 +24,13 @@ export const videoQueue = isRedisConfigured
       },
     })
   : ({
-      add: async (name: string, data: any) => {
+      add: async (name: string, data: { projectId?: string }) => {
         logger.info(`[Mock Queue] Adding job ${name} with data:`, data);
         
         const projectId = data.projectId;
+        if (!projectId) {
+          throw new Error('projectId is required for mock queue jobs');
+        }
         const supabase = await createClient();
         
         setTimeout(async () => {

@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { createMockClient } from './mockClient'
 
@@ -16,7 +17,7 @@ export async function createClient() {
           cookieStore.delete('mock-session');
         }
       }
-    ) as any;
+    ) as unknown as SupabaseClient;
   }
 
   return createServerClient(
@@ -42,4 +43,6 @@ export async function createClient() {
     }
   )
 }
+
+export type { SupabaseClient }
 

@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Mic, UserSquare, MessageSquare, Film, Video, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import logger from '@/lib/logger';
 
 interface GenerationProgressProps {
   projectId: string;
@@ -42,7 +43,7 @@ export default function GenerationProgress({ projectId, initialProgress }: Gener
           }
         }
       } catch (err) {
-        console.error('Failed to poll status', err);
+        logger.error('Failed to poll status', err);
       }
     }, 3000);
 

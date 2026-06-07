@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { videoQueue } from '@/lib/queue/videoQueue';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { z } from 'zod';
 import logger from '@/lib/logger';
 
 // Note: Ensure UPSTASH_REDIS_REST_URL and TOKEN are set correctly
@@ -37,11 +38,24 @@ export async function POST(request: Request) {
       logger.warn('Ratelimit check skipped/failed', e);
     }
 
-    const { projectId, quality = '1080p', format = 'mp4', aspectRatio = '9:16' } = await request.json();
+    const bodySchema = z.object({
+      projectId: z.string().min(1, 'projectId is required'),
+      quality: z.enum(['720p', '1080p', '4K']).default('1080p'),
+      format: z.enum(['mp4', 'webm']).default('mp4'),
+      aspectRatio: z.enum(['9:16', '16:9', '1:1']).default('9:16'),
+    });
 
-    if (!projectId) {
-      return NextResponse.json({ success: false, error: 'projectId is required' }, { status: 400 });
+    const body = await request.json();
+    const parsedBody = bodySchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', details: parsedBody.error.flatten() },
+        { status: 400 }
+      );
     }
+
+    const { projectId, quality, format, aspectRatio } = parsedBody.data;
 
     // 1. Get project and verify ownership
     const { data: project, error: projectError } = await supabase

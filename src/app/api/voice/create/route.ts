@@ -18,8 +18,8 @@ const ratelimit = new Ratelimit({
 
 const createVoiceSchema = z.object({
   storageUrl: z.string().url(),
-  voiceName: z.string().min(1),
-  description: z.string().optional(),
+  voiceName: z.string().trim().min(1),
+  description: z.string().trim().optional(),
 });
 
 export async function POST(request: Request) {
@@ -42,7 +42,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const validatedData = createVoiceSchema.parse(body);
+    const validatedData = createVoiceSchema.safeParse(body);
+
+    if (!validatedData.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', details: validatedData.error.flatten() },
+        { status: 400 }
+      );
+    }
 
     const { data: userData } = await supabase
       .from('users')
@@ -71,10 +78,10 @@ export async function POST(request: Request) {
       .from('voice_profiles')
       .insert({
         user_id: user.id,
-        name: validatedData.voiceName,
-        description: validatedData.description,
+        name: validatedData.data.voiceName,
+        description: validatedData.data.description,
         provider: 'kokoro',
-        sample_url: validatedData.storageUrl,
+        sample_url: validatedData.data.storageUrl,
         is_default: isFirstVoice,
       })
       .select()
@@ -84,9 +91,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: newVoiceProfile });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: error.issues }, { status: 400 });
-    }
     logger.error('Create Voice Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }

@@ -55,7 +55,8 @@ export async function DELETE(
         await supabase
           .from('voice_profiles')
           .update({ is_default: true })
-          .eq('id', remainingVoices[0].id);
+          .eq('id', remainingVoices[0].id)
+          .eq('user_id', user.id);
       }
     }
 

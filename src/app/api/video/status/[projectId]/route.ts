@@ -25,12 +25,14 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Project not found' }, { status: 404 });
     }
 
+    const metadata = project.metadata as { error?: string } | null;
+
     return NextResponse.json({ 
       success: true, 
       data: { 
         status: project.status, 
         render_progress: project.render_progress, 
-        error_message: (project.metadata as any)?.error || null,
+        error_message: metadata?.error || null,
         final_video_url: project.final_video_url 
       } 
     });

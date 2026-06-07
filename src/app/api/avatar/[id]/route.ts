@@ -60,7 +60,8 @@ export async function DELETE(
         await supabase
           .from('avatar_profiles')
           .update({ is_default: true })
-          .eq('id', remainingAvatars[0].id);
+          .eq('id', remainingAvatars[0].id)
+          .eq('user_id', user.id);
       }
     }
 

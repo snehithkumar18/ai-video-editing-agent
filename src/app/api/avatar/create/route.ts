@@ -20,7 +20,7 @@ const ratelimit = new Ratelimit({
 
 const createAvatarSchema = z.object({
   storageUrl: z.string().url(),
-  avatarName: z.string().min(1),
+  avatarName: z.string().trim().min(1),
   fileType: z.enum(['image', 'video']),
 });
 
@@ -94,7 +94,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const validatedData = createAvatarSchema.parse(body);
+    const validatedData = createAvatarSchema.safeParse(body);
+
+    if (!validatedData.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', details: validatedData.error.flatten() },
+        { status: 400 }
+      );
+    }
 
     const { data: userData } = await supabase
       .from('users')
@@ -123,9 +130,9 @@ export async function POST(request: Request) {
       .from('avatar_profiles')
       .insert({
         user_id: user.id,
-        name: validatedData.avatarName,
-        source_asset_url: validatedData.storageUrl,
-        type: validatedData.fileType,
+        name: validatedData.data.avatarName,
+        source_asset_url: validatedData.data.storageUrl,
+        type: validatedData.data.fileType,
         status: 'processing',
         is_default: isFirstAvatar,
       })
@@ -135,13 +142,10 @@ export async function POST(request: Request) {
     if (error) throw error;
 
     // Start background processing without awaiting
-    processAvatarAsync(newAvatar.id, validatedData.storageUrl, validatedData.fileType, user.id);
+    processAvatarAsync(newAvatar.id, validatedData.data.storageUrl, validatedData.data.fileType, user.id);
 
     return NextResponse.json({ success: true, data: { avatarId: newAvatar.id, status: 'processing' } });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: error.issues }, { status: 400 });
-    }
     logger.error('Create Avatar Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }

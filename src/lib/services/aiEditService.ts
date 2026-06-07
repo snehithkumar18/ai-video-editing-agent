@@ -7,7 +7,7 @@ const groq = isGroqConfigured ? new Groq({ apiKey: process.env.GROQ_API_KEY }) :
 
 function mockAIEditResponse(prompt: string, timelineSummary: string): AIEditResponse {
   const normalized = prompt.toLowerCase();
-  const operations: any[] = [];
+  const operations: AIEditResponse['operations'] = [];
   let explanation = "Simulated AI edit response for local testing.";
   let summary = "Simulated update";
 
@@ -142,6 +142,11 @@ Return the JSON operations to fulfill this request.`
   })
 
   const parsed: AIEditResponse = JSON.parse(response.choices[0].message.content!)
+
+  type PexelsVideoFile = {
+    quality?: string;
+    link: string;
+  }
   
   // For REPLACE_BROLL and ADD_BROLL operations, fetch actual Pexels URLs
   for (const op of parsed.operations) {
@@ -155,7 +160,7 @@ Return the JSON operations to fulfill this request.`
         const pexelsData = await pexelsRes.json()
         if (pexelsData.videos?.length > 0) {
           const video = pexelsData.videos[0]
-          const file = video.video_files.find((f: any) => f.quality === 'hd') || video.video_files[0]
+          const file = video.video_files.find((f: PexelsVideoFile) => f.quality === 'hd') || video.video_files[0]
           searchOp.newAssetUrl = file.link
         }
       } catch (err) {

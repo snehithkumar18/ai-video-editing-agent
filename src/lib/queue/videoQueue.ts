@@ -1,6 +1,7 @@
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
 import { createClient } from '../supabase/server';
+import logger from '../logger';
 
 const isRedisConfigured = !!process.env.UPSTASH_REDIS_REST_URL;
 
@@ -24,7 +25,7 @@ export const videoQueue = isRedisConfigured
     })
   : ({
       add: async (name: string, data: any) => {
-        console.log(`[Mock Queue] Adding job ${name} with data:`, data);
+        logger.info(`[Mock Queue] Adding job ${name} with data:`, data);
         
         const projectId = data.projectId;
         const supabase = await createClient();
@@ -49,9 +50,9 @@ export const videoQueue = isRedisConfigured
               final_video_url: 'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-smartphone-talking-to-camera-40156-large.mp4'
             }).eq('id', projectId);
             
-            console.log(`[Mock Queue] Completed export job for project ${projectId}`);
+            logger.info(`[Mock Queue] Completed export job for project ${projectId}`);
           } catch (e) {
-            console.error('Error in mock export runner:', e);
+            logger.error('Error in mock export runner:', e);
           }
         }, 1000);
         

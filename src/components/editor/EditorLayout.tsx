@@ -11,6 +11,7 @@ import AssetLibrary from './AssetLibrary';
 import Timeline from './Timeline';
 import AIEditBar from './AIEditBar';
 import AIEditHistory from './AIEditHistory';
+import logger from '@/lib/logger';
 
 export default function EditorLayout({ project }: { project: any }) {
   const loadTimeline = useTimelineStore(s => s.loadTimeline);
@@ -95,7 +96,7 @@ export default function EditorLayout({ project }: { project: any }) {
         setIsDirty(false);
       }
     } catch (e) {
-      console.error('Save failed', e);
+      logger.error('Save failed', e);
     } finally {
       setIsSaving(false);
     }

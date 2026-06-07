@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import logger from '@/lib/logger'
 
 const PLATFORMS = [
   { id: 'youtube_shorts', label: 'YouTube Shorts', icon: '📱' },
@@ -64,7 +65,7 @@ export default function CreateProjectModal({ open, onOpenChange }: CreateProject
         router.push(`/projects/${data.data.id}`)
       }
     } catch (error) {
-      console.error(error)
+      logger.error(error)
     } finally {
       setLoading(false)
     }

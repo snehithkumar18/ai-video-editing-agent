@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import { uploadBuffer } from './storageService';
 import { detectFaceInBuffer } from '../utils/faceDetection';
+import logger from '@/lib/logger';
 
 export const avatarService = {
   async processAvatarImage(
@@ -21,7 +22,7 @@ export const avatarService = {
         return { processedUrl: '', thumbnailUrl: '', error: 'Multiple faces detected. Please use a photo with only your face.' };
       }
     } catch (e) {
-      console.warn("Face detection failed or bypassed, proceeding with image processing", e);
+      logger.warn('Face detection failed or bypassed, proceeding with image processing', e);
     }
 
     const processedBuffer = await sharp(imageBuffer)
@@ -69,7 +70,7 @@ export const avatarService = {
         'image/jpeg'
       );
     } catch (error) {
-      console.error('Failed to generate video thumbnail with Sharp', error);
+      logger.error('Failed to generate video thumbnail with Sharp', error);
       // Fallback: in a real scenario, use fluent-ffmpeg. Returning a generic/placeholder thumbnail URL or throw.
       throw new Error('Failed to extract video thumbnail');
     }

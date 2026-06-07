@@ -61,7 +61,7 @@ export const videoQueue = isRedisConfigured
         
         return { id: 'mock-job-' + Date.now() };
       }
-    } as any);
+    } as unknown as Queue);
 
 export const JOB_NAMES = {
   GENERATE_VOICE: 'GENERATE_VOICE',

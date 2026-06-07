@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { TimelineJSON } from '@/lib/types/timeline';
+import logger from '@/lib/logger';
 
 export async function PATCH(
   request: Request,
@@ -35,7 +36,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, data: { savedAt: new Date().toISOString() } });
   } catch (error) {
-    console.error('Save Timeline Error:', error);
+    logger.error('Save Timeline Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

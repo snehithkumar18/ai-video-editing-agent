@@ -7,6 +7,7 @@ import { processAssembleVideo } from '../src/lib/queue/processors/assembleVideoJ
 import { processExportVideo } from '../src/lib/queue/processors/exportVideoJob';
 import Redis from 'ioredis';
 import { createClient } from '../src/lib/supabase/admin';
+import logger from './src/lib/logger';
 
 const connection = new Redis(process.env.UPSTASH_REDIS_REST_URL!, {
   password: process.env.UPSTASH_REDIS_REST_TOKEN!,
@@ -17,7 +18,7 @@ const connection = new Redis(process.env.UPSTASH_REDIS_REST_URL!, {
 const worker = new Worker(
   'video-generation',
   async (job: Job) => {
-    console.log(`[Worker] Starting job: ${job.name} (${job.id}) for project: ${job.data.projectId}`);
+    logger.info(`[Worker] Starting job: ${job.name} (${job.id}) for project: ${job.data.projectId}`);
     try {
       switch (job.name) {
         case 'GENERATE_VOICE': return await processGenerateVoice(job);
@@ -29,7 +30,7 @@ const worker = new Worker(
         default: throw new Error(`Unknown job: ${job.name}`);
       }
     } catch (error) {
-      console.error(`[Worker] Job ${job.name} failed:`, error);
+      logger.error(`[Worker] Job ${job.name} failed:`, error);
       
       // Update project status on failure
       const supabase = createClient();
@@ -49,15 +50,15 @@ const worker = new Worker(
   { connection, concurrency: 2, maxStalledCount: 3 }
 );
 
-worker.on('completed', (job) => console.log(`[Worker] Completed: ${job.name} (${job.id})`));
-worker.on('failed', (job, err) => console.error(`[Worker] Failed: ${job?.name}:`, err.message));
-worker.on('error', (err) => console.error('[Worker] Error:', err));
+worker.on('completed', (job) => logger.info(`[Worker] Completed: ${job.name} (${job.id})`));
+worker.on('failed', (job, err) => logger.error(`[Worker] Failed: ${job?.name}:`, err?.message));
+worker.on('error', (err) => logger.error('[Worker] Error:', err));
 
-console.log('[Worker] Video generation worker started');
+logger.info('[Worker] Video generation worker started');
 
 // Keep the process running
 process.on('SIGINT', async () => {
-  console.log('Shutting down worker...');
+  logger.info('Shutting down worker...');
   await worker.close();
   process.exit(0);
 });

@@ -11,6 +11,12 @@ import { VoiceProfile } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { formatFileSize, formatDuration } from '@/lib/utils/formatters';
 
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
+
 interface VoiceUploadModalProps {
   open: boolean;
   onClose: () => void;
@@ -51,9 +57,9 @@ export default function VoiceUploadModal({ open, onClose, onSuccess }: VoiceUplo
     setStep('validating');
     
     try {
-      const AudioContextCtor = (window as any).AudioContext || (window as any).webkitAudioContext;
+      const AudioContextCtor = window.AudioContext ?? window.webkitAudioContext;
       if (!AudioContextCtor) throw new Error('AudioContext is not supported in this browser');
-      const audioContext = new (AudioContextCtor as { new(): AudioContext })();
+      const audioContext = new AudioContextCtor();
       const arrayBuffer = await selectedFile.arrayBuffer();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
       

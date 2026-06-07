@@ -2,19 +2,20 @@ import * as faceapi from '@vladmandic/face-api';
 import { Canvas, Image, ImageData, createCanvas, loadImage } from 'canvas';
 import logger from '@/lib/logger';
 
+// face-api expects the node-canvas bindings to be present at runtime.
+// Suppress the TS mismatch here while passing the runtime objects directly.
 // @ts-ignore
-faceapi.env.monkeyPatch({ Canvas: Canvas as any, Image: Image as any, ImageData: ImageData as any });
+faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
 let modelsLoaded = false;
 
 export async function loadFaceModels(): Promise<void> {
   if (modelsLoaded) return;
-  // Models should ideally be loaded from a CDN or public URL if this runs edge/serverless, 
+  // Models should ideally be loaded from a CDN or public URL if this runs edge/serverless,
   // but for local/Node environments, providing a path to models works.
   const modelPath = process.cwd() + '/public/models';
-  
+
   try {
-    // In a real production deployment, you might need to handle fetching models differently
     await faceapi.nets.ssdMobilenetv1.loadFromDisk(modelPath);
     modelsLoaded = true;
   } catch (err) {
@@ -34,9 +35,9 @@ export async function detectFaceInBuffer(imageBuffer: Buffer): Promise<{
     const img = await loadImage(imageBuffer);
     const canvas = createCanvas(img.width, img.height);
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(img as any, 0, 0);
+    ctx.drawImage(img, 0, 0);
     const detections = await faceapi.detectAllFaces(
-      canvas as any,
+      canvas,
       new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 })
     );
     return {

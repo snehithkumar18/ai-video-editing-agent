@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import logger from '@/lib/logger';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -19,7 +20,7 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<voi
       `,
     });
   } catch (error) {
-    console.error('Failed to send welcome email', error);
+    logger.error('Failed to send welcome email', error);
   }
 }
 
@@ -40,7 +41,7 @@ export async function sendVideoReadyEmail(email: string, name: string, projectTi
       `,
     });
   } catch (error) {
-    console.error('Failed to send video ready email', error);
+    logger.error('Failed to send video ready email', error);
   }
 }
 
@@ -61,7 +62,7 @@ export async function sendLowCreditsEmail(email: string, name: string, creditsRe
       `,
     });
   } catch (error) {
-    console.error('Failed to send low credits email', error);
+    logger.error('Failed to send low credits email', error);
   }
 }
 
@@ -82,6 +83,6 @@ export async function sendSubscriptionConfirmedEmail(email: string, name: string
       `,
     });
   } catch (error) {
-    console.error('Failed to send subscription email', error);
+    logger.error('Failed to send subscription email', error);
   }
 }

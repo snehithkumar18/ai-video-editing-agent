@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { processAIEditPrompt } from '@/lib/services/aiEditService';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { z } from 'zod';
 import logger from '@/lib/logger';
 
 const redis = new Redis({
@@ -41,20 +42,22 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Project not found or access denied' }, { status: 404 });
     }
 
-    // Parse & validate body
-    const { prompt, timelineSummary } = await request.json();
+    const bodySchema = z.object({
+      prompt: z.string().trim().min(1, 'Prompt is required').max(500, 'Prompt must be 500 characters or less'),
+      timelineSummary: z.string().min(1, 'Timeline summary is required'),
+    });
 
-    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-      return NextResponse.json({ success: false, error: 'Prompt is required' }, { status: 400 });
+    const body = await request.json();
+    const parsedBody = bodySchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', details: parsedBody.error.flatten() },
+        { status: 400 }
+      );
     }
 
-    if (prompt.length > 500) {
-      return NextResponse.json({ success: false, error: 'Prompt must be 500 characters or less' }, { status: 400 });
-    }
-
-    if (!timelineSummary || typeof timelineSummary !== 'string') {
-      return NextResponse.json({ success: false, error: 'Timeline summary is required' }, { status: 400 });
-    }
+    const { prompt, timelineSummary } = parsedBody.data;
 
     // Check rate limit
     try {

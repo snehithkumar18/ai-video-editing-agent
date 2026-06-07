@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { temporal } from 'zundo';
-import type { TimelineJSON, Track, Clip } from '@/lib/types/timeline';
+import type { TimelineJSON, Track, Clip, CaptionStyle } from '@/lib/types/timeline';
 import type { TimelineOperation } from '@/lib/types/aiEdit';
 
 interface TimelineState {
@@ -29,6 +29,18 @@ interface TimelineState {
   getSelectedClip: () => Clip | null;
   getTimelineSummary: () => string;
   applyOperations: (operations: TimelineOperation[]) => void;
+}
+
+function mergeCaptionStyle(base?: CaptionStyle, changes?: Partial<CaptionStyle>): CaptionStyle {
+  return {
+    fontSize: changes?.fontSize ?? base?.fontSize ?? 48,
+    fontWeight: changes?.fontWeight ?? base?.fontWeight ?? 'normal',
+    color: changes?.color ?? base?.color ?? '#FFFFFF',
+    backgroundColor: changes?.backgroundColor ?? base?.backgroundColor,
+    borderRadius: changes?.borderRadius ?? base?.borderRadius,
+    animation: changes?.animation ?? base?.animation ?? 'none',
+    position: changes?.position ?? base?.position ?? 'bottom',
+  };
 }
 
 export const useTimelineStore = create<TimelineState>()(
@@ -222,7 +234,8 @@ export const useTimelineStore = create<TimelineState>()(
               if (captionTrack) {
                 const clip = captionTrack.clips.find(c => c.id === op.clipId);
                 if (clip) {
-                  get().updateClip(captionTrack.id, op.clipId, { style: { ...clip.style, ...op.changes } as any });
+                  const mergedStyle: CaptionStyle = mergeCaptionStyle(clip.style, op.changes);
+                  get().updateClip(captionTrack.id, op.clipId, { style: mergedStyle });
                 }
               }
               break;
@@ -231,7 +244,8 @@ export const useTimelineStore = create<TimelineState>()(
               const captionTrack = get().timeline?.tracks.find(t => t.type === 'captions')
               if (captionTrack) {
                 captionTrack.clips.forEach(clip => {
-                  get().updateClip(captionTrack.id, clip.id, { style: { ...clip.style, ...op.changes } as any })
+                  const mergedStyle: CaptionStyle = mergeCaptionStyle(clip.style, op.changes);
+                  get().updateClip(captionTrack.id, clip.id, { style: mergedStyle })
                 })
               }
               break

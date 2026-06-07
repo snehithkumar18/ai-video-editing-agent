@@ -6,6 +6,7 @@ import { PLAN_LIMITS } from '@/lib/utils/constants';
 import { avatarService } from '@/lib/services/avatarService';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import logger from '@/lib/logger';
 
 // Rate limit: 3 avatar profile creations per day per user
 const ratelimit = new Ratelimit({
@@ -47,7 +48,7 @@ async function processAvatarAsync(avatarId: string, storageUrl: string, fileType
       try {
         thumbnailUrl = await avatarService.generateVideoThumbnail(buffer, userId, avatarId);
       } catch (err) {
-        console.warn('Video thumbnail generation failed, using generic thumbnail', err);
+        logger.warn('Video thumbnail generation failed, using generic thumbnail', err);
         // Could set a generic thumbnail url here
       }
     }
@@ -62,7 +63,7 @@ async function processAvatarAsync(avatarId: string, storageUrl: string, fileType
       .eq('id', avatarId);
       
   } catch (error) {
-    console.error(`Avatar processing failed for ${avatarId}:`, error);
+    logger.error(`Avatar processing failed for ${avatarId}:`, error);
     await supabase
       .from('avatar_profiles')
       .update({
@@ -89,7 +90,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: 'Rate limit exceeded. You can create up to 3 avatar profiles per day.' }, { status: 429 });
       }
     } catch (e) {
-      console.warn('Ratelimit check skipped/failed', e);
+      logger.warn('Ratelimit check skipped/failed', e);
     }
 
     const body = await request.json();
@@ -141,7 +142,7 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ success: false, error: error.issues }, { status: 400 });
     }
-    console.error('Create Avatar Error:', error);
+    logger.error('Create Avatar Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -2,7 +2,18 @@ import Groq from 'groq-sdk';
 import { VoiceProfile } from '../types';
 import logger from '@/lib/logger';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || 'dummy_key' });
+function getGroqKey(): string {
+  const key = process.env.GROQ_API_KEY;
+  if (!key) {
+    throw new Error(
+      '[voiceService] Missing GROQ_API_KEY environment variable. ' +
+      'Set it in .env.local or your deployment environment.'
+    );
+  }
+  return key;
+}
+
+const groq = new Groq({ apiKey: getGroqKey() });
 
 export async function generateSpeechKokoro(text: string, voiceSampleUrl: string): Promise<Buffer> {
   // Try Kokoro Space endpoint

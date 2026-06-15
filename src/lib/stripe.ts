@@ -2,7 +2,18 @@ import Stripe from 'stripe';
 
 type StripeCtorOptions = ConstructorParameters<typeof Stripe>[1];
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy', {
+function getStripeKey(): string {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error(
+      '[stripe] Missing STRIPE_SECRET_KEY environment variable. ' +
+      'Set it in .env.local or your deployment environment.'
+    );
+  }
+  return key;
+}
+
+export const stripe = new Stripe(getStripeKey(), {
   apiVersion: '2024-10-28.acacia' as any,
 });
 

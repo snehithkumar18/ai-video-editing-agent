@@ -3,9 +3,20 @@
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
 import { MoreVertical, Copy, Trash2, Edit2, Play } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+function formatDistanceToNowCustom(date: Date): string {
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInSecs = Math.floor(diffInMs / 1000);
+  const diffInMins = Math.floor(diffInSecs / 60);
+  const diffInHours = Math.floor(diffInMins / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInSecs < 60) return 'just now';
+  if (diffInMins < 60) return `${diffInMins}m`;
+  if (diffInHours < 24) return `${diffInHours}h`;
+  return `${diffInDays}d`;
+}
 import Link from 'next/link'
 import type { Project } from '@/lib/types'
 
@@ -16,13 +27,13 @@ interface ProjectCardProps {
 export default function ProjectCard({ project }: ProjectCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'draft': return 'bg-gray-500/20 text-gray-400 border-gray-500/20'
-      case 'generating': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/20'
-      case 'editing': return 'bg-blue-500/20 text-blue-400 border-blue-500/20'
-      case 'rendering': return 'bg-purple-500/20 text-purple-400 border-purple-500/20'
-      case 'complete': return 'bg-green-500/20 text-green-400 border-green-500/20'
-      case 'failed': return 'bg-red-500/20 text-red-400 border-red-500/20'
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/20'
+      case 'draft': return 'bg-[#EDE9FE] text-[#7C3AED] border-[#7C3AED]/20'
+      case 'generating': return 'bg-amber-50 text-amber-600 border-amber-200'
+      case 'editing': return 'bg-blue-50 text-blue-600 border-blue-200'
+      case 'rendering': return 'bg-purple-50 text-purple-600 border-purple-200'
+      case 'complete': return 'bg-emerald-50 text-emerald-600 border-emerald-200'
+      case 'failed': return 'bg-red-50 text-red-500 border-red-200'
+      default: return 'bg-gray-100 text-gray-500 border-gray-200'
     }
   }
 
@@ -31,54 +42,54 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   }
 
   return (
-    <Card className="bg-[#0D0D0D] border-border overflow-hidden hover:border-violet-500/50 transition-colors group flex flex-col">
-      <Link href={`/projects/${project.id}`} className="block relative aspect-video bg-muted overflow-hidden">
+    <div className="bg-white rounded-2xl border border-[#E5E3EB] overflow-hidden hover:border-[#C4B5FD] transition-all card-hover group flex flex-col">
+      <Link href={`/projects/${project.id}`} className="block relative aspect-video bg-[#F1F0F5] overflow-hidden">
         {project.thumbnail_url ? (
           <img src={project.thumbnail_url} alt={project.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-900/20 to-black">
-            <Play className="text-violet-500/50 w-12 h-12" />
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE]">
+            <Play className="text-[#7C3AED]/30 w-12 h-12" />
           </div>
         )}
         <div className="absolute top-2 right-2">
-          <Badge variant="outline" className={getStatusColor(project.status)}>
+          <span className={`text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getStatusColor(project.status)}`}>
             {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-          </Badge>
+          </span>
         </div>
         {project.duration_seconds && (
-          <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white font-medium">
+          <div className="absolute bottom-2 right-2 bg-[#1E1B4B]/80 px-2 py-1 rounded-lg text-xs text-white font-medium backdrop-blur-sm">
             {Math.floor(project.duration_seconds / 60)}:{(Math.floor(project.duration_seconds % 60)).toString().padStart(2, '0')}
           </div>
         )}
       </Link>
-      <CardContent className="p-4 flex-1">
-        <h3 className="font-semibold text-lg line-clamp-2 mb-2 text-white group-hover:text-violet-400 transition-colors">
+      <div className="p-4 flex-1">
+        <h3 className="font-semibold text-base line-clamp-2 mb-2 text-[#1E1B4B] group-hover:text-[#7C3AED] transition-colors">
           <Link href={`/projects/${project.id}`}>{project.title}</Link>
         </h3>
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary" className="bg-white/5 text-muted-foreground border-border">
+          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F1F0F5] text-[#78767B] border border-[#E5E3EB]">
             {formatPlatform(project.platform)}
-          </Badge>
+          </span>
         </div>
-      </CardContent>
-      <CardFooter className="p-4 pt-0 flex items-center justify-between border-t border-border/50 mt-auto">
-        <span className="text-xs text-muted-foreground">
-          {formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}
+      </div>
+      <div className="px-4 py-3 flex items-center justify-between border-t border-[#E5E3EB]/50">
+        <span className="text-xs text-[#78767B]">
+          {formatDistanceToNowCustom(new Date(project.created_at))} ago
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white">
+            <button className="h-7 w-7 flex items-center justify-center rounded-lg text-[#B8B6BC] hover:text-[#1E1B4B] hover:bg-[#F1F0F5] transition-colors">
               <MoreVertical size={16} />
-            </Button>
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuContent align="end" className="w-40 bg-white border-[#E5E3EB] rounded-xl">
             <DropdownMenuItem asChild>
-              <Link href={`/projects/${project.id}/edit`} className="cursor-pointer">
+              <Link href={`/projects/${project.id}/edit`} className="cursor-pointer text-[#1E1B4B]">
                 <Edit2 className="mr-2 h-4 w-4" />
                 Edit
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer text-[#1E1B4B]">
               <Copy className="mr-2 h-4 w-4" />
               Duplicate
             </DropdownMenuItem>
@@ -88,7 +99,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   )
 }

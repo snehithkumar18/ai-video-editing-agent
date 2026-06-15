@@ -27,7 +27,7 @@ export default function AudioClipEditor({ clip, trackId }: AudioClipEditorProps)
       <div className="p-3 bg-black rounded-md border border-border">
         <Label className="text-xs text-gray-500 mb-1 block">Audio File</Label>
         <div className="text-xs text-white truncate" title={clip.assetUrl}>
-          {clip.assetUrl.split('/').pop()}
+          {(clip.assetUrl || '').split('/').pop()}
         </div>
         
         <Button variant="outline" size="sm" className="w-full mt-3 h-7 text-xs border-white/10 hover:bg-white/5">

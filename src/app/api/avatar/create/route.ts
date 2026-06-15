@@ -4,19 +4,33 @@ import { createClient as createAdminClient } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { PLAN_LIMITS } from '@/lib/utils/constants';
 import { avatarService } from '@/lib/services/avatarService';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
 import logger from '@/lib/logger';
 
 // Rate limit: 3 avatar profile creations per day per user
-const ratelimit = new Ratelimit({
-  redis: new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL || '',
-    token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-  }),
-  limiter: Ratelimit.slidingWindow(3, '1 d'),
-  analytics: true,
-});
+let ratelimitInstance: any = null;
+async function getRatelimit() {
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
+    return {
+      limit: async () => ({ success: true })
+    };
+  }
+
+  if (!ratelimitInstance) {
+    const limitPkg = '@upstash/ratelimit';
+    const redisPkg = '@upstash/redis';
+    const { Ratelimit } = eval('require')(limitPkg);
+    const { Redis } = eval('require')(redisPkg);
+    ratelimitInstance = new Ratelimit({
+      redis: new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+      }),
+      limiter: Ratelimit.slidingWindow(3, '1 d'),
+      analytics: true,
+    });
+  }
+  return ratelimitInstance;
+}
 
 const createAvatarSchema = z.object({
   storageUrl: z.string().url(),
@@ -85,7 +99,8 @@ export async function POST(request: Request) {
 
     // Rate limiting check
     try {
-      const { success } = await ratelimit.limit(`avatar_create_${user.id}`);
+      const limitInstance = await getRatelimit();
+      const { success } = await limitInstance.limit(`avatar_create_${user.id}`);
       if (!success) {
         return NextResponse.json({ success: false, error: 'Rate limit exceeded. You can create up to 3 avatar profiles per day.' }, { status: 429 });
       }

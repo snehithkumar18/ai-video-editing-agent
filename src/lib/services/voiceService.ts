@@ -2,7 +2,7 @@ import Groq from 'groq-sdk';
 import { VoiceProfile } from '../types';
 import logger from '@/lib/logger';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || 'dummy_key' });
 
 export async function generateSpeechKokoro(text: string, voiceSampleUrl: string): Promise<Buffer> {
   // Try Kokoro Space endpoint
@@ -106,7 +106,7 @@ export async function cloneVoiceWithElevenLabs(audioBuffer: Buffer, name: string
   const formData = new FormData();
   formData.append('name', name);
   
-  const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+  const blob = new Blob([audioBuffer as any], { type: 'audio/mpeg' });
   formData.append('files', blob, 'sample.mp3');
 
   const res = await fetch('https://api.elevenlabs.io/v1/voices/add', {
@@ -130,7 +130,7 @@ export interface WordTimestamp {
 }
 
 export async function transcribeAudioForTimestamps(audioBuffer: Buffer): Promise<WordTimestamp[]> {
-  const file = new File([audioBuffer], 'audio.mp3', { type: 'audio/mpeg' });
+  const file = new File([audioBuffer as any], 'audio.mp3', { type: 'audio/mpeg' });
   
   const transcription = await groq.audio.transcriptions.create({
     file,
@@ -139,11 +139,13 @@ export async function transcribeAudioForTimestamps(audioBuffer: Buffer): Promise
     timestamp_granularities: ['word'],
   });
 
-  if (!transcription.words) return [];
+  const verbose = transcription as any;
+  if (!verbose.words) return [];
 
-  return transcription.words.map((w: { word?: string; start?: number; end?: number }) => ({
-    word: w.word,
-    start: w.start,
-    end: w.end,
+  return verbose.words.map((w: { word?: string; start?: number; end?: number }) => ({
+    word: w.word || '',
+    start: w.start || 0,
+    end: w.end || 0,
   }));
 }
+

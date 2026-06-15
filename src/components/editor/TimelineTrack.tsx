@@ -27,9 +27,9 @@ export default function TimelineTrack({ track, zoom, duration }: TimelineTrackPr
   const isSelectedTrack = useTimelineStore(s => s.selectedTrackId === track.id);
 
   return (
-    <div className={`flex border-b border-border h-[42px] group ${isSelectedTrack ? 'bg-white/[0.02]' : ''}`}>
+    <div className={`flex border-b border-white/[0.04] h-[42px] group ${isSelectedTrack ? 'bg-[#7C3AED]/[0.03]' : ''}`}>
       {/* Track Header */}
-      <div className="w-[160px] flex-shrink-0 bg-[#1A1A1A] border-r border-border flex items-center justify-between px-3 z-30 sticky left-0 group-hover:bg-[#222]">
+      <div className="w-[160px] flex-shrink-0 bg-[#12121C] border-r border-white/[0.06] flex items-center justify-between px-3 z-30 sticky left-0 group-hover:bg-[#1A1A28]">
         <span className="text-xs font-medium text-gray-300 truncate w-24" title={track.label}>
           {track.label}
         </span>

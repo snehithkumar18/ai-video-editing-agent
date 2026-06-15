@@ -1,28 +1,42 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { processAIEditPrompt } from '@/lib/services/aiEditService';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
 import { z } from 'zod';
 import logger from '@/lib/logger';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-});
-
 // Rate limit: 30 AI edits per hour per user
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(30, '1 h'),
-  analytics: true,
-});
+let ratelimitInstance: any = null;
+async function getRatelimit() {
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
+    return {
+      limit: async () => ({ success: true })
+    };
+  }
+
+  if (!ratelimitInstance) {
+    const limitPkg = '@upstash/ratelimit';
+    const redisPkg = '@upstash/redis';
+    const { Ratelimit } = eval('require')(limitPkg);
+    const { Redis } = eval('require')(redisPkg);
+    const redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+    });
+    ratelimitInstance = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(30, '1 h'),
+      analytics: true,
+    });
+  }
+  return ratelimitInstance;
+}
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -34,7 +48,7 @@ export async function POST(
     const { data: project, error: projectError } = await supabase
       .from('projects')
       .select('id')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id)
       .single();
 
@@ -61,7 +75,8 @@ export async function POST(
 
     // Check rate limit
     try {
-      const { success } = await ratelimit.limit(`ai_edit_${user.id}`);
+      const limitInstance = await getRatelimit();
+      const { success } = await limitInstance.limit(`ai_edit_${user.id}`);
       if (!success) {
         return NextResponse.json({ 
           success: false, 

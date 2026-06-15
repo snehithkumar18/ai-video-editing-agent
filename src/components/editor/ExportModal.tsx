@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Progress } from '@/components/ui/progress';
-import { Download, MonitorPlay, Smartphone, Square, CheckCircle2, AlertCircle, Share2, Twitter, Facebook } from 'lucide-react';
+import { Download, MonitorPlay, Smartphone, Square, CheckCircle2, AlertCircle, Share2 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 
 interface ExportModalProps {
@@ -26,7 +26,7 @@ export default function ExportModal({ open, onClose, projectId }: ExportModalPro
   const [finalUrl, setFinalUrl] = useState('');
   
   const user = useAuthStore(s => s.user);
-  const pollingRef = useRef<NodeJS.Timeout>();
+  const pollingRef = useRef<any>(null);
 
   const creditsCost = quality === '4K' ? 4 : quality === '1080p' ? 2 : 1;
   const creditsRemaining = user?.render_credits || 0;
@@ -204,21 +204,25 @@ export default function ExportModal({ open, onClose, projectId }: ExportModalPro
               Your video has been successfully exported in {quality} quality.
             </p>
             
-            <Button className="w-full bg-violet-600 hover:bg-violet-700 text-white gap-2 h-12 text-base mb-4" asChild>
-              <a href={finalUrl} target="_blank" rel="noopener noreferrer" download>
-                <Download size={18} /> Download Video
-              </a>
-            </Button>
+            <a 
+              href={finalUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              download
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white gap-2 h-12 text-base mb-4 flex items-center justify-center rounded-lg font-medium transition-colors"
+            >
+              <Download size={18} /> Download Video
+            </a>
             
             <div className="flex gap-4">
               <Button variant="outline" size="icon" className="w-10 h-10 border-gray-700 hover:bg-white/5 rounded-full" title="Share link">
                 <Share2 size={16} />
               </Button>
-              <Button variant="outline" size="icon" className="w-10 h-10 border-gray-700 hover:bg-white/5 rounded-full" title="Share to Twitter">
-                <Twitter size={16} />
+              <Button variant="outline" size="icon" className="w-10 h-10 border-gray-700 hover:bg-white/5 rounded-full flex items-center justify-center text-gray-400 hover:text-white" title="Share to Twitter">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </Button>
-              <Button variant="outline" size="icon" className="w-10 h-10 border-gray-700 hover:bg-white/5 rounded-full" title="Share to Facebook">
-                <Facebook size={16} />
+              <Button variant="outline" size="icon" className="w-10 h-10 border-gray-700 hover:bg-white/5 rounded-full flex items-center justify-center text-gray-400 hover:text-white" title="Share to Facebook">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
               </Button>
             </div>
           </div>

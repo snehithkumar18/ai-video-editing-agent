@@ -5,7 +5,6 @@ import { Player, PlayerRef } from '@remotion/player';
 import { VideoComposition } from '@/remotion/VideoComposition';
 import { useTimelineStore } from '@/store/useTimelineStore';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 
 export default function VideoPreview() {
@@ -49,7 +48,7 @@ export default function VideoPreview() {
 
   return (
     <div className="w-full max-w-[400px] flex flex-col gap-4">
-      <div className="w-full aspect-[9/16] bg-black rounded-lg overflow-hidden border border-border relative shadow-2xl">
+      <div className="w-full aspect-[9/16] bg-black rounded-xl overflow-hidden border border-white/[0.08] relative shadow-2xl shadow-[#7C3AED]/10">
         <Player
           ref={playerRef}
           component={VideoComposition}
@@ -66,7 +65,7 @@ export default function VideoPreview() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs font-mono text-muted-foreground px-1">
+        <div className="flex items-center justify-between text-xs font-mono text-gray-500 px-1">
           <span>{formatTime(currentFrame)}</span>
           <span>{formatTime(durationInFrames)}</span>
         </div>
@@ -80,24 +79,22 @@ export default function VideoPreview() {
             setIsPlaying(false);
             setCurrentFrame(val);
           }}
-          className="w-full cursor-pointer [&>span:first-child]:bg-white/10 [&_[role=slider]]:bg-white [&_[role=slider]]:border-white [&_[role=slider]]:w-3 [&_[role=slider]]:h-3"
+          className="w-full cursor-pointer [&>span:first-child]:bg-white/10 [&_[role=slider]]:bg-[#7C3AED] [&_[role=slider]]:border-[#7C3AED] [&_[role=slider]]:w-3 [&_[role=slider]]:h-3"
         />
 
         <div className="flex items-center justify-center gap-2 mt-2">
-          <Button variant="ghost" size="icon" className="text-white/70 hover:text-white" onClick={() => setCurrentFrame(0)}>
+          <button className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors" onClick={() => setCurrentFrame(0)}>
             <SkipBack size={18} />
-          </Button>
-          <Button 
-            variant="secondary" 
-            size="icon" 
-            className="w-10 h-10 rounded-full bg-white text-black hover:bg-gray-200"
+          </button>
+          <button 
+            className="w-11 h-11 rounded-full bg-[#7C3AED] text-white hover:bg-[#6D28D9] transition-colors flex items-center justify-center shadow-lg shadow-[#7C3AED]/30"
             onClick={() => setIsPlaying(!isPlaying)}
           >
-            {isPlaying ? <Pause size={18} className="fill-current" /> : <Play size={18} className="fill-current ml-1" />}
-          </Button>
-          <Button variant="ghost" size="icon" className="text-white/70 hover:text-white" onClick={() => setCurrentFrame(durationInFrames - 1)}>
+            {isPlaying ? <Pause size={18} className="fill-current" /> : <Play size={18} className="fill-current ml-0.5" />}
+          </button>
+          <button className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors" onClick={() => setCurrentFrame(durationInFrames - 1)}>
             <SkipForward size={18} />
-          </Button>
+          </button>
         </div>
       </div>
     </div>

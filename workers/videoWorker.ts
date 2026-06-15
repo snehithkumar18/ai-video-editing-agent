@@ -7,7 +7,7 @@ import { processAssembleVideo } from '../src/lib/queue/processors/assembleVideoJ
 import { processExportVideo } from '../src/lib/queue/processors/exportVideoJob';
 import Redis from 'ioredis';
 import { createClient } from '../src/lib/supabase/admin';
-import logger from './src/lib/logger';
+import logger from '../src/lib/logger';
 
 const connection = new Redis(process.env.UPSTASH_REDIS_REST_URL!, {
   password: process.env.UPSTASH_REDIS_REST_TOKEN!,

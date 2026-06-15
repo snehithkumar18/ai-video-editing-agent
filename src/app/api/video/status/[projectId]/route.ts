@@ -4,9 +4,10 @@ import logger from '@/lib/logger';
 
 export async function GET(
   request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    const { projectId } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -17,7 +18,7 @@ export async function GET(
     const { data: project, error } = await supabase
       .from('projects')
       .select('status, render_progress, final_video_url, metadata')
-      .eq('id', params.projectId)
+      .eq('id', projectId)
       .eq('user_id', user.id)
       .single();
 

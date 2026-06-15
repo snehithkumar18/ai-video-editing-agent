@@ -50,8 +50,8 @@ export default function AvatarCard({ profile, onDelete, onSetDefault }: AvatarCa
 
           <div className="absolute top-2 right-2 flex gap-1">
             <Badge variant="secondary" className="bg-black/60 backdrop-blur-md text-white border-white/10 shadow-lg">
-              {profile.type === 'image' ? <ImageIcon size={12} className="mr-1" /> : <Video size={12} className="mr-1" />}
-              {profile.type === 'image' ? 'Photo' : 'Video'}
+              {profile.file_type === 'image' ? <ImageIcon size={12} className="mr-1" /> : <Video size={12} className="mr-1" />}
+              {profile.file_type === 'image' ? 'Photo' : 'Video'}
             </Badge>
           </div>
         </div>

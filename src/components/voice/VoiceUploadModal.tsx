@@ -2,13 +2,9 @@
 
 import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Mic, UploadCloud, CheckCircle2, AlertCircle, FileAudio } from 'lucide-react';
 import { VoiceProfile } from '@/lib/types';
-import { cn } from '@/lib/utils';
 import { formatFileSize, formatDuration } from '@/lib/utils/formatters';
 
 declare global {
@@ -18,14 +14,15 @@ declare global {
 }
 
 interface VoiceUploadModalProps {
-  open: boolean;
-  onClose: () => void;
+  open?: boolean;
+  onClose?: () => void;
   onSuccess: (profile: VoiceProfile) => void;
+  embedded?: boolean;
 }
 
 type Step = 'idle' | 'validating' | 'uploading' | 'creating' | 'complete' | 'error';
 
-export default function VoiceUploadModal({ open, onClose, onSuccess }: VoiceUploadModalProps) {
+export default function VoiceUploadModal({ open = false, onClose = () => {}, onSuccess, embedded = false }: VoiceUploadModalProps) {
   const [step, setStep] = useState<Step>('idle');
   const [file, setFile] = useState<File | null>(null);
   const [fileInfo, setFileInfo] = useState<{ duration: number; size: number } | null>(null);
@@ -149,122 +146,136 @@ export default function VoiceUploadModal({ open, onClose, onSuccess }: VoiceUplo
     }
   };
 
+  const body = (
+    <div className="py-4">
+      {step === 'idle' && !file && (
+        <div 
+          className="upload-zone p-8 flex flex-col items-center justify-center text-center cursor-pointer group"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileSelect} 
+            accept="audio/mp3,audio/wav,audio/m4a,audio/mp4,audio/webm" 
+            className="hidden" 
+          />
+          <div className="w-14 h-14 bg-[#EDE9FE] text-[#7C3AED] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <Mic size={24} />
+          </div>
+          <h3 className="font-semibold text-sm mb-1 text-[#7C3AED]">Tap to select or drag audio here</h3>
+          <div className="text-xs text-[#78767B] space-y-0.5 mt-1">
+            <p>WAV, MP3, or M4A</p>
+            <p>(Max 25MB)</p>
+          </div>
+        </div>
+      )}
+
+      {step === 'idle' && file && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-3 p-3 border border-[#E5E3EB] rounded-xl bg-[#F8F7FC]">
+            <div className="w-10 h-10 bg-[#EDE9FE] rounded-xl flex items-center justify-center text-[#7C3AED]">
+              <FileAudio size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm truncate text-[#1E1B4B]">{file.name}</p>
+              <p className="text-xs text-[#78767B]">
+                {formatFileSize(fileInfo?.size || 0)} • {formatDuration(fileInfo?.duration)}
+              </p>
+            </div>
+            <button 
+              onClick={() => setFile(null)} 
+              className="text-xs font-medium text-[#7C3AED] hover:text-[#6D28D9] transition-colors"
+            >
+              Change
+            </button>
+          </div>
+
+          <div>
+            <label htmlFor="voiceName" className="block text-sm font-medium text-[#1E1B4B] mb-1.5">Voice Name</label>
+            <input 
+              id="voiceName" 
+              value={voiceName} 
+              onChange={(e) => setVoiceName(e.target.value)} 
+              placeholder="e.g. My Podcast Voice"
+              className="w-full h-11 px-4 rounded-xl border border-[#E5E3EB] bg-white text-[#1E1B4B] text-sm placeholder:text-[#B8B6BC] outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20 transition-all"
+            />
+          </div>
+
+          <button 
+            onClick={handleUpload} 
+            disabled={!voiceName}
+            className="w-full h-11 rounded-xl btn-gradient text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Upload Voice
+          </button>
+        </div>
+      )}
+
+      {step === 'validating' && (
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <div className="w-14 h-14 border-3 border-[#EDE9FE] border-t-[#7C3AED] rounded-full animate-spin mb-5" />
+          <h3 className="font-medium text-base text-[#1E1B4B]">Checking your file...</h3>
+          <p className="text-sm text-[#78767B] mt-1">Validating audio duration and quality</p>
+        </div>
+      )}
+
+      {(step === 'uploading' || step === 'creating') && (
+        <div className="flex flex-col items-center justify-center py-10 text-center space-y-5">
+          <div className="w-14 h-14 bg-[#EDE9FE] text-[#7C3AED] rounded-full flex items-center justify-center animate-pulse">
+            <UploadCloud size={24} />
+          </div>
+          <div className="w-full space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="font-medium text-[#1E1B4B]">
+                {step === 'uploading' ? 'Uploading file...' : 'Setting up voice profile...'}
+              </span>
+              <span className="text-[#7C3AED] font-semibold">{uploadProgress}%</span>
+            </div>
+            <Progress value={uploadProgress} className="h-2 bg-[#EDE9FE]" indicatorColor="bg-[#7C3AED]" />
+          </div>
+        </div>
+      )}
+
+      {step === 'complete' && (
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-5">
+            <CheckCircle2 size={28} />
+          </div>
+          <h3 className="font-medium text-base text-[#1E1B4B]">Voice cloned successfully!</h3>
+          <p className="text-sm text-[#78767B] mt-1">Your voice is ready to use in your videos.</p>
+        </div>
+      )}
+
+      {step === 'error' && (
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-5">
+            <AlertCircle size={28} />
+          </div>
+          <h3 className="font-medium text-base text-[#1E1B4B] mb-1">Upload Failed</h3>
+          <p className="text-sm text-red-500 mb-6 max-w-sm">{errorMsg}</p>
+          <button 
+            onClick={() => setStep('idle')} 
+            className="h-10 px-6 rounded-xl border border-[#E5E3EB] text-sm font-medium text-[#1E1B4B] hover:bg-[#F8F7FC] transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  if (embedded) {
+    return body;
+  }
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px] bg-[#0D0D0D] border-border text-foreground">
+      <DialogContent className="sm:max-w-[480px] bg-white border-[#E5E3EB] text-[#1E1B4B] rounded-2xl">
         <DialogHeader>
-          <DialogTitle>Upload Voice Profile</DialogTitle>
+          <DialogTitle className="text-lg font-bold">Upload Voice Profile</DialogTitle>
         </DialogHeader>
-
-        <div className="py-6">
-          {step === 'idle' && !file && (
-            <div 
-              className="border-2 border-dashed border-border rounded-xl p-10 flex flex-col items-center justify-center text-center cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-colors group"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileSelect} 
-                accept="audio/mp3,audio/wav,audio/m4a,audio/mp4,audio/webm" 
-                className="hidden" 
-              />
-              <div className="w-16 h-16 bg-violet-600/20 text-violet-400 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Mic size={32} />
-              </div>
-              <h3 className="font-semibold text-lg mb-1 text-white">Drag your audio file here</h3>
-              <p className="text-sm text-muted-foreground mb-4">or click to browse</p>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>Accepts MP3, WAV, M4A</p>
-                <p>Minimum 15 seconds, maximum 3 minutes</p>
-              </div>
-            </div>
-          )}
-
-          {step === 'idle' && file && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-4 p-4 border border-border rounded-lg bg-black/20">
-                <div className="bg-violet-600/20 p-3 rounded-full text-violet-400">
-                  <FileAudio size={24} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate text-white">{file.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatFileSize(fileInfo?.size || 0)} • {formatDuration(fileInfo?.duration)}
-                  </p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => setFile(null)} className="text-muted-foreground hover:text-white">
-                  Change
-                </Button>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="voiceName">Voice Name</Label>
-                <Input 
-                  id="voiceName" 
-                  value={voiceName} 
-                  onChange={(e) => setVoiceName(e.target.value)} 
-                  placeholder="e.g. My Podcast Voice"
-                  className="bg-background border-border"
-                />
-              </div>
-
-              <div className="flex justify-end pt-4">
-                <Button onClick={handleUpload} disabled={!voiceName} className="bg-violet-600 hover:bg-violet-700 text-white w-full">
-                  Upload Voice
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {step === 'validating' && (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 border-4 border-violet-600/20 border-t-violet-600 rounded-full animate-spin mb-6" />
-              <h3 className="font-medium text-lg text-white">Checking your file...</h3>
-              <p className="text-sm text-muted-foreground mt-2">Validating audio duration and quality</p>
-            </div>
-          )}
-
-          {(step === 'uploading' || step === 'creating') && (
-            <div className="flex flex-col items-center justify-center py-12 text-center space-y-6">
-              <div className="w-16 h-16 bg-violet-600/20 text-violet-400 rounded-full flex items-center justify-center animate-pulse">
-                <UploadCloud size={32} />
-              </div>
-              <div className="w-full space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium text-white">
-                    {step === 'uploading' ? 'Uploading file...' : 'Setting up voice profile...'}
-                  </span>
-                  <span className="text-violet-400">{uploadProgress}%</span>
-                </div>
-                <Progress value={uploadProgress} className="h-2 bg-white/10" indicatorColor="bg-violet-600" />
-              </div>
-            </div>
-          )}
-
-          {step === 'complete' && (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-6">
-                <CheckCircle2 size={32} />
-              </div>
-              <h3 className="font-medium text-lg text-white">Voice cloned successfully!</h3>
-              <p className="text-sm text-muted-foreground mt-2">Your voice is ready to use in your videos.</p>
-            </div>
-          )}
-
-          {step === 'error' && (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mb-6">
-                <AlertCircle size={32} />
-              </div>
-              <h3 className="font-medium text-lg text-white mb-2">Upload Failed</h3>
-              <p className="text-sm text-red-400 mb-8 max-w-sm">{errorMsg}</p>
-              <Button onClick={() => setStep('idle')} variant="outline" className="border-border">
-                Try Again
-              </Button>
-            </div>
-          )}
-        </div>
+        {body}
       </DialogContent>
     </Dialog>
   );

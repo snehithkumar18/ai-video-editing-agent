@@ -213,8 +213,10 @@ export default function AIEditBar({ projectId, onOpenHistory }: AIEditBarProps) 
       case 'TRIM_TOTAL_DURATION': {
         return `Trim total project duration to ${op.newDurationSeconds.toFixed(1)}s`;
       }
-      default:
-        return `${op.type} (${op.reasoning || 'No details provided'})`;
+      default: {
+        const anyOp = op as any;
+        return `${anyOp.type || 'Unknown'} (${anyOp.reasoning || 'No details provided'})`;
+      }
     }
   };
 

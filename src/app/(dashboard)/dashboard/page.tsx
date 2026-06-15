@@ -1,10 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Plus, Video, Mic, User, Film } from 'lucide-react'
-import ProjectCard from '@/components/dashboard/ProjectCard'
+import { Plus, Video, Mic, User, Film, LayoutGrid, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import ProjectListItem from '@/components/dashboard/ProjectListItem'
 import Link from 'next/link'
-// import CreateProjectModal from '@/components/dashboard/CreateProjectModal' // We will implement this next
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -26,7 +23,7 @@ export default async function DashboardPage() {
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-    .limit(6)
+    .limit(5)
 
   const { count: projectsCount } = await supabase
     .from('projects')
@@ -38,133 +35,104 @@ export default async function DashboardPage() {
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
 
-  const { count: avatarsCount } = await supabase
-    .from('avatar_profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
+  const displayName = userData?.full_name || user.email?.split('@')[0] || 'Creator'
 
   return (
-    <div className="space-y-8">
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-[#0D0D0D] border-border">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Projects</CardTitle>
-            <Film className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{projectsCount || 0}</div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-[#0D0D0D] border-border">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Render Credits</CardTitle>
-            <Video className="h-4 w-4 text-violet-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-violet-500">{userData?.render_credits || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-[#0D0D0D] border-border">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Voice Profiles</CardTitle>
-            <Mic className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{voicesCount || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-[#0D0D0D] border-border">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Avatars</CardTitle>
-            <User className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avatarsCount || 0}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Actions */}
-      <div className="flex gap-4">
-        <Button className="h-32 flex-1 text-lg gap-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl">
-          <Plus size={24} />
-          Create New Video
-        </Button>
+    <div className="max-w-lg mx-auto space-y-6">
+      {/* Welcome Section */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-[#1E1B4B]">Welcome, {displayName}</h1>
+          <p className="text-sm text-[#78767B] mt-0.5">Ready to generate your next viral hit?</p>
+        </div>
+        <div className="credits-badge">
+          {userData?.render_credits || 0} Credits
+        </div>
       </div>
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-[#0D0D0D] border-border hover:border-violet-500/50 transition-colors cursor-pointer">
-            <Link href="/voice" className="flex items-center gap-4 p-6">
-              <div className="bg-violet-600/20 p-3 rounded-full text-violet-400">
-                <Mic size={24} />
-              </div>
-              <div>
-                <h3 className="font-medium">Upload Voice</h3>
-                <p className="text-sm text-muted-foreground">Clone your voice for AI</p>
-              </div>
-            </Link>
-          </Card>
-          
-          <Card className="bg-[#0D0D0D] border-border hover:border-violet-500/50 transition-colors cursor-pointer">
-            <Link href="/avatars" className="flex items-center gap-4 p-6">
-              <div className="bg-violet-600/20 p-3 rounded-full text-violet-400">
-                <User size={24} />
-              </div>
-              <div>
-                <h3 className="font-medium">Upload Avatar</h3>
-                <p className="text-sm text-muted-foreground">Create your AI presenter</p>
-              </div>
-            </Link>
-          </Card>
-          
-          <Card className="bg-[#0D0D0D] border-border hover:border-violet-500/50 transition-colors cursor-pointer">
-            <Link href="/projects/templates" className="flex items-center gap-4 p-6">
-              <div className="bg-violet-600/20 p-3 rounded-full text-violet-400">
-                <Film size={24} />
-              </div>
-              <div>
-                <h3 className="font-medium">View Templates</h3>
-                <p className="text-sm text-muted-foreground">Browse video styles</p>
-              </div>
-            </Link>
-          </Card>
+        <h2 className="text-xs font-semibold text-[#78767B] uppercase tracking-wider mb-3">Quick Actions</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/projects" className="bg-white rounded-2xl p-4 flex flex-col items-center gap-2.5 border border-[#E5E3EB] card-hover">
+            <div className="w-11 h-11 bg-[#EDE9FE] rounded-xl flex items-center justify-center">
+              <Video size={20} className="text-[#7C3AED]" />
+            </div>
+            <span className="text-sm font-medium text-[#1E1B4B]">Generate Video</span>
+          </Link>
+
+          <Link href="/voice" className="bg-white rounded-2xl p-4 flex flex-col items-center gap-2.5 border border-[#E5E3EB] card-hover">
+            <div className="w-11 h-11 bg-[#EDE9FE] rounded-xl flex items-center justify-center">
+              <Mic size={20} className="text-[#7C3AED]" />
+            </div>
+            <span className="text-sm font-medium text-[#1E1B4B]">Clone Voice</span>
+          </Link>
+
+          <Link href="/avatars" className="bg-white rounded-2xl p-4 flex flex-col items-center gap-2.5 border border-[#E5E3EB] card-hover">
+            <div className="w-11 h-11 bg-[#EDE9FE] rounded-xl flex items-center justify-center">
+              <User size={20} className="text-[#7C3AED]" />
+            </div>
+            <span className="text-sm font-medium text-[#1E1B4B]">Upload Avatar</span>
+          </Link>
+
+          <Link href="/projects/templates" className="bg-white rounded-2xl p-4 flex flex-col items-center gap-2.5 border border-[#E5E3EB] card-hover">
+            <div className="w-11 h-11 bg-[#EDE9FE] rounded-xl flex items-center justify-center">
+              <LayoutGrid size={20} className="text-[#7C3AED]" />
+            </div>
+            <span className="text-sm font-medium text-[#1E1B4B]">Templates</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white rounded-2xl p-4 border border-[#E5E3EB]">
+          <p className="text-xs font-medium text-[#78767B] mb-1">Total Projects</p>
+          <div className="flex items-end gap-2">
+            <span className="text-2xl font-bold text-[#1E1B4B]">{projectsCount || 0}</span>
+            <span className="text-xs text-emerald-500 font-semibold flex items-center gap-0.5 mb-1">
+              <ArrowUpRight size={12} />+12%
+            </span>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl p-4 border border-[#E5E3EB]">
+          <p className="text-xs font-medium text-[#78767B] mb-1">Active Voices</p>
+          <div className="flex items-end gap-2">
+            <span className="text-2xl font-bold text-[#7C3AED]">{String(voicesCount || 0).padStart(2, '0')}</span>
+            <span className="text-xs text-emerald-500 font-semibold flex items-center gap-0.5 mb-1">
+              <ArrowUpRight size={12} />+2
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Recent Projects */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Recent Projects</h2>
-          <Link href="/projects" className="text-sm text-violet-400 hover:text-violet-300">
-            View all
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-semibold text-[#78767B] uppercase tracking-wider">Recent Projects</h2>
+          <Link href="/projects" className="text-xs font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors">
+            See all
           </Link>
         </div>
-        
+
         {projects && projects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-2">
             {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectListItem key={project.id} project={project} />
             ))}
           </div>
         ) : (
-          <Card className="bg-[#0D0D0D] border-border border-dashed p-12 text-center flex flex-col items-center justify-center">
-            <div className="bg-muted p-4 rounded-full mb-4">
-              <Film size={32} className="text-muted-foreground" />
+          <div className="bg-white rounded-2xl border border-dashed border-[#E5E3EB] p-8 text-center flex flex-col items-center">
+            <div className="w-14 h-14 bg-[#EDE9FE] rounded-2xl flex items-center justify-center mb-4">
+              <Film size={24} className="text-[#7C3AED]" />
             </div>
-            <h3 className="text-lg font-medium mb-2">No projects yet</h3>
-            <p className="text-muted-foreground mb-6">Create your first AI video to get started.</p>
-            <Button className="bg-violet-600 hover:bg-violet-700 text-white gap-2">
-              <Plus size={18} />
+            <h3 className="text-base font-semibold text-[#1E1B4B] mb-1">No projects yet</h3>
+            <p className="text-sm text-[#78767B] mb-5">Create your first AI video to get started.</p>
+            <button className="h-10 px-6 rounded-xl btn-gradient text-white text-sm font-semibold flex items-center gap-2">
+              <Plus size={16} />
               Create Project
-            </Button>
-          </Card>
+            </button>
+          </div>
         )}
       </div>
     </div>

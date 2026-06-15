@@ -3,8 +3,6 @@ import { createClient } from '@/lib/supabase/server';
 import { FlowProducer } from 'bullmq';
 import Redis from 'ioredis';
 import { JOB_NAMES } from '@/lib/queue/videoQueue';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis as UpstashRedis } from '@upstash/redis';
 import logger from '@/lib/logger';
 
 const isRedisConfigured = !!process.env.UPSTASH_REDIS_REST_URL;
@@ -136,14 +134,30 @@ const flowProducer = isRedisConfigured
 
 
 // Rate limit: 5 video generation requests per hour per user
-const ratelimit = new Ratelimit({
-  redis: new UpstashRedis({
-    url: process.env.UPSTASH_REDIS_REST_URL || '',
-    token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-  }),
-  limiter: Ratelimit.slidingWindow(5, '1 h'),
-  analytics: true,
-});
+let ratelimitInstance: any = null;
+async function getRatelimit() {
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
+    return {
+      limit: async () => ({ success: true })
+    };
+  }
+
+  if (!ratelimitInstance) {
+    const limitPkg = '@upstash/ratelimit';
+    const redisPkg = '@upstash/redis';
+    const { Ratelimit } = eval('require')(limitPkg);
+    const { Redis: UpstashRedis } = eval('require')(redisPkg);
+    ratelimitInstance = new Ratelimit({
+      redis: new UpstashRedis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+      }),
+      limiter: Ratelimit.slidingWindow(5, '1 h'),
+      analytics: true,
+    });
+  }
+  return ratelimitInstance;
+}
 
 export async function POST(request: Request) {
   try {
@@ -156,7 +170,8 @@ export async function POST(request: Request) {
 
     // Rate limiting check
     try {
-      const { success } = await ratelimit.limit(`generate_${user.id}`);
+      const limitInstance = await getRatelimit();
+      const { success } = await limitInstance.limit(`generate_${user.id}`);
       if (!success) {
         return NextResponse.json({ success: false, error: 'Rate limit exceeded. You can generate up to 5 videos per hour.' }, { status: 429 });
       }

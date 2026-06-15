@@ -1,23 +1,35 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { videoQueue } from '@/lib/queue/videoQueue';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
 import { z } from 'zod';
 import logger from '@/lib/logger';
 
-// Note: Ensure UPSTASH_REDIS_REST_URL and TOKEN are set correctly
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-});
-
 // Create a new ratelimiter, that allows 5 requests per hour
-const ratelimit = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(5, '1 h'),
-  analytics: true,
-});
+let ratelimitInstance: any = null;
+async function getRatelimit() {
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
+    return {
+      limit: async () => ({ success: true })
+    };
+  }
+
+  if (!ratelimitInstance) {
+    const limitPkg = '@upstash/ratelimit';
+    const redisPkg = '@upstash/redis';
+    const { Ratelimit } = eval('require')(limitPkg);
+    const { Redis } = eval('require')(redisPkg);
+    const redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+    });
+    ratelimitInstance = new Ratelimit({
+      redis: redis,
+      limiter: Ratelimit.slidingWindow(5, '1 h'),
+      analytics: true,
+    });
+  }
+  return ratelimitInstance;
+}
 
 export async function POST(request: Request) {
   try {
@@ -30,7 +42,8 @@ export async function POST(request: Request) {
 
     // Rate limiting check
     try {
-      const { success } = await ratelimit.limit(`render_${user.id}`);
+      const limitInstance = await getRatelimit();
+      const { success } = await limitInstance.limit(`render_${user.id}`);
       if (!success) {
         return NextResponse.json({ success: false, error: 'Rate limit exceeded. Please try again later.' }, { status: 429 });
       }

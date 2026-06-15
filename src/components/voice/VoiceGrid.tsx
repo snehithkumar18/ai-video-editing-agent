@@ -6,7 +6,6 @@ import { VoiceProfile } from '@/lib/types';
 import VoiceProfileCard from './VoiceProfileCard';
 import VoiceUploadModal from './VoiceUploadModal';
 import { Mic, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 
@@ -58,22 +57,25 @@ export default function VoiceGrid({ initialProfiles }: VoiceGridProps) {
 
   if (!initialized) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map(i => <Skeleton key={i} className="h-48 rounded-xl bg-[#0D0D0D]" />)}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[1, 2, 3].map(i => <Skeleton key={i} className="h-48 rounded-2xl bg-[#F1F0F5]" />)}
       </div>
     );
   }
 
   return (
     <>
-      <div className="mb-6 flex justify-end">
-        <Button onClick={() => setIsModalOpen(true)} className="bg-violet-600 hover:bg-violet-700 text-white gap-2">
-          <Plus size={18} /> Add Voice Profile
-        </Button>
+      <div className="mb-5 flex justify-end">
+        <button 
+          onClick={() => setIsModalOpen(true)} 
+          className="h-9 px-5 rounded-xl btn-gradient text-white text-sm font-semibold flex items-center gap-2"
+        >
+          <Plus size={16} /> Add Voice Profile
+        </button>
       </div>
 
       {voiceProfiles.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {voiceProfiles.map(profile => (
             <VoiceProfileCard 
               key={profile.id} 
@@ -84,15 +86,18 @@ export default function VoiceGrid({ initialProfiles }: VoiceGridProps) {
           ))}
         </div>
       ) : (
-        <div className="col-span-full flex flex-col items-center justify-center p-12 border border-dashed border-border rounded-lg text-center bg-[#0D0D0D] py-24">
-          <div className="bg-violet-600/20 p-4 rounded-full mb-4">
-            <Mic className="text-violet-400 w-8 h-8" />
+        <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-[#E5E3EB] rounded-2xl text-center bg-white py-20">
+          <div className="w-14 h-14 bg-[#EDE9FE] rounded-2xl flex items-center justify-center mb-4">
+            <Mic className="text-[#7C3AED]" size={24} />
           </div>
-          <h3 className="text-xl font-medium mb-2">No voice profiles yet</h3>
-          <p className="text-muted-foreground max-w-md mb-6">Upload an audio sample to clone your voice and use it across all your videos.</p>
-          <Button onClick={() => setIsModalOpen(true)} className="bg-violet-600 hover:bg-violet-700 text-white">
+          <h3 className="text-lg font-semibold text-[#1E1B4B] mb-1">No voice profiles yet</h3>
+          <p className="text-sm text-[#78767B] max-w-md mb-6">Upload an audio sample to clone your voice and use it across all your videos.</p>
+          <button 
+            onClick={() => setIsModalOpen(true)} 
+            className="h-10 px-6 rounded-xl btn-gradient text-white text-sm font-semibold"
+          >
             Upload your first voice
-          </Button>
+          </button>
         </div>
       )}
 

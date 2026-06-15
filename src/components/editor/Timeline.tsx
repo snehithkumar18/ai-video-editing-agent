@@ -30,7 +30,7 @@ export default function Timeline() {
   const fps = timeline.fps || 30;
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#141414] overflow-hidden select-none">
+    <div className="flex flex-col h-full w-full bg-[#0E0E18] overflow-hidden select-none">
       <div 
         ref={containerRef}
         className="flex-1 overflow-x-auto overflow-y-auto relative custom-scrollbar"

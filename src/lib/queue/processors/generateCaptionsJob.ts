@@ -30,7 +30,7 @@ export async function processGenerateCaptions(job: Job): Promise<{ captionUrl: s
   };
 
   // 3. Transform to caption format
-  const words = Array.isArray(transcription.words) ? (transcription.words as TranscriptionWord[]) : [];
+  const words = Array.isArray((transcription as any).words) ? ((transcription as any).words as TranscriptionWord[]) : [];
   const captions = words.map((w: TranscriptionWord) => ({
     id: `caption-${w.start}`,
     word: w.word.trim(),

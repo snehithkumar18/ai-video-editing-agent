@@ -19,7 +19,7 @@ export default function GenerationProgress({ projectId, initialProgress }: Gener
   const [status, setStatus] = useState<'generating' | 'editing' | 'failed' | 'complete'>('generating');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
-  const pollingRef = useRef<NodeJS.Timeout>();
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     pollingRef.current = setInterval(async () => {
@@ -33,9 +33,9 @@ export default function GenerationProgress({ projectId, initialProgress }: Gener
             
             if (data.data.status === 'failed') {
               setErrorMsg(data.data.error_message || 'An unknown error occurred during generation.');
-              clearInterval(pollingRef.current);
+              if (pollingRef.current) clearInterval(pollingRef.current);
             } else if (data.data.status === 'editing' || data.data.status === 'complete') {
-              clearInterval(pollingRef.current);
+              if (pollingRef.current) clearInterval(pollingRef.current);
               setTimeout(() => {
                 router.refresh();
               }, 1500); // Small delay to let user see 100%

@@ -1,26 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* === VidAgent AI Design System === */
+  --primary: #1E1B4B;
+  --primary-foreground: #ffffff;
+  --secondary: #7C3AED;
+  --secondary-foreground: #ffffff;
+  --tertiary: #EDE9FE;
+  --tertiary-foreground: #1E1B4B;
+  --neutral: #78767B;
+
+  /* Surfaces */
+  --background: #F8F7FC;
+  --foreground: #1E1B4B;
+  --card: #ffffff;
+  --card-foreground: #1E1B4B;
+  --popover: #ffffff;
+  --popover-foreground: #1E1B4B;
+
+  /* Functional */
+  --muted: #F1F0F5;
+  --muted-foreground: #78767B;
+  --accent: #7C3AED;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders & Rings */
+  --border: #E5E3EB;
+  --input: #E5E3EB;
+  --ring: rgba(124, 58, 237, 0.5);
+  --radius: 0.75rem;
+
+  /* Legacy compat tokens */
+  --color-bg: #F8F7FC;
+  --color-surface: #ffffff;
+  --color-surface-2: #F1F0F5;
+  --color-surface-3: #E5E3EB;
+  --color-accent: #7C3AED;
+  --color-accent-hover: #6D28D9;
+  --color-accent-soft: rgba(124, 58, 237, 0.1);
+  --color-border: #E5E3EB;
+  --color-muted: #78767B;
+
+  /* Editor-specific dark tokens */
+  --editor-bg: #0A0A12;
+  --editor-surface: #111118;
+  --editor-surface-2: #1A1A24;
+  --editor-border: rgba(255, 255, 255, 0.08);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: var(--color-bg);
+  --foreground: var(--primary);
+  --font-sans: 'Inter', sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Auth pages hero gradient ===== */
+.auth-hero-gradient {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(124, 58, 237, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse at 30% 60%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 40%, rgba(168, 85, 247, 0.15) 0%, transparent 45%),
+    linear-gradient(180deg, #0E0B28 0%, #1E1B4B 50%, #0E0B28 100%);
+}
+
+/* ===== Editor dark theme ===== */
+.editor-dark {
+  --background: #0A0A12;
+  --foreground: #F8FAFC;
+  --card: #111118;
+  --card-foreground: #F8FAFC;
+  --popover: #111118;
+  --popover-foreground: #F8FAFC;
+  --muted: #1A1A24;
+  --muted-foreground: #9CA3AF;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.08);
+  background: #0A0A12;
+  color: #F8FAFC;
+}
+
+/* ===== Landing page dark theme ===== */
+.landing-dark {
+  --background: #050507;
+  --foreground: #F8FAFC;
+  --card: #0f0f16;
+  --card-foreground: #F8FAFC;
+  --muted: #1A1A24;
+  --muted-foreground: #9CA3AF;
+  --border: rgba(255, 255, 255, 0.10);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(124, 58, 237, 0.28), transparent 34rem),
+    radial-gradient(circle at 85% 0%, rgba(168, 85, 247, 0.18), transparent 30rem),
+    linear-gradient(180deg, #050507 0%, #08080d 50%, #050507 100%);
+  color: #F8FAFC;
+}
+
+.landing-dark::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 78%);
+}
+
+/* ===== Gradient button ===== */
+.btn-gradient {
+  background: linear-gradient(135deg, #7C3AED 0%, #9333EA 50%, #7C3AED 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+  color: #ffffff;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+}
+
+.btn-gradient:hover {
+  background-size: 200% 200%;
+  box-shadow: 0 6px 30px rgba(124, 58, 237, 0.45);
+  transform: translateY(-1px);
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== Custom scrollbar ===== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.3);
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.5);
+}
+
+/* ===== Subtle card hover ===== */
+.card-hover {
+  transition: all 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(30, 27, 75, 0.08);
+}
+
+/* ===== Purple dashed upload zone ===== */
+.upload-zone {
+  border: 2px dashed #C4B5FD;
+  border-radius: 1rem;
+  transition: all 0.25s ease;
+}
+.upload-zone:hover {
+  border-color: #7C3AED;
+  background: rgba(124, 58, 237, 0.04);
+}
+
+/* ===== Bottom navigation ===== */
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--neutral);
+  transition: all 0.2s ease;
+}
+
+.bottom-nav-item:hover {
+  color: var(--secondary);
+}
+
+.bottom-nav-item.active {
+  color: var(--secondary);
+  background: rgba(124, 58, 237, 0.1);
+}
+
+/* ===== Credits badge ===== */
+.credits-badge {
+  background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+/* ===== Status badges ===== */
+.status-processing {
+  background: rgba(249, 115, 22, 0.12);
+  color: #F97316;
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.status-draft {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7C3AED;
+  border: 1px solid rgba(124, 58, 237, 0.2);
 }

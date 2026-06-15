@@ -24,7 +24,7 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
   // 2. Call LatentSync on Replicate
   let outputUrl: string;
   try {
-    const output = await replicate.run(
+    const output = (await replicate.run(
       "bytedance/latentsync:9c4e108bed9ea4e5e8b7ca30296a82dc2c4eb1f43fd32d7e19d0c1e14e2d8892",
       {
         input: {
@@ -32,11 +32,11 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
           audio: audioUrl,
         }
       }
-    ) as string;
+    )) as any;
     outputUrl = output;
   } catch (error) {
     logger.warn('LatentSync failed, falling back to SadTalker', error);
-    const output = await replicate.run(
+    const output = (await replicate.run(
       "cjwbw/sadtalker:3aa3dac9353cc4d6bd62a8f95957bd844003b401ca4e4a9b33baa574c549d376",
       { 
         input: { 
@@ -46,7 +46,7 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
           still_mode: false 
         } 
       }
-    ) as string;
+    )) as any;
     outputUrl = output;
   }
 
@@ -57,10 +57,10 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
   // 4. Run GFPGAN enhancement (optional/fallback in case it fails to not block pipeline)
   let finalVideoUrl = reuploadedVideoUrl;
   try {
-    const enhanced = await replicate.run(
+    const enhanced = (await replicate.run(
       "tencentarc/gfpgan:9283608cc6b7be6b65a8e44983db012355fde4132009bf99d976b2f0896856a3",
       { input: { img: reuploadedVideoUrl, version: '1.4', scale: 2 } }
-    ) as string;
+    )) as any;
     
     // 5. Re-upload enhanced result to R2
     const enhancedKey = `project-assets/${projectId}/lipsync_enhanced_${Date.now()}.mp4`;

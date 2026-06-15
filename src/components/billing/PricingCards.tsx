@@ -13,7 +13,7 @@ interface PricingCardsProps {
 export default function PricingCards({ currentPlanId }: PricingCardsProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
-  const handleCheckout = async (priceId: string | null) => {
+  const handleCheckout = async (priceId: string | null | undefined) => {
     if (!priceId) {
       window.location.href = 'mailto:support@vidagent.app?subject=Downgrade to Free';
       return;

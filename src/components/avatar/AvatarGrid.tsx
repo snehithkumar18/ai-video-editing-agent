@@ -19,7 +19,7 @@ export default function AvatarGrid({ initialProfiles }: AvatarGridProps) {
   const { avatarProfiles, deleteAvatarProfile, setDefault } = useAvatarStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [initialized, setInitialized] = useState(false);
-  const pollingRef = useRef<NodeJS.Timeout>();
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     useAvatarStore.setState({ avatarProfiles: initialProfiles });

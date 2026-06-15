@@ -10,7 +10,7 @@ export default function CaptionRenderer({ captions, fps }: { captions: Clip[]; f
 
   if (!activeCaption) return null;
 
-  const style = activeCaption.style || {};
+  const style = (activeCaption.style || {}) as any;
   const isBackground = style.backgroundColor && style.backgroundColor !== 'transparent';
   
   // Basic animation parsing

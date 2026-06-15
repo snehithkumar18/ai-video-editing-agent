@@ -26,7 +26,7 @@ export default function CaptionEditor({ clip, trackId }: CaptionEditorProps) {
   const updateClip = useTimelineStore(s => s.updateClip);
   const timeline = useTimelineStore(s => s.timeline);
 
-  const style = clip.style || {};
+  const style = (clip.style || {}) as any;
   const isBackgroundEnabled = style.backgroundColor && style.backgroundColor !== 'transparent';
 
   const handleUpdate = (updates: Partial<Clip>) => {
@@ -56,7 +56,7 @@ export default function CaptionEditor({ clip, trackId }: CaptionEditorProps) {
         };
       })
     };
-    useTimelineStore.setState({ timeline: newTimeline, isDirty: true });
+    useTimelineStore.setState({ timeline: newTimeline as any, isDirty: true });
   };
 
   return (

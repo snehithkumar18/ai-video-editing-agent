@@ -18,26 +18,25 @@ export default function EditorTopBar({ project, onSave }: EditorTopBarProps) {
   const isSaving = useTimelineStore(s => s.isSaving);
 
   return (
-    <div className="h-12 bg-[#0A0A0A] border-b border-border flex items-center justify-between px-4 shrink-0">
+    <div className="h-12 bg-[#0A0A12] border-b border-white/[0.06] flex items-center justify-between px-4 shrink-0">
       {/* Left */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="w-8 h-8 text-gray-400 hover:text-white" asChild>
-          <Link href={`/projects/${project.id}`}>
-            <ArrowLeft size={16} />
-          </Link>
-        </Button>
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold text-white">{project.title}</span>
-        </div>
+      <div className="flex items-center gap-3">
+        <Link 
+          href={`/projects/${project.id}`}
+          className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+        >
+          <ArrowLeft size={16} />
+        </Link>
+        <span className="text-sm font-semibold text-white truncate max-w-[150px]">{project.title}</span>
       </div>
 
       {/* Center */}
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-1 bg-[#141414] rounded-md p-1 border border-border">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1 bg-white/[0.04] rounded-lg p-1 border border-white/[0.06]">
           <Button 
             variant="ghost" 
             size="icon" 
-            className="w-7 h-7 text-gray-400 hover:text-white"
+            className="w-7 h-7 text-gray-400 hover:text-white hover:bg-white/10"
             onClick={() => undo()}
             disabled={pastStates.length === 0}
           >
@@ -46,7 +45,7 @@ export default function EditorTopBar({ project, onSave }: EditorTopBarProps) {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="w-7 h-7 text-gray-400 hover:text-white"
+            className="w-7 h-7 text-gray-400 hover:text-white hover:bg-white/10"
             onClick={() => redo()}
             disabled={futureStates.length === 0}
           >
@@ -54,11 +53,11 @@ export default function EditorTopBar({ project, onSave }: EditorTopBarProps) {
           </Button>
         </div>
 
-        <div className="flex items-center gap-2 bg-[#141414] rounded-md p-1 border border-border">
+        <div className="flex items-center gap-1.5 bg-white/[0.04] rounded-lg p-1 border border-white/[0.06]">
           <Button 
             variant="ghost" 
             size="icon" 
-            className="w-7 h-7 text-gray-400 hover:text-white"
+            className="w-7 h-7 text-gray-400 hover:text-white hover:bg-white/10"
             onClick={() => setZoom(zoom - 20)}
           >
             <ZoomOut size={14} />
@@ -67,7 +66,7 @@ export default function EditorTopBar({ project, onSave }: EditorTopBarProps) {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="w-7 h-7 text-gray-400 hover:text-white"
+            className="w-7 h-7 text-gray-400 hover:text-white hover:bg-white/10"
             onClick={() => setZoom(zoom + 20)}
           >
             <ZoomIn size={14} />
@@ -76,24 +75,29 @@ export default function EditorTopBar({ project, onSave }: EditorTopBarProps) {
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 text-xs">
           {isSaving ? (
-            <span className="text-yellow-500 flex items-center gap-1"><CircleDashed size={14} className="animate-spin" /> Saving...</span>
+            <span className="text-amber-400 flex items-center gap-1"><CircleDashed size={14} className="animate-spin" /> Saving...</span>
           ) : isDirty ? (
-            <span className="text-gray-400 flex items-center gap-1">Unsaved changes</span>
+            <span className="text-gray-500 flex items-center gap-1">Unsaved</span>
           ) : (
-            <span className="text-green-500 flex items-center gap-1"><CheckCircle2 size={14} /> Saved</span>
+            <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={14} /> Saved</span>
           )}
         </div>
         
-        <Button onClick={onSave} variant="secondary" size="sm" disabled={!isDirty || isSaving}>
+        <button 
+          onClick={onSave}
+          disabled={!isDirty || isSaving}
+          className="h-8 px-3 rounded-lg text-xs font-medium bg-white/[0.06] text-gray-300 hover:bg-white/10 border border-white/[0.06] disabled:opacity-40 transition-colors"
+        >
           Save
-        </Button>
+        </button>
         
-        <Button className="bg-violet-600 hover:bg-violet-700 text-white gap-2" size="sm">
-          <Download size={14} /> Export
-        </Button>
+        <button className="h-8 px-4 rounded-lg text-xs font-semibold bg-[#7C3AED] text-white hover:bg-[#6D28D9] transition-colors flex items-center gap-1.5">
+          <Download size={13} />
+          Export
+        </button>
       </div>
     </div>
   );

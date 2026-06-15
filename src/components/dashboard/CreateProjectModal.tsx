@@ -29,11 +29,22 @@ const TEMPLATES = [
 ]
 
 interface CreateProjectModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  trigger?: React.ReactNode
 }
 
-export default function CreateProjectModal({ open, onOpenChange }: CreateProjectModalProps) {
+export default function CreateProjectModal({ open, onOpenChange, trigger }: CreateProjectModalProps) {
+  const [localOpen, setLocalOpen] = useState(false)
+  const isControlled = open !== undefined && onOpenChange !== undefined
+  const isOpen = isControlled ? open : localOpen
+  const setIsOpen = (val: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(val)
+    } else {
+      setLocalOpen(val)
+    }
+  }
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -61,7 +72,7 @@ export default function CreateProjectModal({ open, onOpenChange }: CreateProject
 
       const data = await res.json()
       if (data.success) {
-        onOpenChange(false)
+        setIsOpen(false)
         router.push(`/projects/${data.data.id}`)
       }
     } catch (error) {
@@ -71,8 +82,8 @@ export default function CreateProjectModal({ open, onOpenChange }: CreateProject
     }
   }
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+  const modalContent = (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[600px] bg-[#0D0D0D] border-border text-foreground">
         <DialogHeader>
           <DialogTitle>Create New Video</DialogTitle>
@@ -194,4 +205,17 @@ export default function CreateProjectModal({ open, onOpenChange }: CreateProject
       </DialogContent>
     </Dialog>
   )
+
+  if (trigger) {
+    return (
+      <>
+        <span onClick={() => setIsOpen(true)} className="inline-block cursor-pointer">
+          {trigger}
+        </span>
+        {modalContent}
+      </>
+    )
+  }
+
+  return modalContent
 }

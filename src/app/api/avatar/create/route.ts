@@ -52,7 +52,7 @@ async function processAvatarAsync(avatarId: string, storageUrl: string, fileType
     let thumbnailUrl = '';
     
     if (fileType === 'image') {
-      const result = await avatarService.processAvatarImage(buffer, userId, avatarId);
+      const result = await avatarService.processAvatarImage(buffer, userId, avatarId, storageUrl);
       if (result.error) {
         throw new Error(result.error);
       }

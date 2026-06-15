@@ -59,33 +59,35 @@ export default function PricingCards({ currentPlanId }: PricingCardsProps) {
         return (
           <div 
             key={key} 
-            className={`flex flex-col p-6 rounded-xl border bg-[#0D0D0D] relative ${
-              isCurrent ? 'border-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.1)]' : 'border-border'
+            className={`flex flex-col p-6 rounded-2xl border bg-white relative transition-all duration-300 ${
+              isCurrent 
+                ? 'border-[#7C3AED] shadow-[0_0_24px_rgba(124,58,237,0.06)]' 
+                : 'border-[#E5E3EB] hover:border-[#C4B5FD] hover:shadow-md'
             }`}
           >
             {isCurrent && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-violet-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#7C3AED] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                 Current Plan
               </div>
             )}
             
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-              <p className="text-sm text-gray-400 min-h-[40px]">{details.desc}</p>
+              <h3 className="text-lg font-bold text-[#1E1B4B] mb-2">{plan.name}</h3>
+              <p className="text-xs text-[#78767B] min-h-[40px] leading-relaxed">{details.desc}</p>
             </div>
             
             <div className="mb-6">
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold text-white">${plan.price}</span>
-                <span className="text-sm text-gray-500">/mo</span>
+                <span className="text-3xl font-extrabold text-[#1E1B4B]">${plan.price}</span>
+                <span className="text-xs text-[#78767B] font-medium">/mo</span>
               </div>
             </div>
 
             <div className="flex-1">
               <ul className="space-y-3 mb-8">
                 {details.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
-                    <Check size={16} className="text-violet-500 shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2.5 text-xs text-[#1E1B4B]/80 font-medium">
+                    <Check size={14} className="text-[#7C3AED] shrink-0 mt-0.5" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -95,8 +97,14 @@ export default function PricingCards({ currentPlanId }: PricingCardsProps) {
             <Button 
               onClick={() => handleCheckout(plan.priceId)}
               disabled={isCurrent || isLoading === plan.priceId}
-              variant={isCurrent ? 'outline' : (key === 'starter' ? 'default' : 'secondary')}
-              className={`w-full ${key === 'starter' && !isCurrent ? 'bg-violet-600 hover:bg-violet-700 text-white' : ''}`}
+              variant={isCurrent ? 'outline' : 'default'}
+              className={`w-full h-10 rounded-xl text-xs font-semibold ${
+                isCurrent 
+                  ? 'border-[#E5E3EB] text-[#1E1B4B] hover:bg-[#F8F7FC]' 
+                  : (key === 'starter' 
+                      ? 'bg-[#7C3AED] hover:bg-[#6D28D9] text-white shadow-sm' 
+                      : 'bg-[#F8F7FC] hover:bg-[#F1F0F5] text-[#1E1B4B] border border-[#E5E3EB]')
+              }`}
             >
               {isLoading === plan.priceId ? (
                 'Loading...'
@@ -105,7 +113,9 @@ export default function PricingCards({ currentPlanId }: PricingCardsProps) {
               ) : plan.price === 0 ? (
                 'Downgrade'
               ) : (
-                <span className="flex items-center gap-2">Upgrade <Zap size={14} className={key==='starter' ? 'fill-white/20' : ''} /></span>
+                <span className="flex items-center gap-1.5 justify-center">
+                  Upgrade <Zap size={12} className={key==='starter' ? 'fill-white/20' : ''} />
+                </span>
               )}
             </Button>
           </div>

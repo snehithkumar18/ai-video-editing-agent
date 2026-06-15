@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UploadCloud, CheckCircle2, AlertCircle, Image as ImageIcon, Video, Info } from 'lucide-react';
+import { UploadCloud, CheckCircle2, AlertCircle, Image as ImageIcon, Video, Info, FileVideo } from 'lucide-react';
 import { AvatarProfile } from '@/lib/types';
 import { formatFileSize } from '@/lib/utils/formatters';
 
@@ -152,19 +152,19 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
     <div className="py-2">
       {step === 'idle' && !file && (
         <Tabs defaultValue="image" className="w-full" onValueChange={(v) => setFileType(v as FileType)}>
-          <TabsList className="grid w-full grid-cols-2 mb-6 bg-background border border-border">
-            <TabsTrigger value="image" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white">
-              <ImageIcon className="w-4 h-4 mr-2" /> Upload Photo
+          <TabsList className="grid w-full grid-cols-2 mb-6 bg-[#F8F7FC] border border-[#E5E3EB] p-1 rounded-xl">
+            <TabsTrigger value="image" className="rounded-lg text-xs font-semibold text-[#78767B] data-[state=active]:bg-white data-[state=active]:text-[#7C3AED] data-[state=active]:shadow-sm">
+              <ImageIcon className="w-4 h-4 mr-2" /> Photo Avatar
             </TabsTrigger>
-            <TabsTrigger value="video" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white">
-              <Video className="w-4 h-4 mr-2" /> Upload Video
+            <TabsTrigger value="video" className="rounded-lg text-xs font-semibold text-[#78767B] data-[state=active]:bg-white data-[state=active]:text-[#7C3AED] data-[state=active]:shadow-sm">
+              <Video className="w-4 h-4 mr-2" /> Video Avatar
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="image" className="mt-0">
             <div className="flex flex-col md:flex-row gap-6">
               <div 
-                className="flex-1 border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-colors group"
+                className="flex-1 border-2 border-dashed border-[#E5E3EB] rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#C4B5FD] hover:bg-[#EDE9FE]/25 transition-all group"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input 
@@ -174,23 +174,23 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
                   accept="image/png,image/jpeg,image/jpg" 
                   className="hidden" 
                 />
-                <div className="w-12 h-12 bg-violet-600/20 text-violet-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <ImageIcon size={24} />
+                <div className="w-12 h-12 bg-[#EDE9FE] text-[#7C3AED] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <ImageIcon size={22} />
                 </div>
-                <h3 className="font-semibold text-base mb-1 text-white">Drag your photo here</h3>
-                <p className="text-xs text-muted-foreground mb-3">or click to browse</p>
-                <div className="text-[10px] text-muted-foreground">
-                  <p>Accepts PNG, JPEG up to 10MB</p>
+                <h3 className="font-semibold text-sm mb-1 text-[#7C3AED]">Drag your photo here</h3>
+                <p className="text-xs text-[#78767B] mb-3">or click to browse</p>
+                <div className="text-[10px] text-[#78767B] space-y-0.5 mt-1">
+                  <p>PNG, JPEG up to 10MB</p>
                   <p>Must have a clear, front-facing face</p>
                 </div>
               </div>
 
-              <div className="w-full md:w-56 bg-black/20 border border-border rounded-xl p-4 space-y-3">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-400">
+              <div className="w-full md:w-52 bg-[#F8F7FC] border border-[#E5E3EB] rounded-2xl p-4 space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#7C3AED]">
                   <Info size={14} />
                   <span>Photo Guidelines</span>
                 </div>
-                <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
+                <ul className="text-[10px] text-[#78767B] space-y-1.5 list-disc list-inside leading-relaxed font-medium">
                   <li>Neutral facial expression</li>
                   <li>Good lighting, solid background</li>
                   <li>Looking directly at camera</li>
@@ -203,7 +203,7 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
           <TabsContent value="video" className="mt-0">
             <div className="flex flex-col md:flex-row gap-6">
               <div 
-                className="flex-1 border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-colors group"
+                className="flex-1 border-2 border-dashed border-[#E5E3EB] rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-[#C4B5FD] hover:bg-[#EDE9FE]/25 transition-all group"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input 
@@ -213,23 +213,23 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
                   accept="video/mp4,video/quicktime,video/webm" 
                   className="hidden" 
                 />
-                <div className="w-12 h-12 bg-violet-600/20 text-violet-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <Video size={24} />
+                <div className="w-12 h-12 bg-[#EDE9FE] text-[#7C3AED] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <Video size={22} />
                 </div>
-                <h3 className="font-semibold text-base mb-1 text-white">Drag your video here</h3>
-                <p className="text-xs text-muted-foreground mb-3">or click to browse</p>
-                <div className="text-[10px] text-muted-foreground">
-                  <p>Accepts MP4, MOV up to 50MB</p>
+                <h3 className="font-semibold text-sm mb-1 text-[#7C3AED]">Drag your video here</h3>
+                <p className="text-xs text-[#78767B] mb-3">or click to browse</p>
+                <div className="text-[10px] text-[#78767B] space-y-0.5 mt-1">
+                  <p>MP4, MOV up to 50MB</p>
                   <p>15-60 seconds, speaking clearly</p>
                 </div>
               </div>
 
-              <div className="w-full md:w-56 bg-black/20 border border-border rounded-xl p-4 space-y-3">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-400">
+              <div className="w-full md:w-52 bg-[#F8F7FC] border border-[#E5E3EB] rounded-2xl p-4 space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#7C3AED]">
                   <Info size={14} />
                   <span>Video Guidelines</span>
                 </div>
-                <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
+                <ul className="text-[10px] text-[#78767B] space-y-1.5 list-disc list-inside leading-relaxed font-medium">
                   <li>Stable camera, eye level</li>
                   <li>Clear speech, minimal noise</li>
                   <li>Keep head relatively still</li>
@@ -242,35 +242,38 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
       )}
 
       {step === 'idle' && file && (
-        <div className="space-y-6">
-          <div className="flex items-center gap-4 p-4 border border-border rounded-lg bg-black/20">
-            <div className="bg-violet-600/20 p-3 rounded-full text-violet-400">
-              {fileType === 'image' ? <ImageIcon size={24} /> : <Video size={24} />}
+        <div className="space-y-5">
+          <div className="flex items-center gap-3.5 p-3.5 border border-[#E5E3EB] rounded-2xl bg-[#F8F7FC]">
+            <div className="bg-[#EDE9FE] p-3 rounded-xl text-[#7C3AED]">
+              {fileType === 'image' ? <ImageIcon size={22} /> : <FileVideo size={22} />}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate text-white">{file.name}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="font-semibold text-sm truncate text-[#1E1B4B]">{file.name}</p>
+              <p className="text-xs text-[#78767B] mt-0.5 font-medium">
                 {formatFileSize(file.size)} • {fileType.toUpperCase()}
               </p>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setFile(null)} className="text-muted-foreground hover:text-white">
+            <button 
+              onClick={() => setFile(null)} 
+              className="text-xs font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors"
+            >
               Change
-            </Button>
+            </button>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="avatarName">Avatar Name</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="avatarName" className="text-sm font-semibold text-[#1E1B4B]">Avatar Name</Label>
             <Input 
               id="avatarName" 
               value={avatarName} 
               onChange={(e) => setAvatarName(e.target.value)} 
               placeholder="e.g. Professional Avatar"
-              className="bg-background border-border"
+              className="bg-white border-[#E5E3EB] rounded-xl text-[#1E1B4B] placeholder:text-[#B8B6BC] h-11 focus-visible:ring-1 focus-visible:ring-[#7C3AED]"
             />
           </div>
 
           <div className="flex justify-end pt-4">
-            <Button onClick={handleUpload} disabled={!avatarName} className="bg-violet-600 hover:bg-violet-700 text-white w-full">
+            <Button onClick={handleUpload} disabled={!avatarName} className="btn-gradient text-white w-full h-11 rounded-xl font-semibold text-sm">
               Upload and Generate Avatar
             </Button>
           </div>
@@ -279,35 +282,36 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
 
       {step === 'validating' && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-16 h-16 border-4 border-violet-600/20 border-t-violet-600 rounded-full animate-spin mb-6" />
-          <h3 className="font-medium text-lg text-white">Checking your file...</h3>
+          <div className="w-12 h-12 border-3 border-[#EDE9FE] border-t-[#7C3AED] rounded-full animate-spin mb-5" />
+          <h3 className="font-semibold text-base text-[#1E1B4B]">Checking your file...</h3>
+          <p className="text-xs text-[#78767B] mt-1">Validating file size and constraints</p>
         </div>
       )}
 
       {(step === 'uploading' || step === 'creating') && (
-        <div className="flex flex-col items-center justify-center py-12 text-center space-y-6">
-          <div className="w-16 h-16 bg-violet-600/20 text-violet-400 rounded-full flex items-center justify-center animate-pulse">
-            <UploadCloud size={32} />
+        <div className="flex flex-col items-center justify-center py-12 text-center space-y-5">
+          <div className="w-14 h-14 bg-[#EDE9FE] text-[#7C3AED] rounded-full flex items-center justify-center animate-pulse">
+            <UploadCloud size={24} />
           </div>
           <div className="w-full space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="font-medium text-white">
+            <div className="flex justify-between text-xs font-medium">
+              <span className="text-[#1E1B4B]">
                 {step === 'uploading' ? 'Uploading file...' : 'Initiating avatar generation...'}
               </span>
-              <span className="text-violet-400">{uploadProgress}%</span>
+              <span className="text-[#7C3AED] font-bold">{uploadProgress}%</span>
             </div>
-            <Progress value={uploadProgress} className="h-2 bg-white/10" indicatorColor="bg-violet-600" />
+            <Progress value={uploadProgress} className="h-2 bg-[#EDE9FE]" indicatorColor="bg-[#7C3AED]" />
           </div>
         </div>
       )}
 
       {step === 'complete' && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-6">
-            <CheckCircle2 size={32} />
+          <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-5">
+            <CheckCircle2 size={26} />
           </div>
-          <h3 className="font-medium text-lg text-white mb-2">Upload Complete!</h3>
-          <p className="text-sm text-muted-foreground max-w-sm">
+          <h3 className="font-semibold text-base text-[#1E1B4B] mb-1.5">Upload Complete!</h3>
+          <p className="text-xs text-[#78767B] max-w-xs leading-relaxed font-medium">
             Your avatar is being processed in the background. We'll notify you when it's ready.
           </p>
         </div>
@@ -315,12 +319,12 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
 
       {step === 'error' && (
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mb-6">
-            <AlertCircle size={32} />
+          <div className="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-5">
+            <AlertCircle size={26} />
           </div>
-          <h3 className="font-medium text-lg text-white mb-2">Upload Failed</h3>
-          <p className="text-sm text-red-400 mb-8 max-w-sm">{errorMsg}</p>
-          <Button onClick={() => setStep('idle')} variant="outline" className="border-border">
+          <h3 className="font-semibold text-base text-[#1E1B4B] mb-1">Upload Failed</h3>
+          <p className="text-xs text-red-500 mb-6 max-w-xs font-medium">{errorMsg}</p>
+          <Button onClick={() => setStep('idle')} variant="outline" className="border-[#E5E3EB] text-[#1E1B4B] h-10 px-5 rounded-xl hover:bg-[#F8F7FC]">
             Try Again
           </Button>
         </div>
@@ -334,9 +338,9 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px] bg-[#0D0D0D] border-border text-foreground">
+      <DialogContent className="sm:max-w-[600px] bg-white border-[#E5E3EB] text-[#1E1B4B] rounded-3xl p-6">
         <DialogHeader>
-          <DialogTitle>Upload Avatar</DialogTitle>
+          <DialogTitle className="text-lg font-bold text-[#1E1B4B] tracking-tight">Upload Avatar</DialogTitle>
         </DialogHeader>
         {body}
       </DialogContent>

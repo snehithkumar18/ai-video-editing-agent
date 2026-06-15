@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import logger from '@/lib/logger'
@@ -48,10 +49,46 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  
   const [title, setTitle] = useState('')
   const [platform, setPlatform] = useState('youtube_shorts')
   const [template, setTemplate] = useState('split_screen')
   const [script, setScript] = useState('')
+  
+  const [voices, setVoices] = useState<any[]>([])
+  const [avatars, setAvatars] = useState<any[]>([])
+  const [selectedVoice, setSelectedVoice] = useState<string>('')
+  const [selectedAvatar, setSelectedAvatar] = useState<string>('')
+
+  useEffect(() => {
+    if (isOpen) {
+      // Fetch voice profiles
+      fetch('/api/voice/list')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && Array.isArray(data.data)) {
+            setVoices(data.data)
+            const defaultVoice = data.data.find((v: any) => v.is_default)
+            if (defaultVoice) setSelectedVoice(defaultVoice.id)
+            else if (data.data.length > 0) setSelectedVoice(data.data[0].id)
+          }
+        })
+        .catch(err => logger.error('Error fetching voices:', err))
+
+      // Fetch avatar profiles
+      fetch('/api/avatar/list')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && Array.isArray(data.data)) {
+            setAvatars(data.data)
+            const defaultAvatar = data.data.find((a: any) => a.is_default || a.status === 'ready')
+            if (defaultAvatar) setSelectedAvatar(defaultAvatar.id)
+            else if (data.data.length > 0) setSelectedAvatar(data.data[0].id)
+          }
+        })
+        .catch(err => logger.error('Error fetching avatars:', err))
+    }
+  }, [isOpen])
 
   const handleNext = () => setStep(step + 1)
   const handleBack = () => setStep(step - 1)
@@ -66,7 +103,9 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
           title,
           platform,
           style_template: template,
-          script_raw: script
+          script_raw: script,
+          voice_profile_id: selectedVoice || null,
+          avatar_profile_id: selectedAvatar || null
         })
       })
 
@@ -84,32 +123,34 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
 
   const modalContent = (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[600px] bg-[#0D0D0D] border-border text-foreground">
+      <DialogContent className="sm:max-w-[600px] bg-white border-[#E5E3EB] text-[#1E1B4B] rounded-3xl p-6">
         <DialogHeader>
-          <DialogTitle>Create New Video</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-[#1E1B4B] tracking-tight">Create New Video</DialogTitle>
         </DialogHeader>
 
         {step === 1 && (
           <div className="space-y-6 py-4">
             <div className="space-y-2">
-              <Label>Project Title</Label>
+              <Label className="text-sm font-semibold text-[#1E1B4B]">Project Title</Label>
               <Input 
                 value={title} 
                 onChange={(e) => setTitle(e.target.value)} 
                 placeholder="E.g., 5 AI Tools You Need" 
-                className="bg-background"
+                className="bg-[#F8F7FC] border-[#E5E3EB] rounded-xl text-[#1E1B4B] placeholder:text-[#B8B6BC] focus-visible:ring-1 focus-visible:ring-[#7C3AED]"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Platform</Label>
+              <Label className="text-sm font-semibold text-[#1E1B4B]">Platform</Label>
               <div className="grid grid-cols-3 gap-3">
                 {PLATFORMS.map((p) => (
                   <Card 
                     key={p.id}
                     className={cn(
-                      "p-3 cursor-pointer border hover:border-violet-500 transition-colors bg-background flex flex-col items-center gap-2",
-                      platform === p.id ? "border-violet-500 bg-violet-500/10" : "border-border"
+                      "p-3.5 cursor-pointer border rounded-2xl transition-all flex flex-col items-center gap-1.5",
+                      platform === p.id 
+                        ? "border-[#7C3AED] bg-[#EDE9FE]/50 text-[#7C3AED] shadow-sm shadow-[#7C3AED]/5" 
+                        : "border-[#E5E3EB] bg-white text-[#78767B] hover:border-[#C4B5FD] hover:bg-[#F8F7FC]/50"
                     )}
                     onClick={() => setPlatform(p.id)}
                   >
@@ -121,14 +162,16 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
             </div>
 
             <div className="space-y-2">
-              <Label>Style Template</Label>
+              <Label className="text-sm font-semibold text-[#1E1B4B]">Style Template</Label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {TEMPLATES.map((t) => (
                   <Card 
                     key={t.id}
                     className={cn(
-                      "p-3 cursor-pointer border hover:border-violet-500 transition-colors bg-background text-center text-sm",
-                      template === t.id ? "border-violet-500 text-violet-400 bg-violet-500/10" : "border-border text-muted-foreground"
+                      "p-3 cursor-pointer border rounded-xl transition-all text-center text-xs font-medium",
+                      template === t.id 
+                        ? "border-[#7C3AED] text-[#7C3AED] bg-[#EDE9FE]/50 shadow-sm" 
+                        : "border-[#E5E3EB] text-[#78767B] bg-white hover:border-[#C4B5FD]"
                     )}
                     onClick={() => setTemplate(t.id)}
                   >
@@ -139,7 +182,7 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
             </div>
 
             <div className="flex justify-end pt-4">
-              <Button onClick={handleNext} disabled={!title} className="bg-violet-600 hover:bg-violet-700 text-white">
+              <Button onClick={handleNext} disabled={!title} className="h-10 px-6 rounded-xl btn-gradient text-white text-sm font-semibold">
                 Next Step
               </Button>
             </div>
@@ -150,25 +193,25 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Script</Label>
-                <Button variant="outline" size="sm" className="h-8 text-xs bg-violet-600/10 text-violet-400 border-violet-600/20 hover:bg-violet-600/20">
+                <Label className="text-sm font-semibold text-[#1E1B4B]">Script</Label>
+                <button className="h-8 rounded-lg bg-[#EDE9FE] text-[#7C3AED] hover:bg-[#E2DBFD] transition-colors border-none text-xs font-semibold px-3">
                   Optimize with AI
-                </Button>
+                </button>
               </div>
               <Textarea 
                 value={script} 
                 onChange={(e) => setScript(e.target.value)} 
                 placeholder="Paste your script or rough idea here..." 
-                className="h-64 bg-background border-border resize-none"
+                className="h-64 bg-[#F8F7FC] border-[#E5E3EB] rounded-2xl text-[#1E1B4B] placeholder:text-[#B8B6BC] resize-none focus-visible:ring-1 focus-visible:ring-[#7C3AED] p-3.5"
               />
-              <div className="text-xs text-muted-foreground text-right">
+              <div className="text-xs text-[#78767B] text-right font-medium">
                 {script.length} characters
               </div>
             </div>
 
             <div className="flex justify-between pt-4">
-              <Button variant="outline" onClick={handleBack}>Back</Button>
-              <Button onClick={handleNext} className="bg-violet-600 hover:bg-violet-700 text-white">
+              <Button variant="outline" onClick={handleBack} className="h-10 px-6 rounded-xl border border-[#E5E3EB] text-[#1E1B4B] hover:bg-[#F8F7FC]">Back</Button>
+              <Button onClick={handleNext} className="h-10 px-6 rounded-xl btn-gradient text-white text-sm font-semibold">
                 Next Step
               </Button>
             </div>
@@ -177,25 +220,59 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
 
         {step === 3 && (
           <div className="space-y-6 py-4">
-            <div className="space-y-2">
-              <Label>Select Voice</Label>
-              <Card className="p-6 bg-background border-border text-center border-dashed">
-                <p className="text-sm text-muted-foreground mb-2">No voices yet — Upload one first</p>
-                <Button variant="link" className="text-violet-400">Go to Voice Profiles</Button>
-              </Card>
+            <div className="space-y-2.5">
+              <Label className="text-sm font-semibold text-[#1E1B4B]">Select Voice</Label>
+              {voices.length > 0 ? (
+                <Select value={selectedVoice} onValueChange={(val) => setSelectedVoice(val || '')}>
+                  <SelectTrigger className="w-full bg-[#F8F7FC] border-[#E5E3EB] rounded-xl text-[#1E1B4B] h-11">
+                    <SelectValue placeholder="Select a voice profile" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-[#E5E3EB] text-[#1E1B4B] rounded-xl shadow-lg">
+                    {voices.map((v) => (
+                      <SelectItem key={v.id} value={v.id} className="focus:bg-[#EDE9FE] focus:text-[#7C3AED] cursor-pointer">
+                        {v.name} {v.is_default ? '(Default)' : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Card className="p-6 bg-[#F8F7FC] border-[#E5E3EB] text-center border-dashed rounded-2xl">
+                  <p className="text-sm text-[#78767B] mb-2">No voice clones available</p>
+                  <Button variant="link" className="text-[#7C3AED] font-semibold hover:underline p-0 h-auto" onClick={() => { setIsOpen(false); router.push('/voice'); }}>
+                    Upload your first voice
+                  </Button>
+                </Card>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <Label>Select Avatar</Label>
-              <Card className="p-6 bg-background border-border text-center border-dashed">
-                <p className="text-sm text-muted-foreground mb-2">No avatars yet — Upload one first</p>
-                <Button variant="link" className="text-violet-400">Go to Avatars</Button>
-              </Card>
+            <div className="space-y-2.5">
+              <Label className="text-sm font-semibold text-[#1E1B4B]">Select Avatar</Label>
+              {avatars.length > 0 ? (
+                <Select value={selectedAvatar} onValueChange={(val) => setSelectedAvatar(val || '')}>
+                  <SelectTrigger className="w-full bg-[#F8F7FC] border-[#E5E3EB] rounded-xl text-[#1E1B4B] h-11">
+                    <SelectValue placeholder="Select an avatar profile" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-[#E5E3EB] text-[#1E1B4B] rounded-xl shadow-lg">
+                    {avatars.map((a) => (
+                      <SelectItem key={a.id} value={a.id} className="focus:bg-[#EDE9FE] focus:text-[#7C3AED] cursor-pointer">
+                        {a.name} {a.is_default ? '(Default)' : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Card className="p-6 bg-[#F8F7FC] border-[#E5E3EB] text-center border-dashed rounded-2xl">
+                  <p className="text-sm text-[#78767B] mb-2">No avatars available</p>
+                  <Button variant="link" className="text-[#7C3AED] font-semibold hover:underline p-0 h-auto" onClick={() => { setIsOpen(false); router.push('/avatars'); }}>
+                    Upload your first avatar
+                  </Button>
+                </Card>
+              )}
             </div>
 
             <div className="flex justify-between pt-4">
-              <Button variant="outline" onClick={handleBack} disabled={loading}>Back</Button>
-              <Button onClick={handleCreate} disabled={loading} className="bg-violet-600 hover:bg-violet-700 text-white">
+              <Button variant="outline" onClick={handleBack} disabled={loading} className="h-10 px-6 rounded-xl border border-[#E5E3EB] text-[#1E1B4B] hover:bg-[#F8F7FC]">Back</Button>
+              <Button onClick={handleCreate} disabled={loading} className="h-10 px-6 rounded-xl btn-gradient text-white text-sm font-semibold">
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Generate Video
               </Button>

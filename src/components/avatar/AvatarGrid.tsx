@@ -98,7 +98,7 @@ export default function AvatarGrid({ initialProfiles }: AvatarGridProps) {
   if (!initialized) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-64 rounded-xl bg-[#0D0D0D]" />)}
+        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-64 rounded-xl bg-[#F1F0F5]" />)}
       </div>
     );
   }
@@ -123,15 +123,18 @@ export default function AvatarGrid({ initialProfiles }: AvatarGridProps) {
           ))}
         </div>
       ) : (
-        <div className="col-span-full flex flex-col items-center justify-center p-12 border border-dashed border-border rounded-lg text-center bg-[#0D0D0D] py-24">
-          <div className="bg-violet-600/20 p-4 rounded-full mb-4">
-            <User className="text-violet-400 w-8 h-8" />
+        <div className="col-span-full flex flex-col items-center justify-center p-12 border-2 border-dashed border-[#E5E3EB] rounded-2xl text-center bg-white py-20">
+          <div className="w-14 h-14 bg-[#EDE9FE] rounded-2xl flex items-center justify-center mb-4">
+            <User className="text-[#7C3AED]" size={24} />
           </div>
-          <h3 className="text-xl font-medium mb-2">No avatars yet</h3>
-          <p className="text-muted-foreground max-w-md mb-6">Upload a photo or video to create your AI presenter.</p>
-          <Button onClick={() => setIsModalOpen(true)} className="bg-violet-600 hover:bg-violet-700 text-white">
+          <h3 className="text-lg font-semibold text-[#1E1B4B] mb-1">No avatars yet</h3>
+          <p className="text-sm text-[#78767B] max-w-md mb-6">Upload a photo or video to create your AI presenter.</p>
+          <button 
+            onClick={() => setIsModalOpen(true)} 
+            className="h-10 px-6 rounded-xl btn-gradient text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
             Upload your first avatar
-          </Button>
+          </button>
         </div>
       )}
 

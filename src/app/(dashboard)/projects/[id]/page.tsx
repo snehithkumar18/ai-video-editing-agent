@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Play, Download, Edit2, Film, Mic, FileText } from 'lucide-react';
 
-export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -18,7 +19,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
       *,
       project_assets (*)
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
     .single();
 

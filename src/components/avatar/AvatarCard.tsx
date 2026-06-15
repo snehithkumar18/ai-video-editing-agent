@@ -20,75 +20,75 @@ export default function AvatarCard({ profile, onDelete, onSetDefault }: AvatarCa
 
   return (
     <>
-      <Card className="bg-[#0D0D0D] border-border hover:border-violet-500/50 transition-all duration-300 group overflow-hidden flex flex-col">
-        <div className="relative aspect-square bg-black border-b border-border">
+      <Card className="bg-white border border-[#E5E3EB] hover:border-[#C4B5FD] transition-all duration-300 group overflow-hidden flex flex-col rounded-2xl shadow-sm hover:shadow-md">
+        <div className="relative aspect-square bg-[#F8F7FC] border-b border-[#E5E3EB]">
           {profile.preview_image_url ? (
             <img 
               src={profile.preview_image_url} 
               alt={profile.name} 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-violet-900/10 text-violet-500/50">
-              <User size={64} />
+            <div className="w-full h-full flex items-center justify-center bg-[#EDE9FE]/30 text-[#7C3AED]/40">
+              <User size={56} />
             </div>
           )}
 
           {profile.status === 'processing' && (
-            <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center backdrop-blur-sm">
-              <Loader2 className="w-8 h-8 text-violet-500 animate-spin mb-2" />
-              <span className="text-sm font-medium text-white">Processing...</span>
+            <div className="absolute inset-0 bg-[#1E1B4B]/80 flex flex-col items-center justify-center backdrop-blur-sm">
+              <Loader2 className="w-8 h-8 text-[#7C3AED] animate-spin mb-2" />
+              <span className="text-xs font-semibold text-white tracking-wider uppercase">Processing...</span>
             </div>
           )}
 
           {profile.status === 'failed' && (
-            <div className="absolute inset-0 bg-red-950/80 flex flex-col items-center justify-center backdrop-blur-sm p-4 text-center">
-              <XCircle className="w-8 h-8 text-red-500 mb-2" />
-              <span className="text-sm font-medium text-white mb-1">Processing Failed</span>
+            <div className="absolute inset-0 bg-red-900/95 flex flex-col items-center justify-center backdrop-blur-sm p-4 text-center">
+              <XCircle className="w-8 h-8 text-red-100 mb-2" />
+              <span className="text-xs font-bold text-white tracking-wider uppercase">Processing Failed</span>
             </div>
           )}
 
           <div className="absolute top-2 right-2 flex gap-1">
-            <Badge variant="secondary" className="bg-black/60 backdrop-blur-md text-white border-white/10 shadow-lg">
-              {profile.file_type === 'image' ? <ImageIcon size={12} className="mr-1" /> : <Video size={12} className="mr-1" />}
+            <Badge variant="secondary" className="bg-[#1E1B4B]/80 backdrop-blur-md text-white border-none shadow-sm px-2.5 py-0.5 rounded-lg text-[10px] font-semibold tracking-wide flex items-center gap-1">
+              {profile.file_type === 'image' ? <ImageIcon size={11} /> : <Video size={11} />}
               {profile.file_type === 'image' ? 'Photo' : 'Video'}
             </Badge>
           </div>
         </div>
 
-        <CardHeader className="p-4 flex flex-row items-center justify-between mt-auto">
-          <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-            <h3 className="font-bold text-base text-white truncate pr-2">{profile.name}</h3>
+        <CardHeader className="p-3.5 flex flex-row items-center justify-between mt-auto">
+          <div className="flex flex-col gap-1 min-w-0 flex-1">
+            <h3 className="font-bold text-sm text-[#1E1B4B] truncate pr-2">{profile.name}</h3>
             {profile.is_default && (
-              <div>
-                <Badge variant="outline" className="bg-violet-600/20 text-violet-400 border-violet-600/30 font-normal">
-                  <CheckCircle2 size={12} className="mr-1" /> Default
+              <div className="mt-0.5">
+                <Badge variant="outline" className="bg-[#EDE9FE] text-[#7C3AED] border-[#7C3AED]/20 font-semibold text-[10px] px-2 py-0">
+                  <CheckCircle2 size={10} className="mr-1" /> Default
                 </Badge>
               </div>
             )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-white shrink-0">
-                <MoreVertical size={18} />
+              <Button variant="ghost" size="icon" className="w-8 h-8 text-[#78767B] hover:text-[#1E1B4B] hover:bg-[#F1F0F5] rounded-lg shrink-0">
+                <MoreVertical size={16} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-[#1A1A1A] border-border text-white">
+            <DropdownMenuContent align="end" className="w-44 bg-white border border-[#E5E3EB] text-[#1E1B4B] rounded-xl shadow-lg">
               <DropdownMenuItem 
                 disabled={profile.is_default || profile.status !== 'ready'}
                 onClick={onSetDefault}
-                className="cursor-pointer focus:bg-white/10"
+                className="cursor-pointer text-xs font-medium focus:bg-[#EDE9FE] focus:text-[#7C3AED]"
               >
-                <CheckCircle2 className="mr-2 h-4 w-4" /> Set as default
+                <CheckCircle2 className="mr-2 h-3.5 w-3.5" /> Set as default
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer focus:bg-white/10">
-                <Edit2 className="mr-2 h-4 w-4" /> Rename
+              <DropdownMenuItem className="cursor-pointer text-xs font-medium focus:bg-[#EDE9FE] focus:text-[#7C3AED]">
+                <Edit2 className="mr-2 h-3.5 w-3.5" /> Rename
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-red-400 focus:text-red-400 focus:bg-red-500/10 cursor-pointer"
+                className="text-red-500 focus:text-red-500 focus:bg-red-50 focus:bg-red-500/10 cursor-pointer text-xs font-medium"
               >
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -96,19 +96,19 @@ export default function AvatarCard({ profile, onDelete, onSetDefault }: AvatarCa
       </Card>
 
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <DialogContent className="bg-[#0D0D0D] border-border text-white sm:max-w-md">
+        <DialogContent className="bg-white border border-[#E5E3EB] text-[#1E1B4B] rounded-3xl p-6 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete Avatar Profile</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-[#1E1B4B]">Delete Avatar Profile</DialogTitle>
           </DialogHeader>
-          <div className="py-4 text-muted-foreground text-sm">
-            Are you sure you want to delete "{profile.name}"? This action cannot be undone and videos using this avatar may be affected.
+          <div className="py-4 text-[#78767B] text-sm leading-relaxed">
+            Are you sure you want to delete <span className="font-semibold text-[#1E1B4B]">"{profile.name}"</span>? This action cannot be undone and videos using this avatar may be affected.
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)} className="border-border">Cancel</Button>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)} className="h-10 px-5 rounded-xl border border-[#E5E3EB] text-[#1E1B4B] hover:bg-[#F8F7FC]">Cancel</Button>
             <Button variant="destructive" onClick={() => {
               onDelete();
               setShowDeleteConfirm(false);
-            }}>Delete</Button>
+            }} className="h-10 px-5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold">Delete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

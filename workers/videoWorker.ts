@@ -47,7 +47,7 @@ const worker = new Worker(
       throw error;
     }
   },
-  { connection, concurrency: 2, maxStalledCount: 3 }
+  { connection: connection as any, concurrency: 2, maxStalledCount: 3 }
 );
 
 worker.on('completed', (job) => logger.info(`[Worker] Completed: ${job.name} (${job.id})`));

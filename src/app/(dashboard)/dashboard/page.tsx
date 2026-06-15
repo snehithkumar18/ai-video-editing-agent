@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Plus, Video, Mic, User, Film, LayoutGrid, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import ProjectListItem from '@/components/dashboard/ProjectListItem'
 import Link from 'next/link'
+import CreateProjectModal from '@/components/dashboard/CreateProjectModal'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -128,10 +129,14 @@ export default async function DashboardPage() {
             </div>
             <h3 className="text-base font-semibold text-[#1E1B4B] mb-1">No projects yet</h3>
             <p className="text-sm text-[#78767B] mb-5">Create your first AI video to get started.</p>
-            <button className="h-10 px-6 rounded-xl btn-gradient text-white text-sm font-semibold flex items-center gap-2">
-              <Plus size={16} />
-              Create Project
-            </button>
+            <CreateProjectModal 
+              trigger={
+                <button className="h-10 px-6 rounded-xl btn-gradient text-white text-sm font-semibold flex items-center gap-2">
+                  <Plus size={16} />
+                  Create Project
+                </button>
+              }
+            />
           </div>
         )}
       </div>

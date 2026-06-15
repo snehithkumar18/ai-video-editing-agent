@@ -15,7 +15,7 @@ const connection = isRedisConfigured
 
 export const videoQueue = isRedisConfigured
   ? new Queue('video-generation', {
-      connection: connection!,
+      connection: connection as any,
       defaultJobOptions: {
         removeOnComplete: 100,
         removeOnFail: 200,

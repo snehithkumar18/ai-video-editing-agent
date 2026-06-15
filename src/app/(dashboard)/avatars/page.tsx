@@ -38,8 +38,8 @@ export default async function AvatarsPage() {
           <p className="text-muted-foreground mt-1">Upload your face once, animate it in every video</p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-sm text-muted-foreground bg-[#0D0D0D] px-3 py-1.5 rounded-md border border-border">
-            <span className="text-foreground font-medium">{currentCount}</span> of {maxAvatars} avatars used
+          <div className="text-sm text-[#78767B] bg-[#F8F7FC] px-3.5 py-2 rounded-xl border border-[#E5E3EB] font-medium">
+            <span className="text-[#1E1B4B] font-semibold">{currentCount}</span> of {maxAvatars} avatars used
           </div>
         </div>
       </div>

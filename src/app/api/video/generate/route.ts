@@ -22,7 +22,7 @@ const connection = isRedisConfigured
   : null;
 
 const flowProducer = isRedisConfigured
-  ? new FlowProducer({ connection: connection! })
+  ? new FlowProducer({ connection: connection as any })
   : ({
       add: async (flow: MockFlow) => {
         logger.info('[Mock FlowProducer] Adding flow:', flow);

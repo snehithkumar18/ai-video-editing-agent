@@ -1,10 +1,8 @@
 import { Job } from 'bullmq';
 import { createClient } from '@/lib/supabase/admin';
 import { uploadFromUrl } from '@/lib/services/storageService';
-import Replicate from 'replicate';
+import { client, handle_file } from '@gradio/client';
 import logger from '@/lib/logger';
-
-const replicate = new Replicate({ auth: process.env.REPLICATE_API_KEY });
 
 export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: string }> {
   const { projectId, avatarProfileId, audioUrl } = job.data;
@@ -21,52 +19,109 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
     throw new Error(`Avatar profile missing or not processed: ${avatarProfileId}`);
   }
 
-  // 2. Call LatentSync on Replicate
+  const hfToken = process.env.HUGGINGFACE_TOKEN;
+
+  // 2. Call LatentSync on Hugging Face Spaces
   let outputUrl: string;
   try {
-    const output = (await replicate.run(
-      "bytedance/latentsync:9c4e108bed9ea4e5e8b7ca30296a82dc2c4eb1f43fd32d7e19d0c1e14e2d8892",
-      {
-        input: {
-          video: avatarProfile.processed_asset_url,
-          audio: audioUrl,
-        }
-      }
-    )) as any;
-    outputUrl = output;
-  } catch (error) {
-    logger.warn('LatentSync failed, falling back to SadTalker', error);
-    const output = (await replicate.run(
-      "cjwbw/sadtalker:3aa3dac9353cc4d6bd62a8f95957bd844003b401ca4e4a9b33baa574c549d376",
-      { 
-        input: { 
-          source_image: avatarProfile.processed_asset_url, 
-          driven_audio: audioUrl, 
-          preprocess: 'crop', 
-          still_mode: false 
-        } 
-      }
-    )) as any;
-    outputUrl = output;
+    const space = process.env.HF_SPACE_LATENTSYNC || 'fffiloni/LatentSync';
+    logger.info(`Connecting to HF Space for LatentSync: ${space}`);
+    const app = await client(space, hfToken ? { hf_token: hfToken } : {});
+    
+    logger.info(`Running LatentSync prediction...`);
+    const result = await app.predict('/generate_lip_sync_video', [
+      handle_file(avatarProfile.processed_asset_url),
+      handle_file(audioUrl)
+    ]);
+    
+    const outputData = result.data as any;
+    if (!outputData || !outputData[0]) {
+      throw new Error('LatentSync failed: empty response from HF Space');
+    }
+    const fileObj = outputData[0];
+    let url = typeof fileObj === 'string' ? fileObj : fileObj.url || fileObj.path;
+    if (url && url.startsWith('/')) {
+      const spaceHost = space.replace('/', '-').toLowerCase();
+      url = `https://${spaceHost}.hf.space${url}`;
+    }
+    outputUrl = url;
+  } catch (error: any) {
+    logger.warn('LatentSync failed, falling back to SadTalker via HF Spaces', error);
+    const sadTalkerSpace = process.env.HF_SPACE_SADTALKER || 'kevinwang676/SadTalker';
+    const app = await client(sadTalkerSpace, hfToken ? { hf_token: hfToken } : {});
+    
+    logger.info(`Running SadTalker prediction on ${sadTalkerSpace}...`);
+    const result = await app.predict(0, [
+      handle_file(avatarProfile.processed_asset_url), // Source image
+      handle_file(audioUrl), // Input audio
+      'crop', // preprocess
+      false, // still mode
+      false, // GFPGAN as Face enhancer
+      0, // batch size
+      '256', // face model resolution
+      0 // pose style
+    ]);
+    
+    const outputData = result.data as any;
+    if (!outputData || !outputData[0]) {
+      throw new Error('SadTalker fallback failed: empty response from HF Space');
+    }
+    const fileObj = outputData[0];
+    let url = typeof fileObj === 'string' ? fileObj : fileObj.url || fileObj.path;
+    if (url && url.startsWith('/')) {
+      const spaceHost = sadTalkerSpace.replace('/', '-').toLowerCase();
+      url = `https://${spaceHost}.hf.space${url}`;
+    }
+    outputUrl = url;
   }
 
-  // 3. Download from Replicate, re-upload to R2
+  // 3. Download from HF Space, re-upload to storage (R2/Supabase)
   const reuploadedKey = `project-assets/${projectId}/lipsync_${Date.now()}.mp4`;
   const reuploadedVideoUrl = await uploadFromUrl(outputUrl, reuploadedKey, 'video/mp4');
 
-  // 4. Run GFPGAN enhancement (optional/fallback in case it fails to not block pipeline)
+  // 4. Run face enhancement (optional/fallback in case it fails to not block pipeline)
   let finalVideoUrl = reuploadedVideoUrl;
   try {
-    const enhanced = (await replicate.run(
-      "tencentarc/gfpgan:9283608cc6b7be6b65a8e44983db012355fde4132009bf99d976b2f0896856a3",
-      { input: { img: reuploadedVideoUrl, version: '1.4', scale: 2 } }
-    )) as any;
-    
-    // 5. Re-upload enhanced result to R2
-    const enhancedKey = `project-assets/${projectId}/lipsync_enhanced_${Date.now()}.mp4`;
-    finalVideoUrl = await uploadFromUrl(enhanced, enhancedKey, 'video/mp4');
+    const enhanceSpace = process.env.HF_SPACE_GFPGAN || process.env.HF_SPACE_CODEFORMER;
+    if (enhanceSpace) {
+      logger.info(`Running face enhancement on HF Space ${enhanceSpace}...`);
+      const app = await client(enhanceSpace, hfToken ? { hf_token: hfToken } : {});
+      const isCodeFormer = enhanceSpace.toLowerCase().includes('codeformer');
+      
+      let result;
+      if (isCodeFormer) {
+        result = await app.predict('/inference', [
+          handle_file(reuploadedVideoUrl), // image
+          true, // face_align
+          true, // background_enhance
+          true, // face_upsample
+          2, // upscale
+          0.5 // codeformer_fidelity
+        ]);
+      } else {
+        result = await app.predict(0, [
+          handle_file(reuploadedVideoUrl),
+          '1.4',
+          2
+        ]);
+      }
+      
+      const outputData = result.data as any;
+      if (outputData && outputData[0]) {
+        const fileObj = outputData[0];
+        let enhancedUrl = typeof fileObj === 'string' ? fileObj : fileObj.url || fileObj.path;
+        if (enhancedUrl && enhancedUrl.startsWith('/')) {
+          const spaceHost = enhanceSpace.replace('/', '-').toLowerCase();
+          enhancedUrl = `https://${spaceHost}.hf.space${enhancedUrl}`;
+        }
+        
+        // 5. Re-upload enhanced result to storage
+        const enhancedKey = `project-assets/${projectId}/lipsync_enhanced_${Date.now()}.mp4`;
+        finalVideoUrl = await uploadFromUrl(enhancedUrl, enhancedKey, 'video/mp4');
+      }
+    }
   } catch (enhanceError) {
-    logger.warn('GFPGAN enhancement failed, proceeding with original lip-sync', enhanceError);
+    logger.warn('Face enhancement failed, proceeding with original lip-sync', enhanceError);
   }
 
   // 6. Save as project_asset
@@ -84,3 +139,4 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
 
   return { videoUrl: finalVideoUrl };
 }
+

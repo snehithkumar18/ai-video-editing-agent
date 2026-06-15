@@ -217,22 +217,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Project script is empty' }, { status: 400 });
     }
 
-    // 4. Check user has render_credits > 0
-    const { data: userData } = await supabase
-      .from('users')
-      .select('render_credits')
-      .eq('id', user.id)
-      .single();
+    // 4. Atomically check and deduct 1 credit (prevents race conditions)
+    // Uses a single UPDATE ... WHERE render_credits > 0 to make the operation atomic
+    const { data: deductResult, error: deductError } = await supabase
+      .rpc('deduct_render_credits', { p_user_id: user.id, p_cost: 1 });
 
-    if ((userData?.render_credits || 0) <= 0) {
-      return NextResponse.json({ success: false, error: 'Not enough render credits' }, { status: 403 });
+    if (deductError || !deductResult) {
+      return NextResponse.json(
+        { success: false, error: 'Not enough render credits' },
+        { status: 403 }
+      );
     }
-
-    // 5. Deduct 1 credit
-    await supabase
-      .from('users')
-      .update({ render_credits: (userData?.render_credits || 0) - 1 })
-      .eq('id', user.id);
 
     // 6. Update project status
     await supabase

@@ -82,33 +82,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Project not found' }, { status: 404 });
     }
 
-    // 2. Check credits
-    const { data: userData } = await supabase
-      .from('users')
-      .select('render_credits, plan')
-      .eq('id', user.id)
-      .single();
-
-    const currentCredits = userData?.render_credits || 0;
-    
-    // Determine credit cost based on quality
+    // 2. Determine credit cost based on quality
     let cost = 1;
     if (quality === '1080p') cost = 2;
     if (quality === '4K') cost = 4;
 
-    if (userData?.plan !== 'agency' && currentCredits < cost) {
-      return NextResponse.json({ 
-        success: false, 
-        error: `Not enough credits. You need ${cost} credits to export in ${quality}.` 
-      }, { status: 403 });
-    }
+    // 3. Atomically check and deduct credits (prevents race conditions)
+    const { data: userData } = await supabase
+      .from('users')
+      .select('plan')
+      .eq('id', user.id)
+      .single();
 
-    // 3. Deduct credits
     if (userData?.plan !== 'agency') {
-      await supabase
-        .from('users')
-        .update({ render_credits: currentCredits - cost })
-        .eq('id', user.id);
+      const { data: deductResult, error: deductError } = await supabase
+        .rpc('deduct_render_credits', { p_user_id: user.id, p_cost: cost });
+
+      if (deductError || !deductResult) {
+        return NextResponse.json({
+          success: false,
+          error: `Not enough credits. You need ${cost} credits to export in ${quality}.`
+        }, { status: 403 });
+      }
     }
 
     // Update project status

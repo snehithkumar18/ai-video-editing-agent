@@ -2,19 +2,27 @@ import Stripe from 'stripe';
 
 type StripeCtorOptions = ConstructorParameters<typeof Stripe>[1];
 
-function getStripeKey(): string {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
-    throw new Error(
-      '[stripe] Missing STRIPE_SECRET_KEY environment variable. ' +
-      'Set it in .env.local or your deployment environment.'
-    );
-  }
-  return key;
-}
+let stripeInstance: Stripe | null = null;
 
-export const stripe = new Stripe(getStripeKey(), {
-  apiVersion: '2024-10-28.acacia' as any,
+export const stripe = new Proxy({} as Stripe, {
+  get(target, prop, receiver) {
+    if (prop === '$$typeof' || prop === 'then') {
+      return undefined;
+    }
+    if (!stripeInstance) {
+      const key = process.env.STRIPE_SECRET_KEY;
+      if (!key) {
+        throw new Error(
+          '[stripe] Missing STRIPE_SECRET_KEY environment variable. ' +
+          'Set it in .env.local or your deployment environment.'
+        );
+      }
+      stripeInstance = new Stripe(key, {
+        apiVersion: '2024-10-28.acacia' as any,
+      });
+    }
+    return Reflect.get(stripeInstance, prop, receiver);
+  }
 });
 
 export const PLANS = {

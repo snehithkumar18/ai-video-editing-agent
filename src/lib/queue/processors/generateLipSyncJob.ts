@@ -26,7 +26,7 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
   try {
     const space = process.env.HF_SPACE_LATENTSYNC || 'fffiloni/LatentSync';
     logger.info(`Connecting to HF Space for LatentSync: ${space}`);
-    const app = await client(space, hfToken ? { hf_token: hfToken } : {});
+    const app = await client(space, hfToken ? { token: hfToken as `hf_${string}` } : {});
     
     logger.info(`Running LatentSync prediction...`);
     const result = await app.predict('/generate_lip_sync_video', [
@@ -48,7 +48,7 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
   } catch (error: any) {
     logger.warn('LatentSync failed, falling back to SadTalker via HF Spaces', error);
     const sadTalkerSpace = process.env.HF_SPACE_SADTALKER || 'kevinwang676/SadTalker';
-    const app = await client(sadTalkerSpace, hfToken ? { hf_token: hfToken } : {});
+    const app = await client(sadTalkerSpace, hfToken ? { token: hfToken as `hf_${string}` } : {});
     
     logger.info(`Running SadTalker prediction on ${sadTalkerSpace}...`);
     const result = await app.predict(0, [
@@ -85,7 +85,7 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
     const enhanceSpace = process.env.HF_SPACE_GFPGAN || process.env.HF_SPACE_CODEFORMER;
     if (enhanceSpace) {
       logger.info(`Running face enhancement on HF Space ${enhanceSpace}...`);
-      const app = await client(enhanceSpace, hfToken ? { hf_token: hfToken } : {});
+      const app = await client(enhanceSpace, hfToken ? { token: hfToken as `hf_${string}` } : {});
       const isCodeFormer = enhanceSpace.toLowerCase().includes('codeformer');
       
       let result;

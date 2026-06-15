@@ -33,7 +33,7 @@ export const avatarService = {
       const space = process.env.HF_SPACE_REMBG || 'briaai/BRIA-RMBG-2.0';
       logger.info(`Removing background using HF Space: ${space}`);
       const hfToken = process.env.HUGGINGFACE_TOKEN;
-      const app = await client(space, hfToken ? { hf_token: hfToken } : {});
+      const app = await client(space, hfToken ? { token: hfToken as `hf_${string}` } : {});
       
       let result;
       if (storageUrl) {
@@ -41,7 +41,7 @@ export const avatarService = {
         result = await app.predict('/text', [storageUrl]);
       } else {
         logger.info(`Calling BRIA-RMBG-2.0 /image endpoint with Blob`);
-        const blob = new Blob([imageBuffer]);
+        const blob = new Blob([new Uint8Array(imageBuffer)]);
         result = await app.predict('/image', [blob]);
       }
       

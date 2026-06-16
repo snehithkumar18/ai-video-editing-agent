@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/admin';
 
 const supabase = createClient();
-const BUCKET_NAME = process.env.CLOUDFLARE_R2_BUCKET_NAME || 'ai-video-assets';
+const BUCKET_NAME = process.env.SUPABASE_STORAGE_BUCKET || 'ai-video-assets';
 
 export async function uploadBuffer(buffer: Buffer, key: string, contentType: string): Promise<string> {
   const { data, error } = await supabase.storage

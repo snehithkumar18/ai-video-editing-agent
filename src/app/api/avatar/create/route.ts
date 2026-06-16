@@ -146,8 +146,8 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         name: validatedData.data.avatarName,
-        source_asset_url: validatedData.data.storageUrl,
-        type: validatedData.data.fileType,
+        original_asset_url: validatedData.data.storageUrl,
+        file_type: validatedData.data.fileType,
         status: 'processing',
         is_default: isFirstAvatar,
       })

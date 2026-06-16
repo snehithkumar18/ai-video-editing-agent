@@ -38,7 +38,7 @@ export async function DELETE(
       }
     };
 
-    await deleteFiles(avatarProfile.source_asset_url);
+    await deleteFiles(avatarProfile.original_asset_url);
     await deleteFiles(avatarProfile.processed_asset_url);
     await deleteFiles(avatarProfile.preview_image_url);
 

@@ -151,7 +151,7 @@ export default function AvatarUploadModal({ open = false, onClose = () => {}, on
   const body = (
     <div className="py-2">
       {step === 'idle' && !file && (
-        <Tabs defaultValue="image" className="w-full" onValueChange={(v) => setFileType(v as FileType)}>
+        <Tabs defaultValue="image" className="w-full flex flex-col" onValueChange={(v) => setFileType(v as FileType)}>
           <TabsList className="grid w-full grid-cols-2 mb-6 bg-[#F8F7FC] border border-[#E5E3EB] p-1 rounded-xl">
             <TabsTrigger value="image" className="rounded-lg text-xs font-semibold text-[#78767B] data-[state=active]:bg-white data-[state=active]:text-[#7C3AED] data-[state=active]:shadow-sm">
               <ImageIcon className="w-4 h-4 mr-2" /> Photo Avatar

@@ -25,66 +25,66 @@ export default async function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Settings</h1>
-        <p className="text-muted-foreground">Manage your account preferences and integrations.</p>
+        <h1 className="text-3xl font-bold tracking-tight mb-2 text-[#1E1B4B]">Settings</h1>
+        <p className="text-[#78767B]">Manage your account preferences and integrations.</p>
       </div>
 
-      <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full max-w-[400px] grid-cols-4 bg-[#0D0D0D] border border-border">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="notifications">Alerts</TabsTrigger>
-          <TabsTrigger value="api">API Keys</TabsTrigger>
-          <TabsTrigger value="danger" className="text-red-400 data-[state=active]:text-red-500">Danger</TabsTrigger>
+      <Tabs defaultValue="profile" className="w-full flex flex-col">
+        <TabsList className="grid w-full max-w-[400px] grid-cols-4 bg-[#F8F7FC] border border-[#E5E3EB] p-1 rounded-xl h-11">
+          <TabsTrigger value="profile" className="rounded-lg text-xs font-semibold text-[#78767B] data-[state=active]:bg-white data-[state=active]:text-[#7C3AED] data-[state=active]:shadow-sm">Profile</TabsTrigger>
+          <TabsTrigger value="notifications" className="rounded-lg text-xs font-semibold text-[#78767B] data-[state=active]:bg-white data-[state=active]:text-[#7C3AED] data-[state=active]:shadow-sm">Alerts</TabsTrigger>
+          <TabsTrigger value="api" className="rounded-lg text-xs font-semibold text-[#78767B] data-[state=active]:bg-white data-[state=active]:text-[#7C3AED] data-[state=active]:shadow-sm">API Keys</TabsTrigger>
+          <TabsTrigger value="danger" className="rounded-lg text-xs font-semibold text-red-500 data-[state=active]:bg-white data-[state=active]:text-red-600 data-[state=active]:shadow-sm">Danger</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-6 space-y-6">
-          <Card className="bg-[#0D0D0D] border-border">
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Update your display name and email preferences.</CardDescription>
+          <Card className="bg-white border-[#E5E3EB] rounded-3xl shadow-sm overflow-hidden">
+            <CardHeader className="p-6 pb-4">
+              <CardTitle className="text-lg font-bold text-[#1E1B4B]">Personal Information</CardTitle>
+              <CardDescription className="text-sm text-[#78767B]">Update your display name and email preferences.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-6 pt-0 space-y-5">
               <div className="space-y-2 max-w-[400px]">
-                <Label htmlFor="name">Full Name</Label>
-                <Input id="name" defaultValue={userData?.full_name || ''} className="bg-black" />
+                <Label htmlFor="name" className="text-sm font-semibold text-[#1E1B4B]">Full Name</Label>
+                <Input id="name" defaultValue={userData?.full_name || ''} className="bg-white border-[#E5E3EB] text-[#1E1B4B] rounded-xl h-11 focus-visible:ring-1 focus-visible:ring-[#7C3AED]" />
               </div>
               <div className="space-y-2 max-w-[400px]">
-                <Label htmlFor="email">Email Address</Label>
-                <Input id="email" value={user.email || ''} readOnly className="bg-black opacity-50 cursor-not-allowed" />
-                <p className="text-xs text-gray-500 mt-1">To change your email, please contact support.</p>
+                <Label htmlFor="email" className="text-sm font-semibold text-[#1E1B4B]">Email Address</Label>
+                <Input id="email" value={user.email || ''} readOnly className="bg-[#F8F7FC] border-[#E5E3EB] text-[#1E1B4B] opacity-70 cursor-not-allowed rounded-xl h-11" />
+                <p className="text-xs text-[#78767B] mt-1">To change your email, please contact support.</p>
               </div>
             </CardContent>
-            <CardFooter className="border-t border-border pt-4">
-              <Button className="bg-violet-600 hover:bg-violet-700 text-white">Save Changes</Button>
+            <CardFooter className="border-t border-[#E5E3EB] bg-[#F8F7FC]/50 p-6 flex justify-end">
+              <Button className="btn-gradient text-white rounded-xl h-11 px-5 font-semibold text-sm">Save Changes</Button>
             </CardFooter>
           </Card>
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-6">
-          <Card className="bg-[#0D0D0D] border-border">
-            <CardHeader>
-              <CardTitle>Email Notifications</CardTitle>
-              <CardDescription>Choose what alerts we send to your inbox.</CardDescription>
+          <Card className="bg-white border-[#E5E3EB] rounded-3xl shadow-sm overflow-hidden">
+            <CardHeader className="p-6 pb-4">
+              <CardTitle className="text-lg font-bold text-[#1E1B4B]">Email Notifications</CardTitle>
+              <CardDescription className="text-sm text-[#78767B]">Choose what alerts we send to your inbox.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
+            <CardContent className="p-6 pt-0 space-y-6">
+              <div className="flex items-center justify-between py-2">
                 <div className="space-y-0.5">
-                  <Label>Video Generation Complete</Label>
-                  <p className="text-sm text-gray-500">Receive an email when your video finishes rendering.</p>
+                  <Label className="text-sm font-semibold text-[#1E1B4B]">Video Generation Complete</Label>
+                  <p className="text-xs text-[#78767B]">Receive an email when your video finishes rendering.</p>
                 </div>
                 <Switch defaultChecked />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-2 border-t border-[#E5E3EB]/50">
                 <div className="space-y-0.5">
-                  <Label>Low Credits Warning</Label>
-                  <p className="text-sm text-gray-500">Get notified when you have 2 or fewer render credits left.</p>
+                  <Label className="text-sm font-semibold text-[#1E1B4B]">Low Credits Warning</Label>
+                  <p className="text-xs text-[#78767B]">Get notified when you have 2 or fewer render credits left.</p>
                 </div>
                 <Switch defaultChecked />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-2 border-t border-[#E5E3EB]/50">
                 <div className="space-y-0.5">
-                  <Label>Product Updates</Label>
-                  <p className="text-sm text-gray-500">News about new AI models, features, and fixes.</p>
+                  <Label className="text-sm font-semibold text-[#1E1B4B]">Product Updates</Label>
+                  <p className="text-xs text-[#78767B]">News about new AI models, features, and fixes.</p>
                 </div>
                 <Switch defaultChecked={false} />
               </div>
@@ -93,30 +93,32 @@ export default async function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="api" className="mt-6">
-          <Card className="bg-[#0D0D0D] border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><KeyRound size={20}/> API Access</CardTitle>
-              <CardDescription>Generate videos programmatically via the VidAgent REST API.</CardDescription>
+          <Card className="bg-white border-[#E5E3EB] rounded-3xl shadow-sm overflow-hidden">
+            <CardHeader className="p-6 pb-4">
+              <CardTitle className="text-lg font-bold text-[#1E1B4B] flex items-center gap-2"><KeyRound size={20} className="text-[#7C3AED]"/> API Access</CardTitle>
+              <CardDescription className="text-sm text-[#78767B]">Generate videos programmatically via the VidAgent REST API.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6 pt-0">
               {isProOrAgency ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Secret API Key</Label>
+                    <Label className="text-sm font-semibold text-[#1E1B4B]">Secret API Key</Label>
                     <div className="flex gap-3">
-                      <Input value="va_live_***********************************" readOnly className="bg-black font-mono text-gray-400" />
-                      <Button variant="outline">Copy</Button>
+                      <Input value="va_live_***********************************" readOnly className="bg-[#F8F7FC] border-[#E5E3EB] text-[#1E1B4B] font-mono rounded-xl h-11" />
+                      <Button variant="outline" className="border-[#E5E3EB] text-[#1E1B4B] rounded-xl hover:bg-[#F8F7FC] h-11 px-4">Copy</Button>
                     </div>
-                    <p className="text-xs text-yellow-500 mt-2">Never share this key. It grants full access to your account and credits.</p>
+                    <p className="text-xs text-amber-600 mt-2 font-medium">Never share this key. It grants full access to your account and credits.</p>
                   </div>
-                  <Button variant="secondary" className="mt-4">Regenerate Key</Button>
+                  <Button variant="secondary" className="bg-[#F8F7FC] hover:bg-[#EDE9FE]/50 text-[#7C3AED] border border-[#E5E3EB] rounded-xl h-11 px-5 font-semibold mt-4">Regenerate Key</Button>
                 </div>
               ) : (
-                <div className="py-6 flex flex-col items-center justify-center text-center border border-dashed border-border rounded-lg bg-black/50">
-                  <KeyRound size={32} className="text-gray-600 mb-4" />
-                  <h3 className="font-medium text-white mb-2">API Access requires Pro Plan</h3>
-                  <p className="text-sm text-gray-400 mb-6 max-w-[300px]">Upgrade to Pro or Agency to unlock programmatic generation and webhooks.</p>
-                  <Button asChild className="bg-violet-600 hover:bg-violet-700 text-white">
+                <div className="py-8 flex flex-col items-center justify-center text-center border border-dashed border-[#E5E3EB] rounded-2xl bg-[#F8F7FC]/50 p-6">
+                  <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7C3AED] flex items-center justify-center mb-4">
+                    <KeyRound size={22} />
+                  </div>
+                  <h3 className="font-bold text-[#1E1B4B] mb-1">API Access Requires Pro Plan</h3>
+                  <p className="text-sm text-[#78767B] mb-6 max-w-[320px]">Upgrade to Pro or Agency to unlock programmatic video generation and webhooks.</p>
+                  <Button asChild className="btn-gradient text-white rounded-xl h-11 px-6 font-semibold flex items-center justify-center text-sm">
                     <a href="/billing">View Plans</a>
                   </Button>
                 </div>
@@ -126,17 +128,17 @@ export default async function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="danger" className="mt-6">
-          <Card className="bg-red-950/10 border-red-900/30">
-            <CardHeader>
-              <CardTitle className="text-red-500 flex items-center gap-2"><ShieldAlert size={20}/> Danger Zone</CardTitle>
-              <CardDescription>Irreversible actions for your account.</CardDescription>
+          <Card className="bg-red-50/50 border border-red-200 rounded-3xl shadow-sm overflow-hidden">
+            <CardHeader className="p-6 pb-4">
+              <CardTitle className="text-red-600 flex items-center gap-2 font-bold"><ShieldAlert size={20}/> Danger Zone</CardTitle>
+              <CardDescription className="text-red-500/80 font-medium">Irreversible actions for your account.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-400 mb-4">
+            <CardContent className="p-6 pt-0">
+              <p className="text-sm text-red-700/80 mb-6 max-w-2xl leading-relaxed">
                 Deleting your account will immediately remove all your data, voice profiles, avatar models, and rendered videos. 
                 This action cannot be undone. Any active subscriptions will be cancelled.
               </p>
-              <Button variant="destructive">Delete Account Permanently</Button>
+              <Button variant="destructive" className="bg-red-600 hover:bg-red-700 text-white rounded-xl h-11 px-5 font-semibold">Delete Account Permanently</Button>
             </CardContent>
           </Card>
         </TabsContent>

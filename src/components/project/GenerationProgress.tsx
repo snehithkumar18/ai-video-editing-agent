@@ -62,13 +62,13 @@ export default function GenerationProgress({ projectId, initialProgress }: Gener
 
   if (status === 'failed') {
     return (
-      <Card className="bg-red-950/20 border-red-900/50 p-8 text-center max-w-2xl mx-auto">
-        <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto mb-6">
+      <Card className="bg-red-50/50 border border-red-200 p-8 text-center max-w-2xl mx-auto rounded-3xl shadow-sm">
+        <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
           <AlertCircle size={32} />
         </div>
-        <h3 className="text-xl font-bold text-white mb-2">Generation Failed</h3>
-        <p className="text-red-400 mb-8">{errorMsg}</p>
-        <Button onClick={() => window.location.reload()} variant="outline" className="border-red-900/50 hover:bg-red-900/20 text-red-100">
+        <h3 className="text-xl font-bold text-red-600 mb-2">Generation Failed</h3>
+        <p className="text-red-500 mb-8 text-sm font-medium">{errorMsg}</p>
+        <Button onClick={() => window.location.reload()} variant="outline" className="border-red-200 hover:bg-red-50 text-red-600 rounded-xl">
           Try Again
         </Button>
       </Card>
@@ -80,15 +80,15 @@ export default function GenerationProgress({ projectId, initialProgress }: Gener
   const estimatedMinutes = Math.ceil((remainingPercent / 100) * 3);
 
   return (
-    <Card className="bg-[#0D0D0D] border-border p-8 max-w-2xl mx-auto">
+    <Card className="bg-white border-[#E5E3EB] p-8 max-w-2xl mx-auto rounded-3xl shadow-sm">
       <div className="mb-10">
         <div className="flex justify-between items-end mb-2">
-          <span className="text-3xl font-bold text-white">{progress}%</span>
-          <span className="text-sm text-violet-400 font-medium">
+          <span className="text-3xl font-bold text-[#1E1B4B]">{progress}%</span>
+          <span className="text-sm text-[#7C3AED] font-semibold">
             {progress < 100 ? `About ${estimatedMinutes} min remaining` : 'Finalizing...'}
           </span>
         </div>
-        <div className="h-4 bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
+        <div className="h-4 bg-[#F8F7FC] rounded-full overflow-hidden border border-[#E5E3EB] relative">
           <div 
             className="absolute top-0 left-0 h-full bg-gradient-to-r from-violet-600 to-fuchsia-500 transition-all duration-1000 ease-out"
             style={{ width: `${progress}%` }}
@@ -114,24 +114,28 @@ export default function GenerationProgress({ projectId, initialProgress }: Gener
               )}
             >
               <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors duration-500",
-                isDone ? "bg-green-500/20 text-green-400" : (isActive ? "bg-violet-600/20 text-violet-400 border border-violet-500/30 shadow-[0_0_15px_rgba(124,58,237,0.3)]" : "bg-white/5 text-white/40")
+                "w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-all duration-500",
+                isDone 
+                  ? "bg-emerald-50 text-emerald-500 border-emerald-100" 
+                  : (isActive 
+                      ? "bg-[#EDE9FE] text-[#7C3AED] border-[#C4B5FD]/30 shadow-[0_0_15px_rgba(124,58,237,0.15)]" 
+                      : "bg-[#F8F7FC] text-[#B8B6BC] border-[#E5E3EB]")
               )}>
                 {isDone ? <CheckCircle2 size={20} /> : <Icon size={20} className={isActive ? "animate-pulse" : ""} />}
               </div>
               <div className="flex-1">
                 <h4 className={cn(
-                  "font-medium transition-colors duration-500",
-                  isActive ? "text-white text-lg" : (isDone ? "text-gray-300" : "text-gray-500")
+                  "font-semibold transition-colors duration-500 text-sm",
+                  isActive ? "text-[#1E1B4B] text-base" : (isDone ? "text-[#78767B]" : "text-[#B8B6BC]")
                 )}>
                   {step.label}
                 </h4>
               </div>
               {isActive && (
                 <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               )}
             </div>

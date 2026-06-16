@@ -34,12 +34,12 @@ export default async function VoicePage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Voice Profiles</h2>
-          <p className="text-muted-foreground mt-1">Upload your voice once, reuse in every video forever</p>
+          <h2 className="text-2xl font-bold tracking-tight text-[#1E1B4B]">Voice Profiles</h2>
+          <p className="text-[#78767B] mt-1 text-sm font-medium">Upload your voice once, reuse in every video forever</p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-sm text-muted-foreground bg-[#0D0D0D] px-3 py-1.5 rounded-md border border-border">
-            <span className="text-foreground font-medium">{currentCount}</span> of {maxVoices} voices used
+          <div className="text-sm text-[#78767B] bg-white px-3 py-1.5 rounded-xl border border-[#E5E3EB] shadow-sm">
+            <span className="text-[#1E1B4B] font-bold">{currentCount}</span> of {maxVoices} voices used
           </div>
         </div>
       </div>

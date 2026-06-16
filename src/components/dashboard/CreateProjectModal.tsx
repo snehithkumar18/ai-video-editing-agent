@@ -90,6 +90,28 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
     }
   }, [isOpen])
 
+  const [optimizing, setOptimizing] = useState(false)
+
+  const handleOptimize = async () => {
+    if (!script.trim()) return
+    setOptimizing(true)
+    try {
+      const res = await fetch('/api/project/optimize-script', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ script })
+      })
+      const data = await res.json()
+      if (data.success && data.optimizedScript) {
+        setScript(data.optimizedScript)
+      }
+    } catch (err) {
+      logger.error('Error optimizing script:', err)
+    } finally {
+      setOptimizing(false)
+    }
+  }
+
   const handleNext = () => setStep(step + 1)
   const handleBack = () => setStep(step - 1)
 
@@ -194,8 +216,12 @@ export default function CreateProjectModal({ open, onOpenChange, trigger }: Crea
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-semibold text-[#1E1B4B]">Script</Label>
-                <button className="h-8 rounded-lg bg-[#EDE9FE] text-[#7C3AED] hover:bg-[#E2DBFD] transition-colors border-none text-xs font-semibold px-3">
-                  Optimize with AI
+                <button 
+                  onClick={handleOptimize}
+                  disabled={optimizing || !script.trim()}
+                  className="h-8 rounded-lg bg-[#EDE9FE] text-[#7C3AED] hover:bg-[#E2DBFD] transition-colors border-none text-xs font-semibold px-3 disabled:opacity-50"
+                >
+                  {optimizing ? 'Optimizing...' : 'Optimize with AI'}
                 </button>
               </div>
               <Textarea 

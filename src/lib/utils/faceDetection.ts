@@ -49,22 +49,10 @@ export async function detectFaceInBuffer(imageBuffer: Buffer): Promise<{
   faceCount: number;
   confidence: number;
   error?: string;
-  bypassed?: boolean;
 }> {
   try {
-    try {
-      await loadFaceModels();
-    } catch (e) {
-      logger.warn('Skipping face detection: Face-api models are not available in public/models', e);
-      return {
-        faceDetected: true,
-        faceCount: 1,
-        confidence: 1.0,
-        bypassed: true
-      };
-    }
-
     const faceapi = await getFaceApi();
+    await loadFaceModels();
     const img = await loadImage(imageBuffer);
     const canvas = createCanvas(img.width, img.height);
     const ctx = canvas.getContext('2d');
@@ -79,13 +67,7 @@ export async function detectFaceInBuffer(imageBuffer: Buffer): Promise<{
       confidence: detections[0]?.score || 0,
     };
   } catch (err) {
-    logger.warn('Skipping face detection due to processing error:', err);
-    return {
-      faceDetected: true,
-      faceCount: 1,
-      confidence: 1.0,
-      bypassed: true,
-      error: String(err)
-    };
+    logger.error('Face detection processing error:', err);
+    throw err;
   }
 }

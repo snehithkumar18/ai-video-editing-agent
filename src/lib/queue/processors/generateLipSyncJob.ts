@@ -78,9 +78,9 @@ export async function processGenerateLipSync(job: Job): Promise<{ videoUrl: stri
     } catch (sadTalkerError: any) {
       logger.warn('SadTalker failed, falling back to Wav2Lip via Replicate', sadTalkerError);
       
-      const replicateToken = process.env.REPLICATE_API_TOKEN;
+      const replicateToken = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
       if (!replicateToken) {
-        throw new Error('REPLICATE_API_TOKEN is not configured. Wav2Lip fallback aborted.');
+        throw new Error('REPLICATE_API_TOKEN or REPLICATE_API_KEY is not configured. Wav2Lip fallback aborted.');
       }
       
       const replicate = new Replicate({ auth: replicateToken });

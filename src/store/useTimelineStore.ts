@@ -220,6 +220,11 @@ export const useTimelineStore = create<TimelineState>()(
             const clip = track.clips[0]
             lines.push(`AUDIO TRACK(${track.label}): volume ${clip?.volume || 1.0}, from ${clip?.start.toFixed(1)}s to ${clip?.end.toFixed(1)}s, id:${clip?.id}`)
           }
+          
+          if (track.type === 'music') {
+            const clip = track.clips[0]
+            lines.push(`MUSIC TRACK(${track.label}): volume ${clip?.volume || 1.0}, from ${clip?.start.toFixed(1)}s to ${clip?.end.toFixed(1)}s, id:${clip?.id}`)
+          }
         }
         
         return lines.join('\n')

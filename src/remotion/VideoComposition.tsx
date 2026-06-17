@@ -9,6 +9,7 @@ export const VideoComposition: React.FC<{ timeline: TimelineJSON }> = ({ timelin
   const avatarTrack = timeline.tracks.find(t => t.id === 'avatar-track');
   const audioTrack = timeline.tracks.find(t => t.id === 'audio-track');
   const captionTrack = timeline.tracks.find(t => t.id === 'caption-track');
+  const musicTrack = timeline.tracks.find(t => t.id === 'music-track');
 
   return (
     <AbsoluteFill style={{ backgroundColor: 'black' }}>
@@ -51,7 +52,19 @@ export const VideoComposition: React.FC<{ timeline: TimelineJSON }> = ({ timelin
         );
       })}
 
-      {/* 4. Caption Track */}
+      {/* 4. Background Music Track */}
+      {musicTrack?.visible && musicTrack.clips.map(clip => {
+        if (!clip.assetUrl) return null;
+        const from = Math.round(clip.start * fps);
+        const durationInFrames = Math.max(1, Math.round(clip.duration * fps));
+        return (
+          <Sequence key={clip.id} from={from} durationInFrames={durationInFrames}>
+            <Audio src={clip.assetUrl} volume={clip.volume ?? 0.2} />
+          </Sequence>
+        );
+      })}
+
+      {/* 5. Caption Track */}
       {captionTrack?.visible && captionTrack.clips.length > 0 && (
         <CaptionRenderer captions={captionTrack.clips} fps={fps} />
       )}

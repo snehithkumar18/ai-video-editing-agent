@@ -83,6 +83,10 @@ export async function processAssembleVideo(job: Job): Promise<{ finalVideoUrl: s
         {
           id: 'audio-track', type: 'audio', label: 'Voice', visible: true, locked: false,
           clips: [{ id: 'voice-1', assetUrl: audioAsset.url, start: 0, end: videoDuration, duration: videoDuration, volume: 1.0, locked: true }]
+        },
+        {
+          id: 'music-track', type: 'music', label: 'Background Music', visible: true, locked: false,
+          clips: []
         }
       ]
     };

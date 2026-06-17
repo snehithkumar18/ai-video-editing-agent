@@ -4,7 +4,7 @@ import { useRef, useEffect } from 'react';
 import { Clip, Track } from '@/lib/types/timeline';
 import { useTimelineStore } from '@/store/useTimelineStore';
 import { cn } from '@/lib/utils';
-import { FileText, Film, Mic, Video } from 'lucide-react';
+import { FileText, Film, Mic, Video, Music } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface TimelineClipProps {
@@ -88,6 +88,8 @@ export default function TimelineClip({ clip, track, zoom }: TimelineClipProps) {
     switch (track.type) {
       case 'video': return isSelected ? 'bg-indigo-500 border-indigo-400' : 'bg-indigo-600/80 border-indigo-500';
       case 'audio': return isSelected ? 'bg-emerald-500 border-emerald-400' : 'bg-emerald-600/80 border-emerald-500';
+      case 'music': return isSelected ? 'bg-violet-500 border-violet-400' : 'bg-violet-600/80 border-violet-500';
+      case 'sfx': return isSelected ? 'bg-teal-500 border-teal-400' : 'bg-teal-600/80 border-teal-500';
       case 'captions': return isSelected ? 'bg-amber-500 border-amber-400 text-black' : 'bg-amber-600/80 border-amber-500';
       default: return 'bg-gray-600 border-gray-500';
     }
@@ -97,6 +99,8 @@ export default function TimelineClip({ clip, track, zoom }: TimelineClipProps) {
     switch (track.type) {
       case 'video': return <Film size={12} className="shrink-0 opacity-70" />;
       case 'audio': return <Mic size={12} className="shrink-0 opacity-70" />;
+      case 'music': return <Music size={12} className="shrink-0 opacity-70" />;
+      case 'sfx': return <Mic size={12} className="shrink-0 opacity-70" />;
       case 'captions': return <FileText size={12} className="shrink-0 opacity-70" />;
       default: return <Video size={12} className="shrink-0 opacity-70" />;
     }

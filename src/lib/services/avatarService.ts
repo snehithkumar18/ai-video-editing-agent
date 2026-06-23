@@ -89,13 +89,13 @@ export const avatarService = {
     const contentType = backgroundRemoved ? 'image/png' : 'image/jpeg';
 
     const processedUrl = await uploadBuffer(
-      processedBuffer,
+      processedBuffer as any,
       `avatar-uploads/${userId}/processed/${avatarId}.${extension}`,
       contentType
     );
 
     const thumbnailUrl = await uploadBuffer(
-      thumbnailBuffer,
+      thumbnailBuffer as any,
       `avatar-uploads/${userId}/thumbnails/${avatarId}.${extension}`,
       contentType
     );

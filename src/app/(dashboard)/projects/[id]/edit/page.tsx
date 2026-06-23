@@ -22,8 +22,10 @@ export default async function EditorPage({ params }: { params: Promise<{ id: str
     notFound();
   }
 
-  // If no timeline exists or project is still drafting, they shouldn't be here yet
-  if (!project.timeline_json && project.status !== 'generating') {
+  // If no timeline tracks exist or project is still drafting, they shouldn't be here yet
+  const timeline = project.timeline_json as any;
+  const hasTracks = timeline && Array.isArray(timeline.tracks);
+  if (!hasTracks && project.status !== 'generating') {
     redirect(`/projects/${project.id}`);
   }
 

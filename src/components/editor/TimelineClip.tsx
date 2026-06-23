@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Clip, Track } from '@/lib/types/timeline';
 import { useTimelineStore } from '@/store/useTimelineStore';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,7 @@ interface TimelineClipProps {
   zoom: number;
 }
 
-export default function TimelineClip({ clip, track, zoom }: TimelineClipProps) {
+function TimelineClip({ clip, track, zoom }: TimelineClipProps) {
   const isSelected = useTimelineStore(s => s.selectedClipId === clip.id);
   const selectClip = useTimelineStore(s => s.selectClip);
   const moveClip = useTimelineStore(s => s.moveClip);
@@ -108,7 +108,7 @@ export default function TimelineClip({ clip, track, zoom }: TimelineClipProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild nativeButton={false}>
         <div
           ref={clipRef}
           onPointerDown={handlePointerDown}
@@ -154,3 +154,5 @@ export default function TimelineClip({ clip, track, zoom }: TimelineClipProps) {
     </DropdownMenu>
   );
 }
+
+export default React.memo(TimelineClip);

@@ -1,4 +1,4 @@
-import { AbsoluteFill, Sequence, Video, Audio } from 'remotion';
+import { AbsoluteFill, Sequence, Video, Audio, Img } from 'remotion';
 import { TimelineJSON } from '@/lib/types/timeline';
 import CaptionRenderer from './CaptionRenderer';
 
@@ -19,10 +19,17 @@ export const VideoComposition: React.FC<{ timeline: TimelineJSON }> = ({ timelin
         const durationInFrames = Math.max(1, Math.round(clip.duration * fps));
         return (
           <Sequence key={clip.id} from={from} durationInFrames={durationInFrames}>
-            <Video 
-              src={clip.assetUrl} 
-              style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
-            />
+            {clip.assetUrl?.match(/\.(png|jpg|jpeg|webp)/i) ? (
+              <Img 
+                src={clip.assetUrl} 
+                style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
+              />
+            ) : (
+              <Video 
+                src={clip.assetUrl} 
+                style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
+              />
+            )}
           </Sequence>
         );
       })}
@@ -33,10 +40,17 @@ export const VideoComposition: React.FC<{ timeline: TimelineJSON }> = ({ timelin
         const durationInFrames = Math.max(1, Math.round(clip.duration * fps));
         return (
           <Sequence key={clip.id} from={from} durationInFrames={durationInFrames}>
-            <Video 
-              src={clip.assetUrl} 
-              style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
-            />
+            {clip.assetUrl?.match(/\.(png|jpg|jpeg|webp)/i) ? (
+              <Img 
+                src={clip.assetUrl} 
+                style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
+              />
+            ) : (
+              <Video 
+                src={clip.assetUrl} 
+                style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
+              />
+            )}
           </Sequence>
         );
       })}

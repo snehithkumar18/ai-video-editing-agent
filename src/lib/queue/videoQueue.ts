@@ -1,68 +1,6 @@
-import { Queue } from 'bullmq';
-import Redis from 'ioredis';
-import { createClient } from '../supabase/server';
 import logger from '../logger';
 
-const isRedisConfigured = !!process.env.UPSTASH_REDIS_REST_URL;
-
-const connection = isRedisConfigured
-  ? new Redis(process.env.UPSTASH_REDIS_REST_URL!, {
-      password: process.env.UPSTASH_REDIS_REST_TOKEN!,
-      tls: {},
-      maxRetriesPerRequest: null,
-    })
-  : null;
-
-export const videoQueue = isRedisConfigured
-  ? new Queue('video-generation', {
-      connection: connection as any,
-      defaultJobOptions: {
-        removeOnComplete: 100,
-        removeOnFail: 200,
-        attempts: 3,
-        backoff: { type: 'exponential', delay: 10000 },
-      },
-    })
-  : ({
-      add: async (name: string, data: { projectId?: string }) => {
-        logger.info(`[Mock Queue] Adding job ${name} with data:`, data);
-        
-        const projectId = data.projectId;
-        if (!projectId) {
-          throw new Error('projectId is required for mock queue jobs');
-        }
-        const supabase = await createClient();
-        
-        setTimeout(async () => {
-          try {
-            await supabase.from('projects').update({ render_progress: 10 }).eq('id', projectId);
-            await new Promise(r => setTimeout(r, 1000));
-            
-            await supabase.from('projects').update({ render_progress: 35 }).eq('id', projectId);
-            await new Promise(r => setTimeout(r, 1000));
-            
-            await supabase.from('projects').update({ render_progress: 70 }).eq('id', projectId);
-            await new Promise(r => setTimeout(r, 1000));
-            
-            await supabase.from('projects').update({ render_progress: 95 }).eq('id', projectId);
-            await new Promise(r => setTimeout(r, 1000));
-            
-            await supabase.from('projects').update({
-              status: 'complete',
-              render_progress: 100,
-              final_video_url: 'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-smartphone-talking-to-camera-40156-large.mp4'
-            }).eq('id', projectId);
-            
-            logger.info(`[Mock Queue] Completed export job for project ${projectId}`);
-          } catch (e) {
-            logger.error('Error in mock export runner:', e);
-          }
-        }, 1000);
-        
-        return { id: 'mock-job-' + Date.now() };
-      }
-    } as unknown as Queue);
-
+// Job names used by both the flow producer and worker
 export const JOB_NAMES = {
   GENERATE_VOICE: 'GENERATE_VOICE',
   GENERATE_LIPSYNC: 'GENERATE_LIPSYNC',
@@ -71,3 +9,51 @@ export const JOB_NAMES = {
   ASSEMBLE_VIDEO: 'ASSEMBLE_VIDEO',
 };
 
+// Only create a real BullMQ Queue if Redis is configured
+// Otherwise, the generate route handles inline processing
+const isRedisConfigured = !!process.env.UPSTASH_REDIS_REST_URL;
+
+let videoQueue: any;
+
+if (isRedisConfigured) {
+  // Dynamically import to avoid connection errors at module load time
+  const Redis = require('ioredis');
+  const { Queue } = require('bullmq');
+
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL!;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  const connection = redisUrl.startsWith('https://')
+    ? new Redis({
+        host: redisUrl.replace('https://', ''),
+        port: 6379,
+        password: redisToken,
+        tls: {},
+        maxRetriesPerRequest: null,
+      })
+    : new Redis(redisUrl, {
+        password: redisToken,
+        tls: {},
+        maxRetriesPerRequest: null,
+      });
+
+  videoQueue = new Queue('video-generation', {
+    connection,
+    defaultJobOptions: {
+      removeOnComplete: 100,
+      removeOnFail: 200,
+      attempts: 3,
+      backoff: { type: 'exponential', delay: 10000 },
+    },
+  });
+} else {
+  // Stub queue - not used when inline processing is active
+  videoQueue = {
+    add: async (name: string, data: any) => {
+      logger.info(`[Stub Queue] Job ${name} would be queued. Inline processing handles this.`);
+      return { id: 'stub-' + Date.now() };
+    }
+  };
+}
+
+export { videoQueue };

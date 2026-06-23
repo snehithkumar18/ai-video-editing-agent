@@ -2,7 +2,7 @@ import Groq from 'groq-sdk';
 import { VoiceProfile } from '../types';
 import logger from '@/lib/logger';
 
-function getGroqKey(): string {
+function getGroq(): Groq {
   const key = process.env.GROQ_API_KEY;
   if (!key) {
     throw new Error(
@@ -10,24 +10,21 @@ function getGroqKey(): string {
       'Set it in .env.local or your deployment environment.'
     );
   }
-  return key;
+  return new Groq({ apiKey: key });
 }
 
-const groq = new Groq({ apiKey: getGroqKey() });
-
-export async function generateSpeechKokoro(text: string, voiceSampleUrl: string): Promise<Buffer> {
-  // Try Kokoro Space endpoint
-  const url = `https://${process.env.HF_USERNAME || 'example'}-kokoro-tts.hf.space/api/predict`;
+export async function generateSpeechGroqTTS(text: string, voiceSampleUrl: string): Promise<Buffer> {
+  // Use Groq's Orpheus TTS model (replaced decommissioned playai-tts)
+  const groq = getGroq();
   
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: [text, voiceSampleUrl] }),
+  const response = await groq.audio.speech.create({
+    model: 'canopylabs/orpheus-v1-english',
+    voice: 'Kore',
+    input: text,
+    response_format: 'mp3',
   });
 
-  if (!res.ok) throw new Error('Kokoro TTS failed');
-  
-  const arrayBuffer = await res.arrayBuffer();
+  const arrayBuffer = await response.arrayBuffer();
   return Buffer.from(arrayBuffer);
 }
 
@@ -89,10 +86,10 @@ export async function generateSpeechElevenLabs(text: string, voiceId: string): P
 
 export async function generateSpeech(text: string, voiceProfile: VoiceProfile): Promise<{ audioBuffer: Buffer; providerUsed: string }> {
   try {
-    const buffer = await generateSpeechKokoro(text, voiceProfile.sample_url);
-    return { audioBuffer: buffer, providerUsed: 'kokoro' };
+    const buffer = await generateSpeechGroqTTS(text, voiceProfile.sample_url);
+    return { audioBuffer: buffer, providerUsed: 'groq_playai' };
   } catch (error) {
-    logger.warn('Provider 1 Kokoro failed, falling back to OpenVoice', error);
+    logger.warn('Provider 1 Groq PlayAI TTS failed, falling back to OpenVoice', error);
   }
 
   try {
@@ -143,7 +140,7 @@ export interface WordTimestamp {
 export async function transcribeAudioForTimestamps(audioBuffer: Buffer): Promise<WordTimestamp[]> {
   const file = new File([audioBuffer as any], 'audio.mp3', { type: 'audio/mpeg' });
   
-  const transcription = await groq.audio.transcriptions.create({
+  const transcription = await getGroq().audio.transcriptions.create({
     file,
     model: 'whisper-large-v3',
     response_format: 'verbose_json',

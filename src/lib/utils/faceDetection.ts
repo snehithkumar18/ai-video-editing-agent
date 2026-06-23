@@ -53,7 +53,7 @@ export async function detectFaceInBuffer(imageBuffer: Buffer): Promise<{
   try {
     const faceapi = await getFaceApi();
     await loadFaceModels();
-    const img = await loadImage(imageBuffer);
+    const img = await loadImage(imageBuffer as any);
     const canvas = createCanvas(img.width, img.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);

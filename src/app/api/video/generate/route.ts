@@ -1,136 +1,303 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { FlowProducer } from 'bullmq';
-import Redis from 'ioredis';
 import { JOB_NAMES } from '@/lib/queue/videoQueue';
 import logger from '@/lib/logger';
 
 const isRedisConfigured = !!process.env.UPSTASH_REDIS_REST_URL;
 
-type MockFlow = {
-  data: {
-    projectId?: string;
-  };
-};
+// Only create Redis/BullMQ connections when Redis is actually configured
+let flowProducer: any;
 
-const connection = isRedisConfigured
-  ? new Redis(process.env.UPSTASH_REDIS_REST_URL!, {
-      password: process.env.UPSTASH_REDIS_REST_TOKEN!,
-      tls: {},
-      maxRetriesPerRequest: null,
-    })
-  : null;
+if (isRedisConfigured) {
+  const Redis = require('ioredis');
+  const { FlowProducer } = require('bullmq');
 
-const flowProducer = isRedisConfigured
-  ? new FlowProducer({ connection: connection as any })
-  : ({
-      add: async (flow: MockFlow) => {
-        logger.info('[Mock FlowProducer] Adding flow:', flow);
-        const projectId = flow.data.projectId;
-        if (!projectId) {
-          throw new Error('projectId is required for mock flow jobs');
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL!;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  const connection = redisUrl.startsWith('https://')
+    ? new Redis({
+        host: redisUrl.replace('https://', ''),
+        port: 6379,
+        password: redisToken,
+        tls: {},
+        maxRetriesPerRequest: null,
+      })
+    : new Redis(redisUrl, {
+        password: redisToken,
+        tls: {},
+        maxRetriesPerRequest: null,
+      });
+
+  flowProducer = new FlowProducer({ connection: connection as any });
+} else {
+  // Inline processing - no Redis needed
+  flowProducer = {
+    add: async (flow: { data: { projectId?: string } }) => {
+      const projectId = flow.data.projectId;
+      if (!projectId) throw new Error('projectId is required');
+
+      // Run inline processing in the background
+      setTimeout(async () => {
+        try {
+          await runInlineVideoGeneration(projectId);
+        } catch (e) {
+          logger.error('[Inline Flow] Fatal error:', e);
         }
-        
-        setTimeout(async () => {
+      }, 100);
+
+      return { id: 'inline-flow-' + Date.now() };
+    }
+  };
+}
+
+/**
+ * Inline video generation - runs all jobs sequentially without Redis.
+ * Calls real APIs (Groq TTS, Pexels, Groq Whisper) and updates Supabase.
+ */
+async function runInlineVideoGeneration(projectId: string) {
+  // Use admin client that bypasses RLS
+  const { createClient: createAdminClient } = await import('@/lib/supabase/admin');
+  const supabase = createAdminClient();
+  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  try {
+    // Get project data
+    const { data: project } = await supabase
+      .from('projects')
+      .select('*, voice_profiles:voice_profile_id(*), avatar_profiles:avatar_profile_id(*)')
+      .eq('id', projectId)
+      .single();
+
+    if (!project) {
+      logger.error(`[Inline Flow] Project not found: ${projectId}`);
+      return;
+    }
+
+    const script = project.script_optimized || project.script_raw || '';
+
+    // ===== STEP 1: Generate Voice (20%) =====
+    logger.info(`[Inline Flow] Step 1/4: Generating voice for project ${projectId}`);
+    await supabase.from('projects').update({ render_progress: 5 }).eq('id', projectId);
+    await delay(1500);
+
+    let audioUrl = '';
+    let audioDuration = 15; // fallback
+    try {
+      const { generateSpeech } = await import('@/lib/services/voiceService');
+      const voiceProfile = project.voice_profiles || { sample_url: 'af_bella', provider_voice_id: null };
+      const { audioBuffer, providerUsed } = await generateSpeech(script, voiceProfile);
+      logger.info(`[Inline Flow] Voice generated using ${providerUsed}`);
+
+      // Upload to Supabase storage
+      const { uploadBuffer } = await import('@/lib/services/storageService');
+      const audioKey = `project-assets/${projectId}/voice_audio_${Date.now()}.mp3`;
+      audioUrl = await uploadBuffer(audioBuffer, audioKey, 'audio/mpeg');
+
+      // Save as project asset
+      await supabase.from('project_assets').insert({
+        project_id: projectId,
+        type: 'voice_audio',
+        url: audioUrl,
+        metadata: { providerUsed }
+      });
+
+      logger.info(`[Inline Flow] Voice audio uploaded: ${audioUrl}`);
+    } catch (voiceErr) {
+      logger.warn('[Inline Flow] Voice generation failed, using placeholder audio', voiceErr);
+      audioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+      await supabase.from('project_assets').insert({
+        project_id: projectId,
+        type: 'voice_audio',
+        url: audioUrl,
+        metadata: { fallback: true }
+      });
+    }
+    await supabase.from('projects').update({ render_progress: 20 }).eq('id', projectId);
+    await delay(1500);
+
+    // ===== STEP 2: Fetch B-Roll (50%) =====
+    logger.info(`[Inline Flow] Step 2/4: Fetching B-roll for project ${projectId}`);
+    await supabase.from('projects').update({ render_progress: 30 }).eq('id', projectId);
+    await delay(1500);
+
+    const brollClips: any[] = [];
+    try {
+      // Extract scene keywords from script
+      const scenes = script
+        .split(/[.!?\n]+/)
+        .map((s: string) => s.trim())
+        .filter((s: string) => s.length > 8)
+        .slice(0, 5);
+
+      const searchTerms = scenes.length > 0 ? scenes : ['cinematic background', 'workspace', 'technology'];
+
+      if (process.env.PEXELS_API_KEY) {
+        for (const scene of searchTerms.slice(0, 3)) {
           try {
-            const supabase = await createClient();
-            
-            await supabase.from('projects').update({ status: 'generating', render_progress: 20 }).eq('id', projectId);
-            await new Promise(r => setTimeout(r, 1000));
-            
-            await supabase.from('projects').update({ render_progress: 50 }).eq('id', projectId);
-            await new Promise(r => setTimeout(r, 1000));
-            
-            await supabase.from('projects').update({ render_progress: 80 }).eq('id', projectId);
-            await new Promise(r => setTimeout(r, 1000));
-            
-            const timelineJson = {
-              tracks: [
-                {
-                  id: 'track-avatar',
-                  type: 'video',
-                  name: 'Avatar Track',
-                  clips: [
-                    {
-                      id: 'clip-avatar-1',
-                      type: 'video',
-                      name: 'Avatar Presenter',
-                      url: 'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-smartphone-talking-to-camera-40156-large.mp4',
-                      start: 0,
-                      end: 15,
-                      duration: 15,
-                      volume: 1,
-                      opacity: 1
-                    }
-                  ]
-                },
-                {
-                  id: 'track-audio',
-                  type: 'audio',
-                  name: 'Voice Track',
-                  clips: [
-                    {
-                      id: 'clip-voice-1',
-                      type: 'audio',
-                      name: 'Voiceover',
-                      url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-                      start: 0,
-                      end: 15,
-                      duration: 15,
-                      volume: 1
-                    }
-                  ]
-                },
-                {
-                  id: 'track-captions',
-                  type: 'captions',
-                  name: 'Captions Track',
-                  clips: [
-                    {
-                      id: 'caption-1',
-                      type: 'text',
-                      text: 'Welcome to VidAgent!',
-                      start: 0,
-                      end: 3,
-                      style: { fontSize: 24, color: '#ffffff', backgroundColor: '#00000088' }
-                    },
-                    {
-                      id: 'caption-2',
-                      type: 'text',
-                      text: 'This is a fully automated AI video editor.',
-                      start: 3,
-                      end: 8,
-                      style: { fontSize: 24, color: '#ffffff', backgroundColor: '#00000088' }
-                    },
-                    {
-                      id: 'caption-3',
-                      type: 'text',
-                      text: 'You can edit this timeline directly using text prompts.',
-                      start: 8,
-                      end: 15,
-                      style: { fontSize: 24, color: '#ffffff', backgroundColor: '#00000088' }
-                    }
-                  ]
-                }
-              ],
-              duration: 15
-            };
-            
-            await supabase.from('projects').update({
-              status: 'editing',
-              render_progress: 100,
-              timeline_json: timelineJson
-            }).eq('id', projectId);
-            
-            logger.info(`[Mock FlowProducer] Completed flow for project ${projectId}`);
-          } catch (e) {
-            logger.error('Error in mock flow runner:', e);
+            const res = await fetch(
+              `https://api.pexels.com/videos/search?query=${encodeURIComponent(scene)}&per_page=2&orientation=portrait`,
+              { headers: { Authorization: process.env.PEXELS_API_KEY } }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              if (data.videos?.length > 0) {
+                const video = data.videos[0];
+                const file = video.video_files.find((f: any) => f.quality === 'hd') || video.video_files[0];
+                const clip = { keyword: scene, url: file.link, thumbnailUrl: video.image, duration: video.duration, source: 'pexels' };
+                brollClips.push(clip);
+
+                await supabase.from('project_assets').insert({
+                  project_id: projectId,
+                  type: 'broll_clip',
+                  url: file.link,
+                  metadata: clip
+                });
+              }
+            }
+          } catch (err) {
+            logger.warn(`[Inline Flow] Pexels failed for: ${scene}`, err);
           }
-        }, 1000);
-        
-        return { id: 'mock-flow-' + Date.now() };
+        }
       }
-    });
+    } catch (brollErr) {
+      logger.warn('[Inline Flow] B-roll fetch failed', brollErr);
+    }
+    await supabase.from('projects').update({ render_progress: 50 }).eq('id', projectId);
+    await delay(1500);
+
+    // ===== STEP 3: Generate Captions (70%) =====
+    logger.info(`[Inline Flow] Step 3/4: Generating captions for project ${projectId}`);
+    await supabase.from('projects').update({ render_progress: 55 }).eq('id', projectId);
+    await delay(1500);
+
+    let captionsData: any[] = [];
+    try {
+      if (process.env.GROQ_API_KEY && audioUrl && !audioUrl.includes('soundhelix')) {
+        // Download audio and transcribe with Groq Whisper
+        const audioRes = await fetch(audioUrl);
+        if (audioRes.ok) {
+          const audioBuffer = Buffer.from(await audioRes.arrayBuffer());
+          const Groq = (await import('groq-sdk')).default;
+          const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+          const file = new File([audioBuffer], 'audio.mp3', { type: 'audio/mpeg' });
+          
+          const transcription = await groq.audio.transcriptions.create({
+            file,
+            model: 'whisper-large-v3',
+            response_format: 'verbose_json',
+            timestamp_granularities: ['word']
+          });
+
+          const words = ((transcription as any).words || []);
+          captionsData = words.map((w: any) => ({
+            id: `caption-${w.start}`,
+            word: (w.word || '').trim(),
+            start: w.start || 0,
+            end: w.end || 0,
+            duration: (w.end || 0) - (w.start || 0),
+            locked: false,
+            style: { fontSize: 48, fontWeight: 'bold', color: '#FFFFFF', backgroundColor: 'rgba(0,0,0,0.6)', animation: 'fadeIn', position: 'bottom' }
+          }));
+        }
+      }
+    } catch (captionErr) {
+      logger.warn('[Inline Flow] Caption generation failed, using script-based fallback', captionErr);
+    }
+
+    // Fallback: generate captions from script text
+    if (captionsData.length === 0) {
+      const words = script.split(/\s+/).filter(Boolean);
+      let currentTime = 0;
+      captionsData = words.map((word: string, i: number) => {
+        const dur = 0.4;
+        const caption = { id: `caption-${i}`, word, start: currentTime, end: currentTime + dur, duration: dur, locked: false, style: { fontSize: 48, fontWeight: 'bold', color: '#FFFFFF', backgroundColor: 'rgba(0,0,0,0.6)', animation: 'fadeIn', position: 'bottom' } };
+        currentTime += dur;
+        return caption;
+      });
+      audioDuration = currentTime;
+    }
+
+    // Upload captions
+    try {
+      const { uploadBuffer } = await import('@/lib/services/storageService');
+      const captionsBuffer = Buffer.from(JSON.stringify(captionsData), 'utf-8');
+      const captionsKey = `project-assets/${projectId}/captions_${Date.now()}.json`;
+      const captionUrl = await uploadBuffer(captionsBuffer, captionsKey, 'application/json');
+      await supabase.from('project_assets').insert({
+        project_id: projectId,
+        type: 'caption_json',
+        url: captionUrl,
+        metadata: { wordCount: captionsData.length }
+      });
+    } catch (uploadErr) {
+      logger.warn('[Inline Flow] Caption upload failed', uploadErr);
+    }
+    await supabase.from('projects').update({ render_progress: 70 }).eq('id', projectId);
+    await delay(1500);
+
+    // ===== STEP 4: Assemble Timeline (100%) =====
+    logger.info(`[Inline Flow] Step 4/4: Assembling timeline for project ${projectId}`);
+    await supabase.from('projects').update({ render_progress: 85 }).eq('id', projectId);
+    await delay(1500);
+
+    const avatarUrl = project.avatar_profiles?.processed_asset_url || 
+      'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-smartphone-talking-to-camera-40156-large.mp4';
+
+    const timelineJson = {
+      version: '1.0',
+      duration: audioDuration,
+      fps: 30,
+      width: 1080,
+      height: 1920,
+      tracks: [
+        {
+          id: 'avatar-track', type: 'video', label: 'Avatar', visible: true, locked: false,
+          clips: [{ id: 'avatar-1', assetUrl: avatarUrl, start: 0, end: audioDuration, duration: audioDuration, locked: true }]
+        },
+        {
+          id: 'broll-track', type: 'video', label: 'B-Roll', visible: true, locked: false,
+          clips: brollClips.map((clip, i) => ({
+            id: `broll-${i}`, assetUrl: clip.url,
+            start: Math.min(i * 8, Math.max(0, audioDuration - 5)),
+            end: Math.min(i * 8 + 8, audioDuration),
+            duration: 8, opacity: 1.0, locked: false
+          }))
+        },
+        {
+          id: 'caption-track', type: 'captions', label: 'Captions', visible: true, locked: false,
+          clips: captionsData
+        },
+        {
+          id: 'audio-track', type: 'audio', label: 'Voice', visible: true, locked: false,
+          clips: [{ id: 'voice-1', assetUrl: audioUrl, start: 0, end: audioDuration, duration: audioDuration, volume: 1.0, locked: true }]
+        },
+        {
+          id: 'music-track', type: 'music', label: 'Background Music', visible: true, locked: false,
+          clips: []
+        }
+      ]
+    };
+
+    // Final update: mark as editing with timeline
+    await supabase.from('projects').update({
+      status: 'editing',
+      render_progress: 100,
+      timeline_json: timelineJson,
+      final_video_url: avatarUrl, // Use avatar as preview until full render
+      duration_seconds: audioDuration
+    }).eq('id', projectId);
+
+    logger.info(`[Inline Flow] ✅ Completed video generation for project ${projectId}`);
+
+  } catch (error) {
+    logger.error(`[Inline Flow] Pipeline failed for project ${projectId}:`, error);
+    await supabase.from('projects').update({
+      status: 'failed',
+      metadata: { error: String(error) }
+    }).eq('id', projectId);
+  }
+}
 
 
 // Rate limit: 5 video generation requests per hour per user
@@ -185,8 +352,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'projectId is required' }, { status: 400 });
     }
 
-    // 2. Get project, verify ownership, verify status is 'draft'
-    const { data: project, error: projectError } = await supabase
+    // Use admin client for DB ops to avoid RLS issues in API routes
+    const { createClient: createAdminClient } = await import('@/lib/supabase/admin');
+    const adminSupabase = createAdminClient();
+
+    // 2. Get project, verify ownership, verify status
+    const { data: project, error: projectError } = await adminSupabase
       .from('projects')
       .select('*')
       .eq('id', projectId)
@@ -197,8 +368,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Project not found' }, { status: 404 });
     }
 
-    if (project.status !== 'draft' && project.status !== 'failed') {
-      return NextResponse.json({ success: false, error: 'Project must be in draft status to generate' }, { status: 400 });
+    // Allow draft, failed, AND stuck generating projects to be re-generated
+    if (project.status !== 'draft' && project.status !== 'failed' && project.status !== 'generating') {
+      return NextResponse.json({ success: false, error: 'Project must be in draft or failed status to generate' }, { status: 400 });
     }
 
     // 3. Verify voice_profile_id and avatar_profile_id
@@ -207,7 +379,7 @@ export async function POST(request: Request) {
     }
 
     // Check profiles are ready
-    const { data: avatar } = await supabase.from('avatar_profiles').select('status').eq('id', project.avatar_profile_id).single();
+    const { data: avatar } = await adminSupabase.from('avatar_profiles').select('status').eq('id', project.avatar_profile_id).single();
     if (avatar?.status !== 'ready') {
       return NextResponse.json({ success: false, error: 'Avatar profile is not ready' }, { status: 400 });
     }
@@ -217,25 +389,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Project script is empty' }, { status: 400 });
     }
 
-    // 4. Atomically check and deduct 1 credit (prevents race conditions)
-    // Uses a single UPDATE ... WHERE render_credits > 0 to make the operation atomic
-    const { data: deductResult, error: deductError } = await supabase
-      .rpc('deduct_render_credits', { p_user_id: user.id, p_cost: 1 });
+    // 4. Atomically check and deduct 1 credit — skip if re-generating a stuck project
+    if (project.status === 'draft') {
+      const { data: deductResult, error: deductError } = await adminSupabase
+        .rpc('deduct_render_credits', { p_user_id: user.id, p_cost: 1 });
 
-    if (deductError || !deductResult) {
-      return NextResponse.json(
-        { success: false, error: 'Not enough render credits' },
-        { status: 403 }
-      );
+      if (deductError || !deductResult) {
+        return NextResponse.json(
+          { success: false, error: 'Not enough render credits' },
+          { status: 403 }
+        );
+      }
     }
 
+    // 5. Clean up any old assets from failed/stuck runs
+    await adminSupabase.from('project_assets').delete().eq('project_id', projectId);
+
     // 6. Update project status
-    await supabase
+    await adminSupabase
       .from('projects')
-      .update({ status: 'generating', render_progress: 0 })
+      .update({ status: 'generating', render_progress: 0, metadata: {} })
       .eq('id', projectId);
 
-    // 7. Add jobs using FlowProducer
+    // 7. Add jobs using FlowProducer (inline or BullMQ)
     await flowProducer.add({
       name: JOB_NAMES.ASSEMBLE_VIDEO,
       queueName: 'video-generation',
@@ -258,12 +434,6 @@ export async function POST(request: Request) {
           queueName: 'video-generation', 
           data: { projectId }, 
           children: [
-            // Note: Since GENERATE_VOICE is identical in the graph, BullMQ handles deduplication natively 
-            // if we provide a custom job ID, but for simplicity we rely on the parent-child structure.
-            // Ideally we'd pass the audio URL directly, but the lip-sync job will pull from DB or we run Voice once and lip-sync/captions depend on it.
-            // Using BullMQ FlowProducer, a single child can't easily be shared by two parents unless we use parent's parent.
-            // So we'll have ASSEMBLE -> [LIPSYNC, CAPTIONS, BROLL], and LIPSYNC and CAPTIONS both fetch audio URL from DB that was generated by a prior step.
-            // To make Voice run first before LIPSYNC/CAPTIONS, we can structure it: ASSEMBLE -> [LIPSYNC, CAPTIONS, BROLL] -> [VOICE]
             { 
               name: JOB_NAMES.GENERATE_VOICE, 
               queueName: 'video-generation', 

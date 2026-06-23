@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import ProjectCard from '@/components/dashboard/ProjectCard'
-import CreateProjectModal from '@/components/dashboard/CreateProjectModal'
-import { Film } from 'lucide-react'
+import ProjectCard from '@/components/dashboard/ProjectCard';
+import CreateProjectModal from '@/components/dashboard/CreateProjectModal';
+import { Film } from 'lucide-react';
 
 export default async function ProjectsPage() {
   const supabase = await createClient()

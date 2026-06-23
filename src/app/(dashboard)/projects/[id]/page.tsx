@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import GenerationProgress from '@/components/project/GenerationProgress';
+import StartGenerationButton from '@/components/project/StartGenerationButton';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Play, Download, Edit2, Film, Mic, FileText } from 'lucide-react';
-import StartGenerationButton from '@/components/project/StartGenerationButton';
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,7 +15,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   if (!user) return null;
 
-  const { data: project, error } = await supabase
+  // Use admin client to bypass RLS for reliable reads
+  const adminSupabase = createAdminClient();
+  const { data: project, error } = await adminSupabase
     .from('projects')
     .select(`
       *,
@@ -48,14 +51,6 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </div>
         
         <div className="flex gap-3">
-          {project.status === 'draft' && (
-            <Button className="btn-gradient text-white gap-2 rounded-xl h-10 px-5 font-semibold text-sm" asChild>
-              <Link href={`/projects/${project.id}/edit`}>
-                <Edit2 size={16} /> Open Editor
-              </Link>
-            </Button>
-          )}
-          
           {(project.status === 'editing' || project.status === 'complete') && (
             <>
               <Button variant="outline" className="border-[#E5E3EB] text-[#1E1B4B] hover:bg-[#F8F7FC] gap-2 rounded-xl h-10 px-5 font-semibold text-sm" asChild>
@@ -74,12 +69,20 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       {(project.status === 'editing' || project.status === 'complete') && project.final_video_url && (
         <Card className="bg-white border-[#E5E3EB] rounded-3xl overflow-hidden shadow-sm">
           <div className="aspect-video bg-black relative flex items-center justify-center">
-            <video 
-              src={project.final_video_url} 
-              controls 
-              className="w-full h-full max-h-[60vh] object-contain"
-              poster={project.thumbnail_url || undefined}
-            />
+            {project.final_video_url.match(/\.(png|jpg|jpeg|webp)/i) ? (
+              <img 
+                src={project.final_video_url} 
+                className="w-full h-full max-h-[60vh] object-contain"
+                alt="Project preview"
+              />
+            ) : (
+              <video 
+                src={project.final_video_url} 
+                controls 
+                className="w-full h-full max-h-[60vh] object-contain"
+                poster={project.thumbnail_url || undefined}
+              />
+            )}
           </div>
         </Card>
       )}

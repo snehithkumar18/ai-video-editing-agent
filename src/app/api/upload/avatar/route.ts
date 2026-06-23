@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(arrayBuffer);
 
     const key = generateKey('avatar-uploads', `${user.id}/originals`, file.name);
-    const storageUrl = await uploadBuffer(buffer, key, file.type);
+    const storageUrl = await uploadBuffer(buffer as any, key, file.type);
 
     return NextResponse.json({ 
       success: true, 

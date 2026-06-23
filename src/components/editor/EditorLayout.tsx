@@ -4,17 +4,19 @@ import { useEffect, useRef, useState } from 'react';
 import { useTimelineStore, useTimelineHistory } from '@/store/useTimelineStore';
 import { useAIEditStore } from '@/store/useAIEditStore';
 import { toast } from 'sonner';
-import EditorTopBar from './EditorTopBar';
-import VideoPreview from './VideoPreview';
-import InspectorPanel from './InspectorPanel';
-import AssetLibrary from './AssetLibrary';
-import Timeline from './Timeline';
-import AIEditBar from './AIEditBar';
-import AIEditHistory from './AIEditHistory';
+import dynamic from 'next/dynamic';
 import logger from '@/lib/logger';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Film, Layers, Video, SlidersHorizontal, Settings } from 'lucide-react';
+import EditorTopBar from './EditorTopBar';
+
+const VideoPreview = dynamic(() => import('./VideoPreview'), { ssr: false });
+const InspectorPanel = dynamic(() => import('./InspectorPanel'), { ssr: false });
+const AssetLibrary = dynamic(() => import('./AssetLibrary'), { ssr: false });
+const Timeline = dynamic(() => import('./Timeline'), { ssr: false });
+const AIEditBar = dynamic(() => import('./AIEditBar'), { ssr: false });
+const AIEditHistory = dynamic(() => import('./AIEditHistory'), { ssr: false });
 
 const editorTabs = [
   { id: 'projects', label: 'Projects', icon: Film, href: '/projects' },

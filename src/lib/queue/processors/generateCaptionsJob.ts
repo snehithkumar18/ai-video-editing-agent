@@ -3,11 +3,16 @@ import { createClient } from '@/lib/supabase/admin';
 import { uploadBuffer } from '@/lib/services/storageService';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const isGroqConfigured = !!process.env.GROQ_API_KEY;
+const groq = isGroqConfigured ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 
 export async function processGenerateCaptions(job: Job): Promise<{ captionUrl: string; wordCount: number }> {
   const { projectId, audioUrl } = job.data;
   const supabase = createClient();
+
+  if (!groq) {
+    throw new Error('GROQ_API_KEY is not configured. Captions generation is unavailable. Please set GROQ_API_KEY in .env.local.');
+  }
 
   // 1. Download audio from R2 as Buffer
   const audioResponse = await fetch(audioUrl);

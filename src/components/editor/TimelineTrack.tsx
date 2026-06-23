@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Track } from '@/lib/types/timeline';
 import TimelineClip from './TimelineClip';
 import { Eye, EyeOff, Lock, Unlock } from 'lucide-react';
@@ -11,7 +12,7 @@ interface TimelineTrackProps {
   duration: number;
 }
 
-export default function TimelineTrack({ track, zoom, duration }: TimelineTrackProps) {
+function TimelineTrack({ track, zoom, duration }: TimelineTrackProps) {
   const updateTrack = (updates: Partial<Track>) => {
     const state = useTimelineStore.getState();
     if (!state.timeline) return;
@@ -68,3 +69,5 @@ export default function TimelineTrack({ track, zoom, duration }: TimelineTrackPr
     </div>
   );
 }
+
+export default React.memo(TimelineTrack);

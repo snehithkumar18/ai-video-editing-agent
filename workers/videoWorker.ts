@@ -1,3 +1,4 @@
+import './register-env';
 import { Worker, Job } from 'bullmq';
 import { processGenerateVoice } from '../src/lib/queue/processors/generateVoiceJob';
 import { processGenerateLipSync } from '../src/lib/queue/processors/generateLipSyncJob';
@@ -9,11 +10,22 @@ import Redis from 'ioredis';
 import { createClient } from '../src/lib/supabase/admin';
 import logger from '../src/lib/logger';
 
-const connection = new Redis(process.env.UPSTASH_REDIS_REST_URL!, {
-  password: process.env.UPSTASH_REDIS_REST_TOKEN!,
-  tls: {},
-  maxRetriesPerRequest: null,
-});
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL || '';
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || '';
+
+const connection = redisUrl.startsWith('https://')
+  ? new Redis({
+      host: redisUrl.replace('https://', ''),
+      port: 6379,
+      password: redisToken,
+      tls: {},
+      maxRetriesPerRequest: null,
+    })
+  : new Redis(redisUrl, {
+      password: redisToken,
+      tls: {},
+      maxRetriesPerRequest: null,
+    });
 
 const worker = new Worker(
   'video-generation',

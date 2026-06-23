@@ -54,7 +54,7 @@ export default function Timeline() {
             className="relative flex flex-col pt-2 pb-10"
             onClick={handleBackgroundClick}
           >
-            {timeline.tracks.map(track => (
+            {(timeline.tracks || []).map(track => (
               <TimelineTrack 
                 key={track.id} 
                 track={track} 

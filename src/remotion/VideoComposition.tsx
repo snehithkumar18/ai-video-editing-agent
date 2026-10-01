@@ -1,6 +1,7 @@
 import { AbsoluteFill, Sequence, Video, Audio, Img } from 'remotion';
 import { TimelineJSON } from '@/lib/types/timeline';
 import CaptionRenderer from './CaptionRenderer';
+import TalkingAvatar from './TalkingAvatar';
 
 export const VideoComposition: React.FC<{ timeline: TimelineJSON }> = ({ timeline }) => {
   const fps = timeline.fps || 30;
@@ -41,9 +42,11 @@ export const VideoComposition: React.FC<{ timeline: TimelineJSON }> = ({ timelin
         return (
           <Sequence key={clip.id} from={from} durationInFrames={durationInFrames}>
             {clip.assetUrl?.match(/\.(png|jpg|jpeg|webp)/i) ? (
-              <Img 
-                src={clip.assetUrl} 
-                style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
+              <TalkingAvatar 
+                src={clip.assetUrl}
+                captions={captionTrack?.clips || []}
+                fps={fps}
+                style={{ opacity: clip.opacity ?? 1 }} 
               />
             ) : (
               <Video 

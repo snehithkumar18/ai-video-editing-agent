@@ -86,13 +86,39 @@ async function runInlineVideoGeneration(projectId: string) {
     try {
       const { generateSpeech } = await import('@/lib/services/voiceService');
       const voiceProfile = project.voice_profiles || { sample_url: 'af_bella', provider_voice_id: null };
-      const { audioBuffer, providerUsed } = await generateSpeech(script, voiceProfile);
-      logger.info(`[Inline Flow] Voice generated using ${providerUsed}`);
 
-      // Upload to Supabase storage
-      const { uploadBuffer } = await import('@/lib/services/storageService');
-      const audioKey = `project-assets/${projectId}/voice_audio_${Date.now()}.mp3`;
-      audioUrl = await uploadBuffer(audioBuffer, audioKey, 'audio/mpeg');
+      let audioBuffer: Buffer;
+      let providerUsed = 'kokoro_tts';
+
+      // Check if user uploaded their own voice note
+      if (voiceProfile.sample_url && voiceProfile.sample_url.startsWith('http') && !voiceProfile.sample_url.includes('soundhelix')) {
+        logger.info(`[Inline Flow] Using user's uploaded voice note: ${voiceProfile.sample_url}`);
+        const voiceRes = await fetch(voiceProfile.sample_url);
+        if (voiceRes.ok) {
+          audioBuffer = Buffer.from(await voiceRes.arrayBuffer());
+          audioUrl = voiceProfile.sample_url;
+          providerUsed = 'user_voice_note';
+        } else {
+          // Fallback to synthesizing with Kokoro-TTS
+          const gen = await generateSpeech(script, voiceProfile);
+          audioBuffer = gen.audioBuffer;
+          providerUsed = gen.providerUsed;
+        }
+      } else {
+        // Synthesize voice from script using Kokoro-TTS
+        const gen = await generateSpeech(script, voiceProfile);
+        audioBuffer = gen.audioBuffer;
+        providerUsed = gen.providerUsed;
+      }
+
+      logger.info(`[Inline Flow] Voice ready using provider: ${providerUsed}`);
+
+      // Upload if not already a storage URL
+      if (!audioUrl) {
+        const { uploadBuffer } = await import('@/lib/services/storageService');
+        const audioKey = `project-assets/${projectId}/voice_audio_${Date.now()}.mp3`;
+        audioUrl = await uploadBuffer(audioBuffer, audioKey, 'audio/mpeg');
+      }
 
       // Save as project asset
       await supabase.from('project_assets').insert({
@@ -102,7 +128,7 @@ async function runInlineVideoGeneration(projectId: string) {
         metadata: { providerUsed }
       });
 
-      logger.info(`[Inline Flow] Voice audio uploaded: ${audioUrl}`);
+      logger.info(`[Inline Flow] Voice audio active: ${audioUrl}`);
     } catch (voiceErr) {
       logger.warn('[Inline Flow] Voice generation failed, using placeholder audio', voiceErr);
       audioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
@@ -241,8 +267,44 @@ async function runInlineVideoGeneration(projectId: string) {
     await supabase.from('projects').update({ render_progress: 85 }).eq('id', projectId);
     await delay(1500);
 
-    const avatarUrl = project.avatar_profiles?.processed_asset_url || 
+    let avatarUrl = project.avatar_profiles?.processed_asset_url || 
       'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-smartphone-talking-to-camera-40156-large.mp4';
+
+    // If avatar is an image and audio is available, generate animated talking character video
+    if (avatarUrl && avatarUrl.match(/\.(png|jpg|jpeg|webp)/i) && audioUrl) {
+      try {
+        logger.info(`[Inline Flow] Animating character image into talking video for project ${projectId}...`);
+        const { generateTalkingCharacterVideo } = await import('@/lib/services/talkingCharacterService');
+        const [imgRes, audioRes] = await Promise.all([fetch(avatarUrl), fetch(audioUrl)]);
+        if (imgRes.ok && audioRes.ok) {
+          const imgBuf = Buffer.from(await imgRes.arrayBuffer());
+          const audioBuf = Buffer.from(await audioRes.arrayBuffer());
+          const timestamps = captionsData.map((c: any) => ({
+            word: c.word || '',
+            start: c.start || 0,
+            end: c.end || 0,
+          }));
+          const talkingVideoBuf = await generateTalkingCharacterVideo({
+            imageBuffer: imgBuf,
+            audioBuffer: audioBuf,
+            timestamps,
+          });
+          const { uploadBuffer } = await import('@/lib/services/storageService');
+          const videoKey = `project-assets/${projectId}/talking_character_${Date.now()}.mp4`;
+          avatarUrl = await uploadBuffer(talkingVideoBuf, videoKey, 'video/mp4');
+          logger.info(`[Inline Flow] Generated and uploaded talking character video: ${avatarUrl}`);
+
+          await supabase.from('project_assets').insert({
+            project_id: projectId,
+            type: 'avatar_video',
+            url: avatarUrl,
+            metadata: { generated: true }
+          });
+        }
+      } catch (animErr) {
+        logger.warn('[Inline Flow] Talking character video generation fallback to client-side animation', animErr);
+      }
+    }
 
     const timelineJson = {
       version: '1.0',

@@ -83,20 +83,41 @@ export async function processExportVideo(job: Job) {
       throw new Error('No avatar video found in the timeline. Cannot export.');
     }
 
-    // 3. Download the avatar video
-    const avatarLocalPath = path.join(workDir, 'avatar.mp4');
-    logger.info(`[Export] Downloading avatar video...`);
-    await downloadFile(avatarClip.assetUrl, avatarLocalPath);
-    await supabase.from('projects').update({ render_progress: 15 }).eq('id', projectId);
-
-    // 4. Download the voice audio (if exists as a separate file)
+    // 3. Download the voice audio (if exists as a separate file)
     let audioLocalPath: string | null = null;
     if (audioClip?.assetUrl) {
       audioLocalPath = path.join(workDir, 'voice.mp3');
       logger.info(`[Export] Downloading voice audio...`);
       await downloadFile(audioClip.assetUrl, audioLocalPath);
     }
-    await supabase.from('projects').update({ render_progress: 25 }).eq('id', projectId);
+    await supabase.from('projects').update({ render_progress: 20 }).eq('id', projectId);
+
+    // 4. Download and prepare the avatar video
+    const isImage = avatarClip.assetUrl.match(/\.(png|jpg|jpeg|webp)/i);
+    let avatarLocalPath = path.join(workDir, isImage ? 'avatar_input.png' : 'avatar.mp4');
+    logger.info(`[Export] Downloading avatar asset...`);
+    await downloadFile(avatarClip.assetUrl, avatarLocalPath);
+
+    if (isImage && audioLocalPath) {
+      logger.info(`[Export] Converting avatar image into animated talking character video...`);
+      const animatedVideoPath = path.join(workDir, 'avatar.mp4');
+      const { generateTalkingCharacterVideo } = await import('@/lib/services/talkingCharacterService');
+      const imageBuf = await fsp.readFile(avatarLocalPath);
+      const audioBuf = await fsp.readFile(audioLocalPath);
+      const timestamps = (captionTrack?.clips || []).map((c: any) => ({
+        word: c.word || '',
+        start: c.start || 0,
+        end: c.end || 0,
+      }));
+      const animatedBuf = await generateTalkingCharacterVideo({
+        imageBuffer: imageBuf,
+        audioBuffer: audioBuf,
+        timestamps,
+      });
+      await fsp.writeFile(animatedVideoPath, animatedBuf);
+      avatarLocalPath = animatedVideoPath;
+    }
+    await supabase.from('projects').update({ render_progress: 30 }).eq('id', projectId);
 
     // 5. Build caption drawtext filters
     const captionFilters: string[] = [];

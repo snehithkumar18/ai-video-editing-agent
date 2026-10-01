@@ -84,28 +84,68 @@ export async function generateSpeechElevenLabs(text: string, voiceId: string): P
   return Buffer.from(arrayBuffer);
 }
 
+export async function generateSpeechKokoro(text: string, voiceName?: string): Promise<Buffer> {
+  const { client } = await import('@gradio/client');
+  const hfToken = process.env.HUGGINGFACE_TOKEN as `hf_${string}`;
+  const space = process.env.HF_SPACE_KOKORO || 'remsky/Kokoro-TTS-Zero';
+  const voice = voiceName || 'af_bella';
+
+  logger.info(`[Kokoro-TTS] Synthesizing speech with voice "${voice}" on space "${space}"`);
+  const app = await client(space, hfToken ? { token: hfToken } : {});
+  
+  const result = await app.predict('/generate_speech_from_ui', [
+    text,
+    [voice],
+    1.0
+  ]) as any;
+
+  if (!result?.data || !result.data[0]?.url) {
+    throw new Error('Kokoro TTS returned invalid or empty response');
+  }
+
+  const audioUrl = result.data[0].url;
+  const res = await fetch(audioUrl);
+  if (!res.ok) throw new Error(`Failed to download audio from ${audioUrl}: ${res.statusText}`);
+
+  const arrayBuffer = await res.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+}
+
 export async function generateSpeech(text: string, voiceProfile: VoiceProfile): Promise<{ audioBuffer: Buffer; providerUsed: string }> {
+  // Provider 1: Kokoro-TTS (100% Free, Runs on CPU space with high quality natural human voices)
+  try {
+    const voiceChoice = voiceProfile.provider_voice_id || voiceProfile.sample_url || 'af_bella';
+    const buffer = await generateSpeechKokoro(text, voiceChoice);
+    return { audioBuffer: buffer, providerUsed: 'kokoro_tts' };
+  } catch (error) {
+    logger.warn('Provider 1 Kokoro TTS failed, falling back to Groq TTS', error);
+  }
+
+  // Provider 2: Groq TTS
   try {
     const buffer = await generateSpeechGroqTTS(text, voiceProfile.sample_url);
     return { audioBuffer: buffer, providerUsed: 'groq_playai' };
   } catch (error) {
-    logger.warn('Provider 1 Groq PlayAI TTS failed, falling back to OpenVoice', error);
+    logger.warn('Provider 2 Groq TTS failed, falling back to OpenVoice', error);
   }
 
+  // Provider 3: OpenVoice on HF
   try {
     const buffer = await generateSpeechOpenVoice(text, voiceProfile.sample_url);
     return { audioBuffer: buffer, providerUsed: 'openvoice' };
   } catch (error) {
-    logger.warn('Provider 2 OpenVoice failed, falling back to Fish Audio', error);
+    logger.warn('Provider 3 OpenVoice failed, falling back to Fish Audio', error);
   }
 
+  // Provider 4: Fish Audio
   try {
     const buffer = await generateSpeechFishAudio(text, voiceProfile.provider_voice_id || voiceProfile.sample_url);
     return { audioBuffer: buffer, providerUsed: 'fish_audio' };
   } catch (error) {
-    logger.warn('Provider 3 Fish Audio failed, falling back to ElevenLabs', error);
+    logger.warn('Provider 4 Fish Audio failed, falling back to ElevenLabs', error);
   }
 
+  // Provider 5: ElevenLabs (paid fallback if key provided)
   const buffer = await generateSpeechElevenLabs(text, voiceProfile.provider_voice_id!);
   return { audioBuffer: buffer, providerUsed: 'elevenlabs' };
 }

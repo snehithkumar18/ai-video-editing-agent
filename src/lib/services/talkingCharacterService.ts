@@ -78,11 +78,19 @@ export async function generateTalkingCharacterVideo(
       charH = height;
       charW = height * imgAspect;
     }
-    const baseY = (height - charH) / 2;
+    const charX = -charW / 2;
+    const charY = -charH / 2;
 
-    const mouthCenterY = baseY + charH * 0.62;
-    const mouthRadiusX = width * 0.055;
-    const mouthRadiusY = width * 0.025;
+    const mouthNormalizedY = 0.505;
+    const mouthNormalizedX = 0.500;
+    const eyeNormalizedY = 0.342;
+    const leftEyeNormalizedX = 0.422;
+    const rightEyeNormalizedX = 0.578;
+
+    const mouthYRel = charY + charH * mouthNormalizedY;
+    const mouthXRel = charX + charW * mouthNormalizedX;
+    const mouthRadiusX = charW * 0.028;
+    const mouthRadiusY = charH * 0.006;
 
     let currentFrame = 0;
     const frameStream = new Readable({
@@ -113,66 +121,87 @@ export async function generateTalkingCharacterVideo(
         ctx.save();
         ctx.translate(width / 2 + subtleSwayX, height / 2 + breathSwayY);
         ctx.rotate(subtleHeadTilt);
-        ctx.drawImage(img, -charW / 2, -charH / 2, charW, charH);
+        ctx.drawImage(img, charX, charY, charW, charH);
 
         // Mouth Articulation (Lip-Sync synced to speech)
         if (isSpeaking) {
           const timeInWord = currentTime - (activeWord?.start || 0);
-          const cycle = Math.sin(timeInWord * Math.PI * 9);
+          const cycle = Math.sin(timeInWord * Math.PI * 9.5);
           const openness = Math.max(0, cycle);
 
-          if (openness > 0.15) {
-            const openY = openness * 14;
-            const openX = openness * 6;
+          if (openness > 0.12) {
+            const openY = openness * 7.5;
+            const openX = openness * 3.5;
 
             ctx.save();
+            const grad = ctx.createRadialGradient(
+              mouthXRel,
+              mouthYRel,
+              1,
+              mouthXRel,
+              mouthYRel,
+              mouthRadiusX + openX
+            );
+            grad.addColorStop(0, 'rgba(25, 12, 16, 0.95)');
+            grad.addColorStop(0.7, 'rgba(45, 20, 26, 0.88)');
+            grad.addColorStop(1, 'rgba(75, 38, 45, 0.0)');
+
             ctx.beginPath();
             ctx.ellipse(
-              0,
-              mouthCenterY - height / 2,
+              mouthXRel,
+              mouthYRel,
               mouthRadiusX + openX,
               mouthRadiusY + openY,
               0,
               0,
               Math.PI * 2
             );
-
-            // Lip shadow / mouth depth
-            ctx.fillStyle = 'rgba(28, 12, 16, 0.88)';
+            ctx.fillStyle = grad;
             ctx.fill();
 
-            // Lip contour
-            ctx.lineWidth = 2.5;
-            ctx.strokeStyle = 'rgba(120, 50, 60, 0.4)';
-            ctx.stroke();
-
-            // Subtle teeth visibility on wider openings
-            if (openness > 0.5) {
-              ctx.fillStyle = 'rgba(240, 240, 240, 0.75)';
-              ctx.fillRect(-mouthRadiusX * 0.4, mouthCenterY - height / 2 - 4, mouthRadiusX * 0.8, 4);
+            // Subtle teeth visibility on open vowels
+            if (openness > 0.45) {
+              ctx.fillStyle = 'rgba(235, 235, 240, 0.72)';
+              ctx.beginPath();
+              ctx.ellipse(
+                mouthXRel,
+                mouthYRel - openY * 0.25,
+                (mouthRadiusX + openX) * 0.45,
+                2.5,
+                0,
+                0,
+                Math.PI * 2
+              );
+              ctx.fill();
             }
 
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = 'rgba(75, 40, 45, 0.3)';
+            ctx.stroke();
             ctx.restore();
           }
         }
 
         // Natural Eye Blink every 3.5s
         const blinkCycle = currentTime % 3.5;
-        if (blinkCycle > 3.35) {
-          const eyeCenterY = baseY + charH * 0.44 - height / 2;
-          const eyeLeftX = -width * 0.11;
-          const eyeRightX = width * 0.11;
-          const eyeWidth = width * 0.05;
+        if (blinkCycle > 3.38) {
+          const leftEyeX = charX + charW * leftEyeNormalizedX;
+          const rightEyeX = charX + charW * rightEyeNormalizedX;
+          const eyeY = charY + charH * eyeNormalizedY;
+          const eyeWidth = charW * 0.026;
 
           ctx.save();
-          ctx.strokeStyle = 'rgba(40, 30, 30, 0.6)';
-          ctx.lineWidth = 3;
+          ctx.strokeStyle = 'rgba(65, 45, 38, 0.65)';
+          ctx.lineWidth = 2.0;
+
           ctx.beginPath();
-          ctx.arc(eyeLeftX, eyeCenterY, eyeWidth, 0.1 * Math.PI, 0.9 * Math.PI);
+          ctx.arc(leftEyeX, eyeY + 1, eyeWidth, 0.1 * Math.PI, 0.9 * Math.PI);
           ctx.stroke();
+
           ctx.beginPath();
-          ctx.arc(eyeRightX, eyeCenterY, eyeWidth, 0.1 * Math.PI, 0.9 * Math.PI);
+          ctx.arc(rightEyeX, eyeY + 1, eyeWidth, 0.1 * Math.PI, 0.9 * Math.PI);
           ctx.stroke();
+
           ctx.restore();
         }
 

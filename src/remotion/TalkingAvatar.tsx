@@ -89,33 +89,31 @@ export const TalkingAvatar: React.FC<TalkingAvatarProps> = ({
         />
 
         {/* Dynamic Mouth Overlay */}
-        {isSpeaking && mouthOpenY > 2 && (
+        {isSpeaking && mouthOpenY > 1.5 && (
           <div
             style={{
               position: 'absolute',
-              top: '62%',
+              top: '50.5%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: `${48 + mouthOpenX}px`,
-              height: `${12 + mouthOpenY}px`,
-              backgroundColor: 'rgba(25, 10, 14, 0.88)',
+              width: `${36 + mouthOpenX}px`,
+              height: `${8 + mouthOpenY}px`,
+              background: 'radial-gradient(ellipse at center, rgba(25, 12, 16, 0.95) 0%, rgba(45, 20, 26, 0.88) 65%, transparent 100%)',
               borderRadius: '50%',
-              boxShadow: '0 0 6px rgba(0,0,0,0.6)',
-              border: '2px solid rgba(110, 40, 50, 0.35)',
               pointerEvents: 'none',
             }}
           >
             {/* Subtle Teeth visibility on wider vowels */}
-            {mouthOpenY > 7 && (
+            {mouthOpenY > 4 && (
               <div
                 style={{
                   position: 'absolute',
                   top: '1px',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  width: '65%',
-                  height: '4px',
-                  backgroundColor: 'rgba(240, 240, 245, 0.85)',
+                  width: '55%',
+                  height: '2.5px',
+                  backgroundColor: 'rgba(235, 235, 240, 0.75)',
                   borderRadius: '2px',
                 }}
               />
@@ -130,11 +128,12 @@ export const TalkingAvatar: React.FC<TalkingAvatarProps> = ({
             <div
               style={{
                 position: 'absolute',
-                top: '43.5%',
-                left: '39%',
-                width: '38px',
-                height: '4px',
-                backgroundColor: 'rgba(50, 40, 40, 0.75)',
+                top: '34.2%',
+                left: '42.2%',
+                transform: 'translateX(-50%)',
+                width: '26px',
+                height: '2px',
+                backgroundColor: 'rgba(65, 45, 38, 0.65)',
                 borderRadius: '50%',
                 pointerEvents: 'none',
               }}
@@ -143,11 +142,12 @@ export const TalkingAvatar: React.FC<TalkingAvatarProps> = ({
             <div
               style={{
                 position: 'absolute',
-                top: '43.5%',
-                left: '61%',
-                width: '38px',
-                height: '4px',
-                backgroundColor: 'rgba(50, 40, 40, 0.75)',
+                top: '34.2%',
+                left: '57.8%',
+                transform: 'translateX(-50%)',
+                width: '26px',
+                height: '2px',
+                backgroundColor: 'rgba(65, 45, 38, 0.65)',
                 borderRadius: '50%',
                 pointerEvents: 'none',
               }}

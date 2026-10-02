@@ -112,6 +112,28 @@ export async function generateSpeechKokoro(text: string, voiceName?: string): Pr
 }
 
 export async function generateSpeech(text: string, voiceProfile: VoiceProfile): Promise<{ audioBuffer: Buffer; providerUsed: string }> {
+  // Provider 0: Local VoiceStudio (OmniVoice/CosyVoice) if running and reference audio provided
+  if (voiceProfile.sample_url && voiceProfile.sample_url.startsWith('http') && !voiceProfile.sample_url.includes('soundhelix')) {
+    try {
+      const { checkVoiceStudioHealth, cloneAndSynthesizeVoiceStudio } = await import('./voiceStudioService');
+      const health = await checkVoiceStudioHealth();
+      if (health.available) {
+        logger.info(`[VoiceService] VoiceStudio is online at ${health.endpoint}. Running high-fidelity local voice cloning...`);
+        const sampleRes = await fetch(voiceProfile.sample_url);
+        if (sampleRes.ok) {
+          const sampleBuffer = Buffer.from(await sampleRes.arrayBuffer());
+          const cloned = await cloneAndSynthesizeVoiceStudio({
+            text,
+            referenceAudioBuffer: sampleBuffer,
+          });
+          return { audioBuffer: cloned.audioBuffer, providerUsed: cloned.provider };
+        }
+      }
+    } catch (vsErr) {
+      logger.warn('[VoiceService] VoiceStudio cloning failed or timed out, falling back to Kokoro TTS', vsErr);
+    }
+  }
+
   // Provider 1: Kokoro-TTS (100% Free, Runs on CPU space with high quality natural human voices)
   try {
     const voiceChoice = voiceProfile.provider_voice_id || voiceProfile.sample_url || 'af_bella';

@@ -18,20 +18,24 @@ export interface WordTimestamp {
   end: number;
 }
 
+import { generateNeuralTalkingCharacterVideo } from './sadtalkerService';
+
 export interface TalkingCharacterOptions {
   imageBuffer: Buffer;
   audioBuffer: Buffer;
-  timestamps: WordTimestamp[];
+  timestamps?: WordTimestamp[];
   width?: number;
   height?: number;
   fps?: number;
+  mode?: 'neural' | 'canvas';
+  mouthNormalizedY?: number;
+  mouthNormalizedX?: number;
 }
 
 /**
- * Generates an animated talking character MP4 video buffer from:
- * - A character portrait photo (Buffer)
- * - An audio speech file (Buffer)
- * - Word-level timestamps from Whisper
+ * Generates an animated talking character MP4 video buffer.
+ * Automatically attempts photorealistic Neural generation (SadTalker) first
+ * when mode='neural', falling back gracefully to the dynamic local engine.
  */
 export async function generateTalkingCharacterVideo(
   options: TalkingCharacterOptions
@@ -39,11 +43,29 @@ export async function generateTalkingCharacterVideo(
   const {
     imageBuffer,
     audioBuffer,
-    timestamps,
+    timestamps = [],
     width = 720,
     height = 1280,
     fps = 30,
+    mode = 'neural',
+    mouthNormalizedY = 0.462,
+    mouthNormalizedX = 0.500,
   } = options;
+
+  if (mode === 'neural') {
+    try {
+      logger.info('[TalkingCharacter] Attempting Neural Talking Character generation via SadTalker...');
+      const neuralBuffer = await generateNeuralTalkingCharacterVideo({
+        imageBuffer,
+        audioBuffer,
+        size: '256',
+        enhance: false,
+      });
+      return neuralBuffer;
+    } catch (err: any) {
+      logger.warn(`[TalkingCharacter] Neural generation failed (${err.message}). Falling back to local dynamic engine.`);
+    }
+  }
 
   const tempDir = path.join(os.tmpdir(), `talking_char_${Date.now()}_${Math.random().toString(36).substring(7)}`);
   await fsp.mkdir(tempDir, { recursive: true });
@@ -81,16 +103,10 @@ export async function generateTalkingCharacterVideo(
     const charX = -charW / 2;
     const charY = -charH / 2;
 
-    const mouthNormalizedY = 0.505;
-    const mouthNormalizedX = 0.500;
-    const eyeNormalizedY = 0.342;
-    const leftEyeNormalizedX = 0.422;
-    const rightEyeNormalizedX = 0.578;
-
     const mouthYRel = charY + charH * mouthNormalizedY;
     const mouthXRel = charX + charW * mouthNormalizedX;
-    const mouthRadiusX = charW * 0.028;
-    const mouthRadiusY = charH * 0.006;
+    const mouthRadiusX = charW * 0.027;
+    const mouthRadiusY = charH * 0.005;
 
     let currentFrame = 0;
     const frameStream = new Readable({
@@ -107,11 +123,14 @@ export async function generateTalkingCharacterVideo(
           (w) => currentTime >= w.start - 0.05 && currentTime <= w.end + 0.08
         );
         const isSpeaking = !!activeWord;
+        const timeInWord = isSpeaking ? currentTime - (activeWord?.start || 0) : 0;
 
-        // Natural life-like floating and breathing
-        const breathSwayY = Math.sin(currentTime * 2.2) * 3;
-        const subtleSwayX = Math.cos(currentTime * 1.4) * 2;
-        const subtleHeadTilt = Math.sin(currentTime * 1.8) * 0.008; // radians
+        // Natural conversational gestures: head nodding on syllable stress & sway
+        const speechNod = isSpeaking ? Math.sin(timeInWord * Math.PI * 5) * 5 : 0;
+        const speechTilt = isSpeaking ? Math.sin(timeInWord * Math.PI * 2.5) * 0.025 : 0;
+        const breathSwayY = Math.sin(currentTime * 1.8) * 4 + speechNod;
+        const subtleSwayX = Math.cos(currentTime * 1.1) * 6;
+        const subtleHeadTilt = Math.sin(currentTime * 1.4) * 0.02 + speechTilt; // radians
 
         // Background
         ctx.fillStyle = '#0a0a0c';

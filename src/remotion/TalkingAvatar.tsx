@@ -13,6 +13,9 @@ interface TalkingAvatarProps {
   src: string;
   captions?: CaptionClip[];
   fps: number;
+  mouthYPercent?: number; // e.g. 46 for natural lips
+  mouthXPercent?: number;
+  motionIntensity?: number;
   style?: React.CSSProperties;
 }
 
@@ -20,6 +23,9 @@ export const TalkingAvatar: React.FC<TalkingAvatarProps> = ({
   src,
   captions = [],
   fps = 30,
+  mouthYPercent = 46.2,
+  mouthXPercent = 50.0,
+  motionIntensity = 1.0,
   style = {},
 }) => {
   const frame = useCurrentFrame();
@@ -30,22 +36,24 @@ export const TalkingAvatar: React.FC<TalkingAvatarProps> = ({
     (c) => currentTime >= c.start - 0.04 && currentTime <= c.end + 0.06
   );
   const isSpeaking = !!activeCaption;
+  const timeInWord = isSpeaking ? currentTime - activeCaption.start : 0;
 
-  // 2. Natural breathing & gentle posture sway
-  const breathY = Math.sin(currentTime * 2.2) * 3.5;
-  const swayX = Math.cos(currentTime * 1.3) * 2;
-  const breathScale = 1 + Math.sin(currentTime * 1.5) * 0.006;
-  const headTilt = Math.sin(currentTime * 1.8) * 0.4; // degrees
+  // 2. Conversational head gestures, dynamic nodding on speech cadence & sway
+  const speechNod = isSpeaking ? Math.sin(timeInWord * Math.PI * 5) * 5.5 * motionIntensity : 0;
+  const speechTilt = isSpeaking ? Math.sin(timeInWord * Math.PI * 2.5) * 1.8 * motionIntensity : 0;
+  const breathY = (Math.sin(currentTime * 1.8) * 4.5 + speechNod) * motionIntensity;
+  const swayX = (Math.cos(currentTime * 1.1) * 7.5) * motionIntensity;
+  const breathScale = 1.008 + (Math.sin(currentTime * 1.2) * 0.012);
+  const headTilt = (Math.sin(currentTime * 1.4) * 1.8 + speechTilt) * motionIntensity; // degrees
 
-  // 3. Mouth articulation when speaking
+  // 3. Dynamic Mouth & Jaw Articulation when speaking
   let mouthOpenY = 0;
   let mouthOpenX = 0;
   if (isSpeaking) {
-    const timeInWord = currentTime - (activeCaption?.start || 0);
-    const cycle = Math.sin(timeInWord * Math.PI * 9);
+    const cycle = Math.sin(timeInWord * Math.PI * 9.5);
     const openness = Math.max(0, cycle);
-    mouthOpenY = openness * 14;
-    mouthOpenX = openness * 6;
+    mouthOpenY = openness * 16 * motionIntensity;
+    mouthOpenX = openness * 7 * motionIntensity;
   }
 
   // 4. Natural Eye Blink every 3.5s
@@ -88,19 +96,20 @@ export const TalkingAvatar: React.FC<TalkingAvatarProps> = ({
           }}
         />
 
-        {/* Dynamic Mouth Overlay */}
-        {isSpeaking && mouthOpenY > 1.5 && (
+        {/* Dynamic Mouth & Jaw Articulation Overlay */}
+        {isSpeaking && mouthOpenY > 1.2 && (
           <div
             style={{
               position: 'absolute',
-              top: '50.5%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: `${36 + mouthOpenX}px`,
-              height: `${8 + mouthOpenY}px`,
-              background: 'radial-gradient(ellipse at center, rgba(25, 12, 16, 0.95) 0%, rgba(45, 20, 26, 0.88) 65%, transparent 100%)',
+              top: `${mouthYPercent}%`,
+              left: `${mouthXPercent}%`,
+              transform: `translate(-50%, -50%) translateY(${mouthOpenY * 0.25}px)`,
+              width: `${34 + mouthOpenX}px`,
+              height: `${6 + mouthOpenY}px`,
+              background: 'radial-gradient(ellipse at center, rgba(18, 8, 12, 0.96) 0%, rgba(40, 16, 22, 0.88) 60%, transparent 100%)',
               borderRadius: '50%',
               pointerEvents: 'none',
+              boxShadow: `0 0 ${4 + mouthOpenY * 0.3}px rgba(25, 10, 15, 0.7)`,
             }}
           >
             {/* Subtle Teeth visibility on wider vowels */}

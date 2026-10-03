@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import VoiceGrid from '@/components/voice/VoiceGrid';
+import VoiceStudioStatusBanner from '@/components/voice/VoiceStudioStatusBanner';
 
 export default async function VoicePage() {
   const supabase = await createClient();
@@ -44,6 +45,9 @@ export default async function VoicePage() {
         </div>
       </div>
       
+      {/* VoiceStudio Live Engine Status & Quick Clone Tester */}
+      <VoiceStudioStatusBanner profiles={profiles || []} />
+
       <VoiceGrid initialProfiles={profiles || []} />
     </div>
   );

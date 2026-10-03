@@ -103,6 +103,10 @@ export async function generateTalkingCharacterVideo(
     const charX = -charW / 2;
     const charY = -charH / 2;
 
+    const eyeNormalizedY = 0.355;
+    const leftEyeNormalizedX = 0.422;
+    const rightEyeNormalizedX = 0.578;
+
     const mouthYRel = charY + charH * mouthNormalizedY;
     const mouthXRel = charX + charW * mouthNormalizedX;
     const mouthRadiusX = charW * 0.027;

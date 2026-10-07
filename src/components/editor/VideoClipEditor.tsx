@@ -59,6 +59,70 @@ export default function VideoClipEditor({ clip, trackId }: VideoClipEditorProps)
             className="[&_[role=slider]]:w-3 [&_[role=slider]]:h-3"
           />
         </div>
+
+        {/* Avatar Anatomical & Motion Tuning (if Avatar clip) */}
+        {(trackId === 'avatar-track' || clip.id?.includes('avatar') || clip.assetUrl?.match(/\.(png|jpg|jpeg|webp)/i)) && (
+          <div className="pt-4 border-t border-border space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold text-white">Avatar Calibration</Label>
+              <span className="text-[10px] text-[#A78BFA] bg-[#7C3AED]/10 px-2 py-0.5 rounded border border-[#7C3AED]/20">
+                Live Preview
+              </span>
+            </div>
+
+            {/* Quick Presets */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 text-[10px] px-2 border-white/10 text-gray-300 hover:text-white"
+                onClick={() => handleUpdate({ mouthYPercent: 46.2, mouthXPercent: 50.0 })}
+              >
+                Portrait (46%)
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 text-[10px] px-2 border-white/10 text-gray-300 hover:text-white"
+                onClick={() => handleUpdate({ mouthYPercent: 27.5, mouthXPercent: 51.0 })}
+              >
+                Full Body (28%)
+              </Button>
+            </div>
+
+            {/* Mouth Height Slider */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-gray-400">Mouth Height Y</span>
+                <span className="text-gray-400 font-mono">{(clip.mouthYPercent ?? 46.2).toFixed(1)}%</span>
+              </div>
+              <Slider
+                value={[clip.mouthYPercent ?? 46.2]}
+                min={20}
+                max={65}
+                step={0.5}
+                onValueChange={([v]) => handleUpdate({ mouthYPercent: v })}
+                className="[&_[role=slider]]:w-3 [&_[role=slider]]:h-3"
+              />
+            </div>
+
+            {/* Head Nod & Motion Intensity */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-gray-400">Motion & Nodding</span>
+                <span className="text-gray-400 font-mono">{(clip.motionIntensity ?? 1.0).toFixed(1)}x</span>
+              </div>
+              <Slider
+                value={[clip.motionIntensity ?? 1.0]}
+                min={0}
+                max={2.0}
+                step={0.1}
+                onValueChange={([v]) => handleUpdate({ motionIntensity: v })}
+                className="[&_[role=slider]]:w-3 [&_[role=slider]]:h-3"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -14,16 +14,21 @@ export const VideoComposition: React.FC<{ timeline: TimelineJSON }> = ({ timelin
 
   return (
     <AbsoluteFill style={{ backgroundColor: 'black' }}>
-      {/* 1. B-Roll Track (Background) */}
-      {brollTrack?.visible && brollTrack.clips.map(clip => {
+      {/* 1. Base Avatar Track (Talking Presenter / Host) */}
+      {avatarTrack?.visible && avatarTrack.clips.map(clip => {
         const from = Math.round(clip.start * fps);
         const durationInFrames = Math.max(1, Math.round(clip.duration * fps));
         return (
           <Sequence key={clip.id} from={from} durationInFrames={durationInFrames}>
             {clip.assetUrl?.match(/\.(png|jpg|jpeg|webp)/i) ? (
-              <Img 
-                src={clip.assetUrl} 
-                style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
+              <TalkingAvatar 
+                src={clip.assetUrl}
+                captions={captionTrack?.clips || []}
+                fps={fps}
+                mouthYPercent={clip.mouthYPercent ?? 46.2}
+                mouthXPercent={clip.mouthXPercent ?? 50.0}
+                motionIntensity={clip.motionIntensity ?? 1.0}
+                style={{ opacity: clip.opacity ?? 1 }} 
               />
             ) : (
               <Video 
@@ -35,18 +40,16 @@ export const VideoComposition: React.FC<{ timeline: TimelineJSON }> = ({ timelin
         );
       })}
 
-      {/* 2. Avatar Track */}
-      {avatarTrack?.visible && avatarTrack.clips.map(clip => {
+      {/* 2. B-Roll Track (Cutaway Video Overlays) */}
+      {brollTrack?.visible && brollTrack.clips.map(clip => {
         const from = Math.round(clip.start * fps);
         const durationInFrames = Math.max(1, Math.round(clip.duration * fps));
         return (
           <Sequence key={clip.id} from={from} durationInFrames={durationInFrames}>
             {clip.assetUrl?.match(/\.(png|jpg|jpeg|webp)/i) ? (
-              <TalkingAvatar 
-                src={clip.assetUrl}
-                captions={captionTrack?.clips || []}
-                fps={fps}
-                style={{ opacity: clip.opacity ?? 1 }} 
+              <Img 
+                src={clip.assetUrl} 
+                style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: clip.opacity ?? 1 }} 
               />
             ) : (
               <Video 

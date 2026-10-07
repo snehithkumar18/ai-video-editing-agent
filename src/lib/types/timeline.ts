@@ -29,6 +29,9 @@ export interface Clip {
   fadeIn?: number;
   fadeOut?: number;
   locked: boolean;
+  mouthYPercent?: number;
+  mouthXPercent?: number;
+  motionIntensity?: number;
   metadata?: Record<string, unknown>;
 }
 

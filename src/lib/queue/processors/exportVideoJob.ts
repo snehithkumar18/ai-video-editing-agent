@@ -109,27 +109,32 @@ export async function processExportVideo(job: Job) {
         start: c.start || 0,
         end: c.end || 0,
       }));
+      const mouthY = (avatarClip as any).mouthYPercent ? (avatarClip as any).mouthYPercent / 100 : 0.462;
+      const mouthX = (avatarClip as any).mouthXPercent ? (avatarClip as any).mouthXPercent / 100 : 0.500;
       const animatedBuf = await generateTalkingCharacterVideo({
         imageBuffer: imageBuf,
         audioBuffer: audioBuf,
         timestamps,
+        mouthNormalizedY: mouthY,
+        mouthNormalizedX: mouthX,
+        mode: 'canvas',
       });
       await fsp.writeFile(animatedVideoPath, animatedBuf);
       avatarLocalPath = animatedVideoPath;
     }
     await supabase.from('projects').update({ render_progress: 30 }).eq('id', projectId);
 
-    // 5. Build caption drawtext filters
+    // 5. Build high-contrast caption drawtext filters
     const captionFilters: string[] = [];
     if (captionTrack?.clips && captionTrack.clips.length > 0) {
       for (const cap of captionTrack.clips) {
         if (!cap.word || cap.start === undefined || cap.end === undefined) continue;
         const text = sanitizeForDrawtext(cap.word);
-        const fontSize = cap.style?.fontSize || 48;
-        const fontColor = cap.style?.color || 'white';
+        const fontSize = cap.style?.fontSize || 54;
+        const fontColor = cap.style?.color || '#FFE600'; // Modern high-visibility yellow
 
         captionFilters.push(
-          `drawtext=text='${text}':fontsize=${fontSize}:fontcolor=${fontColor}:x=(w-text_w)/2:y=h-th-100:enable='between(t\\,${cap.start}\\,${cap.end})':box=1:boxcolor=black@0.5:boxborderw=8`
+          `drawtext=text='${text}':fontsize=${fontSize}:fontcolor=${fontColor}:x=(w-text_w)/2:y=h-th-140:enable='between(t\\,${cap.start}\\,${cap.end})':borderw=4:bordercolor=black:box=1:boxcolor=black@0.55:boxborderw=12`
         );
       }
     }

@@ -56,7 +56,7 @@ export default function ExportModal({ open, onClose, projectId }: ExportModalPro
           if (statusData.success) {
             setProgress(statusData.data.render_progress || 0);
             
-            if (statusData.data.status === 'complete' || statusData.data.status === 'editing') { // editing means ready in our current state flow
+            if (statusData.data.status === 'complete' || (statusData.data.render_progress === 100 && statusData.data.final_video_url)) {
               if (pollingRef.current) clearInterval(pollingRef.current);
               setFinalUrl(statusData.data.final_video_url);
               setStep('complete');

@@ -106,13 +106,37 @@ export async function POST(request: Request) {
       }
     }
 
-    // Update project status
+    // Update project status to exporting
     await supabase
       .from('projects')
-      .update({ status: 'generating', render_progress: 0 })
+      .update({ status: 'generating', render_progress: 2 })
       .eq('id', projectId);
 
-    // 4. Add EXPORT_VIDEO job to queue
+    const isRedisConfigured = !!process.env.UPSTASH_REDIS_REST_URL;
+
+    if (!isRedisConfigured) {
+      // Run inline export in background without requiring Redis
+      setTimeout(async () => {
+        try {
+          const { processExportVideo } = await import('@/lib/queue/processors/exportVideoJob');
+          await processExportVideo({
+            data: {
+              projectId,
+              quality,
+              format,
+              aspectRatio,
+              watermark: userData?.plan === 'free',
+            }
+          } as any);
+        } catch (exportErr) {
+          logger.error('[Render Route] Inline export execution failed:', exportErr);
+        }
+      }, 50);
+
+      return NextResponse.json({ success: true, data: { message: 'Export started (inline mode)', projectId } });
+    }
+
+    // 4. Add EXPORT_VIDEO job to BullMQ queue if Redis is configured
     await videoQueue.add('EXPORT_VIDEO', {
       projectId,
       quality,
@@ -121,7 +145,7 @@ export async function POST(request: Request) {
       watermark: userData?.plan === 'free'
     });
 
-    return NextResponse.json({ success: true, data: { message: 'Export started', projectId } });
+    return NextResponse.json({ success: true, data: { message: 'Export queued', projectId } });
   } catch (error) {
     logger.error('Render Route Error:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });

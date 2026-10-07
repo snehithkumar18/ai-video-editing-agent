@@ -315,7 +315,7 @@ async function runInlineVideoGeneration(projectId: string) {
       tracks: [
         {
           id: 'avatar-track', type: 'video', label: 'Avatar', visible: true, locked: false,
-          clips: [{ id: 'avatar-1', assetUrl: avatarUrl, start: 0, end: audioDuration, duration: audioDuration, locked: true }]
+          clips: [{ id: 'avatar-1', assetUrl: avatarUrl, start: 0, end: audioDuration, duration: audioDuration, locked: true, mouthYPercent: 46.2, motionIntensity: 1.0 }]
         },
         {
           id: 'broll-track', type: 'video', label: 'B-Roll', visible: true, locked: false,

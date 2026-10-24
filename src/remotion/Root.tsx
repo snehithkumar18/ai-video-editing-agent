@@ -2,6 +2,7 @@ import React from 'react';
 import { Composition, staticFile } from 'remotion';
 import { ZoomReelComposition } from './templates/ZoomReelComposition';
 import { SplitScreenReelComposition } from './templates/SplitScreenReelComposition';
+import { WhiteMinimalReelComposition } from './templates/WhiteMinimalReelComposition';
 import timestampsData from '../../public/timestamps_female.json';
 
 export const RemotionRoot: React.FC = () => {
@@ -42,6 +43,21 @@ export const RemotionRoot: React.FC = () => {
           presenterName: 'AI Creator',
           topicTag: 'AI AUTOMATION MASTERCLASS',
           brollSrc: staticFile('broll/broll_2_ai.mp4'),
+        }}
+      />
+
+      {/* 3. White Minimalist Viral Reel (Clean Studio White Background + Reserved Speaker Area) */}
+      <Composition
+        id="WhiteMinimalReel"
+        component={WhiteMinimalReelComposition}
+        durationInFrames={durationInFrames}
+        fps={fps}
+        width={1080}
+        height={1920}
+        defaultProps={{
+          audioSrc: staticFile('speech_female.wav'),
+          timestamps: timestampsData,
+          topicTag: 'AI VIRAL ENGINE 2026',
         }}
       />
     </>

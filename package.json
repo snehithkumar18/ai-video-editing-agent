@@ -15,7 +15,10 @@
   "dependencies": {
     "@base-ui/react": "1.4.1",
     "@gradio/client": "2.2.2",
+    "@remotion/bundler": "^4.0.459",
+    "@remotion/cli": "^4.0.459",
     "@remotion/player": "4.0.459",
+    "@remotion/renderer": "^4.0.459",
     "@stripe/stripe-js": "9.4.0",
     "@supabase/ssr": "0.10.3",
     "@supabase/supabase-js": "2.105.4",

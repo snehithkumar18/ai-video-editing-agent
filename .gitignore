@@ -42,3 +42,8 @@ next-env.d.ts
 
 # scratch
 scratch/
+
+# rendered test media
+public/*.mp4
+public/test_still_frame_*.png
+

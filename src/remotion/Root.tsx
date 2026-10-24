@@ -36,10 +36,10 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1920}
         defaultProps={{
-          presenterCutoutSrc: staticFile('presenter_cutout.png'),
+          presenterCutoutSrc: staticFile('uploaded_character_cutout.png'),
           audioSrc: staticFile('speech_female.wav'),
           timestamps: timestampsData,
-          presenterName: 'Sarah K. (Creator)',
+          presenterName: 'AI Creator',
           topicTag: 'AI AUTOMATION MASTERCLASS',
           brollSrc: staticFile('broll/broll_2_ai.mp4'),
         }}

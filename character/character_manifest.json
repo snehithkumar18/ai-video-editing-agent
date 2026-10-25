@@ -1,0 +1,41 @@
+{
+  "character_id": "user_replacement_presenter",
+  "source_image": "reel_reconstruction/assets/character/character_reference.jpg",
+  "cutout_image": "reel_reconstruction/assets/character/character_cutout.png",
+  "identity": {
+    "gender": "male",
+    "hair": "short dark styled",
+    "facial_hair": "trimmed mustache and beard",
+    "attire": "navy and white checkered button-down collar shirt"
+  },
+  "placement": {
+    "horizontal": "center",
+    "vertical": "bottom",
+    "scale": 1.0,
+    "width": 540,
+    "height": 480,
+    "bottom_offset_px": 0,
+    "z_index": 40
+  },
+  "scene_pose_mapping": {
+    "1": "pose_point_up_right",
+    "2": "pose_both_hands_point",
+    "3": "pose_point_up_right",
+    "4": "pose_point_up_right",
+    "5": "pose_chin_think",
+    "6": "pose_shrug_palms",
+    "7": "pose_both_hands_point",
+    "8": "pose_shrug_palms",
+    "9": "pose_point_up_right",
+    "10": "pose_point_up_right",
+    "11": "pose_point_up_right",
+    "12": "pose_both_hands_point",
+    "13": "pose_point_up_right",
+    "14": "pose_chin_think",
+    "15": "pose_point_up_right",
+    "16": "pose_both_hands_point",
+    "17": "pose_point_up_right",
+    "18": "pose_both_hands_point",
+    "19": "pose_direct_point"
+  }
+}

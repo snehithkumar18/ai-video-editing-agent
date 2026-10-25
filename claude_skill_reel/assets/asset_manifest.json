@@ -1,0 +1,56 @@
+{
+  "project": "How to Create Unlimited Animated Reels Using One Claude Skill",
+  "version": "1.0.0",
+  "resolution": "1080x1920",
+  "duration_s": 49.53,
+  "fps": 30,
+  "assets": [
+    {
+      "asset_id": "character_cutout",
+      "type": "image/png",
+      "path": "character/character_cutout.png",
+      "source_reference": "character/character_reference.jpg",
+      "role": "Presenting creator with natural breathing micro-sway and dynamic vector arm/hand gestures",
+      "scenes_used": [1, 11, 12]
+    },
+    {
+      "asset_id": "voiceover_audio",
+      "type": "audio/wav",
+      "path": "claude_skill_reel/assets/audio/voiceover_49s.wav",
+      "model": "edge_tts / en-US-ChristopherNeural",
+      "duration_ms": 49533,
+      "scenes_used": "All (1-12)"
+    },
+    {
+      "asset_id": "voiceover_timestamps",
+      "type": "application/json",
+      "path": "claude_skill_reel/assets/audio/voiceover_timestamps.json",
+      "model": "faster-whisper / base",
+      "total_words": 156
+    },
+    {
+      "asset_id": "underwater_scene",
+      "type": "svg/vector",
+      "description": "Multi-layer aquatic parallax with swimming tropical fish, swaying kelp, and rising air bubbles",
+      "scene_used": 4
+    },
+    {
+      "asset_id": "editorial_desk_illustration",
+      "type": "svg/vector",
+      "description": "Warm editorial desk illustration with creator figure, steaming coffee mug, and glowing laptop monitor",
+      "scene_used": 6
+    },
+    {
+      "asset_id": "nle_video_editor",
+      "type": "component/react",
+      "description": "Multi-track non-linear video editing timeline with video clips, titles, waveform audio, and playhead",
+      "scenes_used": [7, 8]
+    },
+    {
+      "asset_id": "vertical_reels_grid",
+      "type": "component/react",
+      "description": "3D perspective showcase of 6 distinct finished vertical Reels across multiple verticals",
+      "scene_used": 9
+    }
+  ]
+}

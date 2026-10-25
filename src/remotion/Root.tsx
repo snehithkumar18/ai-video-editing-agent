@@ -4,6 +4,7 @@ import { ZoomReelComposition } from './templates/ZoomReelComposition';
 import { SplitScreenReelComposition } from './templates/SplitScreenReelComposition';
 import { WhiteMinimalReelComposition } from './templates/WhiteMinimalReelComposition';
 import { ReelComposition } from '../../reel_reconstruction/src/ReelComposition';
+import { ClaudeSkillReelComposition } from '../../claude_skill_reel/src/ClaudeSkillReelComposition';
 import timestampsData from '../../public/timestamps_female.json';
 
 export const RemotionRoot: React.FC = () => {
@@ -70,6 +71,16 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={720}
         height={1280}
+      />
+
+      {/* 5. 49.53-Second Motion Graphics Reel: One Claude Skill */}
+      <Composition
+        id="ClaudeSkillReel"
+        component={ClaudeSkillReelComposition}
+        durationInFrames={1486}
+        fps={30}
+        width={1080}
+        height={1920}
       />
     </>
   );

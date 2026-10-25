@@ -1,0 +1,56 @@
+{
+  "name": "Claude Skill Animated Reel Preset",
+  "version": "1.0.0",
+  "canvas": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration_seconds": 49.53,
+    "total_frames": 1486
+  },
+  "colors": {
+    "background": "#F4F1EA",
+    "background_alt": "#FBF9F5",
+    "card_white": "#FFFFFF",
+    "card_dark": "#111418",
+    "card_dark_terminal": "#0B0D10",
+    "accent_coral_orange": "#F95738",
+    "accent_coral_red": "#E11D48",
+    "accent_warm_amber": "#EE964B",
+    "accent_emerald": "#10B981",
+    "accent_cyan": "#0EA5E9",
+    "text_primary": "#0D0F12",
+    "text_secondary": "#4B5563",
+    "text_muted": "#8A92A6",
+    "border_light": "#E5E1D8",
+    "border_dark": "#242A35"
+  },
+  "typography": {
+    "font_headline": "Inter, Montserrat, sans-serif",
+    "font_emphasis": "Playfair Display, Georgia, serif",
+    "font_mono": "Fira Code, JetBrains Mono, monospace",
+    "font_body": "Inter, -apple-system, sans-serif"
+  },
+  "textures": {
+    "dot_grid_spacing_px": 36,
+    "dot_color": "rgba(13, 15, 18, 0.05)",
+    "vignette": "radial-gradient(circle at 50% 35%, transparent 55%, rgba(215, 208, 195, 0.45) 100%)"
+  },
+  "physics": {
+    "card_entrance": {
+      "damping": 14,
+      "stiffness": 110,
+      "mass": 0.8
+    },
+    "text_pop": {
+      "damping": 12,
+      "stiffness": 140,
+      "mass": 0.6
+    },
+    "stamp_slam": {
+      "damping": 9,
+      "stiffness": 190,
+      "mass": 0.5
+    }
+  }
+}

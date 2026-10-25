@@ -1,0 +1,1443 @@
+{
+  "language": "en",
+  "language_probability": 1.0,
+  "duration": 65.83,
+  "segments": [
+    {
+      "id": 1,
+      "start": 0.0,
+      "end": 4.74,
+      "text": "I grew this account to almost 40,000 followers in the past 35 days, and I'm about to give"
+    },
+    {
+      "id": 2,
+      "start": 4.74,
+      "end": 8.24,
+      "text": "you the exact system, because in three months everyone will be doing this."
+    },
+    {
+      "id": 3,
+      "start": 8.62,
+      "end": 11.66,
+      "text": "Right now, AI animated reels are where early TikTok was."
+    },
+    {
+      "id": 4,
+      "start": 11.98,
+      "end": 16.26,
+      "text": "Real-motion graphics, voiceover, and captions made from one prompt, and hardly anyone"
+    },
+    {
+      "id": 5,
+      "start": 16.26,
+      "end": 17.2,
+      "text": "knows it's possible yet."
+    },
+    {
+      "id": 6,
+      "start": 17.4,
+      "end": 21.66,
+      "text": "But this market fills up fast, and when it does, the ones who started first already have"
+    },
+    {
+      "id": 7,
+      "start": 21.66,
+      "end": 22.18,
+      "text": "the audience."
+    },
+    {
+      "id": 8,
+      "start": 22.62,
+      "end": 23.8,
+      "text": "First come, first served."
+    },
+    {
+      "id": 9,
+      "start": 24.16,
+      "end": 26.18,
+      "text": "And most AI reels look like AI slop."
+    },
+    {
+      "id": 10,
+      "start": 26.54,
+      "end": 29.34,
+      "text": "Mine don't, because the system behind them isn't one prompt."
+    },
+    {
+      "id": 11,
+      "start": 29.34,
+      "end": 31.72,
+      "text": "It's 221 files."
+    },
+    {
+      "id": 12,
+      "start": 32.06,
+      "end": 35.0,
+      "text": "Hook patterns and pacing rules decoded from my viral reels."
+    },
+    {
+      "id": 13,
+      "start": 35.3,
+      "end": 39.0,
+      "text": "Spring physics, whip pans, and zoom kicks tuned the way my videos use them."
+    },
+    {
+      "id": 14,
+      "start": 39.4,
+      "end": 42.84,
+      "text": "Word-timed kinetic captions where the keyword lands a beat before it's said."
+    },
+    {
+      "id": 15,
+      "start": 43.1,
+      "end": 46.54,
+      "text": "A multi-step audio chain on top of 11 labs mastered for Instagram."
+    },
+    {
+      "id": 16,
+      "start": 46.98,
+      "end": 50.88,
+      "text": "And before you ever see the reel, it scores its own motion and fixes the weak moments."
+    },
+    {
+      "id": 17,
+      "start": 51.2,
+      "end": 55.74,
+      "text": "You type one line into Claude code, cursor, or codex, and it writes, voices, animates,"
+    },
+    {
+      "id": 18,
+      "start": 55.88,
+      "end": 57.1,
+      "text": "and renders the whole reel."
+    },
+    {
+      "id": 19,
+      "start": 57.1,
+      "end": 61.84,
+      "text": "That's what got this account almost 5 million views in a month, and over $2,500 in"
+    },
+    {
+      "id": 20,
+      "start": 61.84,
+      "end": 62.32,
+      "text": "brand deals."
+    },
+    {
+      "id": 21,
+      "start": 62.58,
+      "end": 64.74,
+      "text": "Comment skill, and I'll send you the exact system."
+    }
+  ],
+  "words": [
+    {
+      "word": "I",
+      "start": 0.0,
+      "end": 0.12,
+      "probability": 0.88
+    },
+    {
+      "word": "grew",
+      "start": 0.12,
+      "end": 0.28,
+      "probability": 0.24
+    },
+    {
+      "word": "this",
+      "start": 0.28,
+      "end": 0.46,
+      "probability": 0.95
+    },
+    {
+      "word": "account",
+      "start": 0.46,
+      "end": 0.68,
+      "probability": 0.99
+    },
+    {
+      "word": "to",
+      "start": 0.68,
+      "end": 0.84,
+      "probability": 0.98
+    },
+    {
+      "word": "almost",
+      "start": 0.84,
+      "end": 1.04,
+      "probability": 0.97
+    },
+    {
+      "word": "40",
+      "start": 1.04,
+      "end": 1.58,
+      "probability": 0.97
+    },
+    {
+      "word": ",000",
+      "start": 1.58,
+      "end": 2.1,
+      "probability": 0.94
+    },
+    {
+      "word": "followers",
+      "start": 2.1,
+      "end": 2.46,
+      "probability": 1.0
+    },
+    {
+      "word": "in",
+      "start": 2.46,
+      "end": 2.64,
+      "probability": 0.98
+    },
+    {
+      "word": "the",
+      "start": 2.64,
+      "end": 2.7,
+      "probability": 1.0
+    },
+    {
+      "word": "past",
+      "start": 2.7,
+      "end": 2.86,
+      "probability": 1.0
+    },
+    {
+      "word": "35",
+      "start": 2.86,
+      "end": 3.42,
+      "probability": 0.96
+    },
+    {
+      "word": "days,",
+      "start": 3.42,
+      "end": 3.84,
+      "probability": 0.99
+    },
+    {
+      "word": "and",
+      "start": 4.16,
+      "end": 4.24,
+      "probability": 0.98
+    },
+    {
+      "word": "I'm",
+      "start": 4.24,
+      "end": 4.34,
+      "probability": 0.97
+    },
+    {
+      "word": "about",
+      "start": 4.34,
+      "end": 4.48,
+      "probability": 1.0
+    },
+    {
+      "word": "to",
+      "start": 4.48,
+      "end": 4.62,
+      "probability": 0.99
+    },
+    {
+      "word": "give",
+      "start": 4.62,
+      "end": 4.74,
+      "probability": 0.99
+    },
+    {
+      "word": "you",
+      "start": 4.74,
+      "end": 4.88,
+      "probability": 0.99
+    },
+    {
+      "word": "the",
+      "start": 4.88,
+      "end": 5.02,
+      "probability": 0.98
+    },
+    {
+      "word": "exact",
+      "start": 5.02,
+      "end": 5.36,
+      "probability": 0.93
+    },
+    {
+      "word": "system,",
+      "start": 5.36,
+      "end": 5.84,
+      "probability": 0.98
+    },
+    {
+      "word": "because",
+      "start": 6.1,
+      "end": 6.24,
+      "probability": 0.98
+    },
+    {
+      "word": "in",
+      "start": 6.24,
+      "end": 6.36,
+      "probability": 0.98
+    },
+    {
+      "word": "three",
+      "start": 6.36,
+      "end": 6.62,
+      "probability": 0.61
+    },
+    {
+      "word": "months",
+      "start": 6.62,
+      "end": 6.78,
+      "probability": 1.0
+    },
+    {
+      "word": "everyone",
+      "start": 6.78,
+      "end": 7.48,
+      "probability": 0.55
+    },
+    {
+      "word": "will",
+      "start": 7.48,
+      "end": 7.7,
+      "probability": 0.99
+    },
+    {
+      "word": "be",
+      "start": 7.7,
+      "end": 7.82,
+      "probability": 0.99
+    },
+    {
+      "word": "doing",
+      "start": 7.82,
+      "end": 8.0,
+      "probability": 1.0
+    },
+    {
+      "word": "this.",
+      "start": 8.0,
+      "end": 8.24,
+      "probability": 1.0
+    },
+    {
+      "word": "Right",
+      "start": 8.62,
+      "end": 8.86,
+      "probability": 0.96
+    },
+    {
+      "word": "now,",
+      "start": 8.86,
+      "end": 9.14,
+      "probability": 1.0
+    },
+    {
+      "word": "AI",
+      "start": 9.34,
+      "end": 9.48,
+      "probability": 0.95
+    },
+    {
+      "word": "animated",
+      "start": 9.48,
+      "end": 10.02,
+      "probability": 0.93
+    },
+    {
+      "word": "reels",
+      "start": 10.02,
+      "end": 10.44,
+      "probability": 0.88
+    },
+    {
+      "word": "are",
+      "start": 10.44,
+      "end": 10.58,
+      "probability": 0.95
+    },
+    {
+      "word": "where",
+      "start": 10.58,
+      "end": 10.72,
+      "probability": 0.99
+    },
+    {
+      "word": "early",
+      "start": 10.72,
+      "end": 11.04,
+      "probability": 0.91
+    },
+    {
+      "word": "TikTok",
+      "start": 11.04,
+      "end": 11.3,
+      "probability": 0.84
+    },
+    {
+      "word": "was.",
+      "start": 11.3,
+      "end": 11.66,
+      "probability": 1.0
+    },
+    {
+      "word": "Real",
+      "start": 11.98,
+      "end": 12.1,
+      "probability": 0.95
+    },
+    {
+      "word": "-motion",
+      "start": 12.1,
+      "end": 12.38,
+      "probability": 0.67
+    },
+    {
+      "word": "graphics,",
+      "start": 12.38,
+      "end": 12.74,
+      "probability": 0.99
+    },
+    {
+      "word": "voiceover,",
+      "start": 13.08,
+      "end": 13.54,
+      "probability": 0.8
+    },
+    {
+      "word": "and",
+      "start": 13.64,
+      "end": 13.68,
+      "probability": 1.0
+    },
+    {
+      "word": "captions",
+      "start": 13.68,
+      "end": 13.98,
+      "probability": 0.99
+    },
+    {
+      "word": "made",
+      "start": 13.98,
+      "end": 14.54,
+      "probability": 0.56
+    },
+    {
+      "word": "from",
+      "start": 14.54,
+      "end": 14.74,
+      "probability": 0.99
+    },
+    {
+      "word": "one",
+      "start": 14.74,
+      "end": 14.96,
+      "probability": 0.77
+    },
+    {
+      "word": "prompt,",
+      "start": 14.96,
+      "end": 15.3,
+      "probability": 1.0
+    },
+    {
+      "word": "and",
+      "start": 15.54,
+      "end": 15.62,
+      "probability": 1.0
+    },
+    {
+      "word": "hardly",
+      "start": 15.62,
+      "end": 15.82,
+      "probability": 1.0
+    },
+    {
+      "word": "anyone",
+      "start": 15.82,
+      "end": 16.26,
+      "probability": 0.99
+    },
+    {
+      "word": "knows",
+      "start": 16.26,
+      "end": 16.44,
+      "probability": 1.0
+    },
+    {
+      "word": "it's",
+      "start": 16.44,
+      "end": 16.66,
+      "probability": 0.95
+    },
+    {
+      "word": "possible",
+      "start": 16.66,
+      "end": 16.98,
+      "probability": 1.0
+    },
+    {
+      "word": "yet.",
+      "start": 16.98,
+      "end": 17.2,
+      "probability": 0.98
+    },
+    {
+      "word": "But",
+      "start": 17.4,
+      "end": 17.48,
+      "probability": 0.91
+    },
+    {
+      "word": "this",
+      "start": 17.48,
+      "end": 17.62,
+      "probability": 0.95
+    },
+    {
+      "word": "market",
+      "start": 17.62,
+      "end": 17.88,
+      "probability": 0.97
+    },
+    {
+      "word": "fills",
+      "start": 17.88,
+      "end": 18.14,
+      "probability": 0.97
+    },
+    {
+      "word": "up",
+      "start": 18.14,
+      "end": 18.32,
+      "probability": 0.99
+    },
+    {
+      "word": "fast,",
+      "start": 18.32,
+      "end": 18.74,
+      "probability": 1.0
+    },
+    {
+      "word": "and",
+      "start": 19.0,
+      "end": 19.14,
+      "probability": 0.99
+    },
+    {
+      "word": "when",
+      "start": 19.14,
+      "end": 19.22,
+      "probability": 0.96
+    },
+    {
+      "word": "it",
+      "start": 19.22,
+      "end": 19.34,
+      "probability": 1.0
+    },
+    {
+      "word": "does,",
+      "start": 19.34,
+      "end": 19.56,
+      "probability": 1.0
+    },
+    {
+      "word": "the",
+      "start": 19.86,
+      "end": 19.94,
+      "probability": 0.99
+    },
+    {
+      "word": "ones",
+      "start": 19.94,
+      "end": 20.08,
+      "probability": 1.0
+    },
+    {
+      "word": "who",
+      "start": 20.08,
+      "end": 20.22,
+      "probability": 0.99
+    },
+    {
+      "word": "started",
+      "start": 20.22,
+      "end": 20.5,
+      "probability": 0.97
+    },
+    {
+      "word": "first",
+      "start": 20.5,
+      "end": 20.78,
+      "probability": 0.99
+    },
+    {
+      "word": "already",
+      "start": 20.78,
+      "end": 21.38,
+      "probability": 0.99
+    },
+    {
+      "word": "have",
+      "start": 21.38,
+      "end": 21.66,
+      "probability": 1.0
+    },
+    {
+      "word": "the",
+      "start": 21.66,
+      "end": 21.8,
+      "probability": 0.99
+    },
+    {
+      "word": "audience.",
+      "start": 21.8,
+      "end": 22.18,
+      "probability": 1.0
+    },
+    {
+      "word": "First",
+      "start": 22.62,
+      "end": 22.76,
+      "probability": 0.92
+    },
+    {
+      "word": "come,",
+      "start": 22.76,
+      "end": 22.98,
+      "probability": 0.79
+    },
+    {
+      "word": "first",
+      "start": 23.3,
+      "end": 23.44,
+      "probability": 0.99
+    },
+    {
+      "word": "served.",
+      "start": 23.44,
+      "end": 23.8,
+      "probability": 0.97
+    },
+    {
+      "word": "And",
+      "start": 24.16,
+      "end": 24.28,
+      "probability": 0.98
+    },
+    {
+      "word": "most",
+      "start": 24.28,
+      "end": 24.46,
+      "probability": 0.98
+    },
+    {
+      "word": "AI",
+      "start": 24.46,
+      "end": 24.7,
+      "probability": 0.99
+    },
+    {
+      "word": "reels",
+      "start": 24.7,
+      "end": 25.06,
+      "probability": 0.98
+    },
+    {
+      "word": "look",
+      "start": 25.06,
+      "end": 25.24,
+      "probability": 0.96
+    },
+    {
+      "word": "like",
+      "start": 25.24,
+      "end": 25.44,
+      "probability": 1.0
+    },
+    {
+      "word": "AI",
+      "start": 25.44,
+      "end": 25.76,
+      "probability": 0.97
+    },
+    {
+      "word": "slop.",
+      "start": 25.76,
+      "end": 26.18,
+      "probability": 0.43
+    },
+    {
+      "word": "Mine",
+      "start": 26.54,
+      "end": 26.68,
+      "probability": 0.74
+    },
+    {
+      "word": "don't,",
+      "start": 26.68,
+      "end": 27.06,
+      "probability": 0.99
+    },
+    {
+      "word": "because",
+      "start": 27.2,
+      "end": 27.4,
+      "probability": 1.0
+    },
+    {
+      "word": "the",
+      "start": 27.4,
+      "end": 27.54,
+      "probability": 1.0
+    },
+    {
+      "word": "system",
+      "start": 27.54,
+      "end": 27.82,
+      "probability": 1.0
+    },
+    {
+      "word": "behind",
+      "start": 27.82,
+      "end": 28.1,
+      "probability": 1.0
+    },
+    {
+      "word": "them",
+      "start": 28.1,
+      "end": 28.32,
+      "probability": 1.0
+    },
+    {
+      "word": "isn't",
+      "start": 28.32,
+      "end": 28.74,
+      "probability": 1.0
+    },
+    {
+      "word": "one",
+      "start": 28.74,
+      "end": 28.92,
+      "probability": 0.98
+    },
+    {
+      "word": "prompt.",
+      "start": 28.92,
+      "end": 29.34,
+      "probability": 0.99
+    },
+    {
+      "word": "It's",
+      "start": 29.34,
+      "end": 29.88,
+      "probability": 0.56
+    },
+    {
+      "word": "221",
+      "start": 29.88,
+      "end": 31.18,
+      "probability": 0.79
+    },
+    {
+      "word": "files.",
+      "start": 31.18,
+      "end": 31.72,
+      "probability": 0.98
+    },
+    {
+      "word": "Hook",
+      "start": 32.06,
+      "end": 32.1,
+      "probability": 0.76
+    },
+    {
+      "word": "patterns",
+      "start": 32.1,
+      "end": 32.42,
+      "probability": 0.93
+    },
+    {
+      "word": "and",
+      "start": 32.42,
+      "end": 32.68,
+      "probability": 0.98
+    },
+    {
+      "word": "pacing",
+      "start": 32.68,
+      "end": 32.94,
+      "probability": 0.98
+    },
+    {
+      "word": "rules",
+      "start": 32.94,
+      "end": 33.24,
+      "probability": 1.0
+    },
+    {
+      "word": "decoded",
+      "start": 33.24,
+      "end": 33.76,
+      "probability": 0.98
+    },
+    {
+      "word": "from",
+      "start": 33.76,
+      "end": 34.0,
+      "probability": 0.98
+    },
+    {
+      "word": "my",
+      "start": 34.0,
+      "end": 34.22,
+      "probability": 0.82
+    },
+    {
+      "word": "viral",
+      "start": 34.22,
+      "end": 34.56,
+      "probability": 0.91
+    },
+    {
+      "word": "reels.",
+      "start": 34.56,
+      "end": 35.0,
+      "probability": 0.85
+    },
+    {
+      "word": "Spring",
+      "start": 35.3,
+      "end": 35.62,
+      "probability": 0.92
+    },
+    {
+      "word": "physics,",
+      "start": 35.62,
+      "end": 35.94,
+      "probability": 0.83
+    },
+    {
+      "word": "whip",
+      "start": 36.26,
+      "end": 36.3,
+      "probability": 0.26
+    },
+    {
+      "word": "pans,",
+      "start": 36.3,
+      "end": 36.56,
+      "probability": 0.57
+    },
+    {
+      "word": "and",
+      "start": 36.76,
+      "end": 36.84,
+      "probability": 0.97
+    },
+    {
+      "word": "zoom",
+      "start": 36.84,
+      "end": 37.02,
+      "probability": 0.76
+    },
+    {
+      "word": "kicks",
+      "start": 37.02,
+      "end": 37.26,
+      "probability": 0.82
+    },
+    {
+      "word": "tuned",
+      "start": 37.26,
+      "end": 37.64,
+      "probability": 0.62
+    },
+    {
+      "word": "the",
+      "start": 37.64,
+      "end": 37.84,
+      "probability": 0.98
+    },
+    {
+      "word": "way",
+      "start": 37.84,
+      "end": 37.94,
+      "probability": 1.0
+    },
+    {
+      "word": "my",
+      "start": 37.94,
+      "end": 38.16,
+      "probability": 0.98
+    },
+    {
+      "word": "videos",
+      "start": 38.16,
+      "end": 38.48,
+      "probability": 0.99
+    },
+    {
+      "word": "use",
+      "start": 38.48,
+      "end": 38.82,
+      "probability": 0.72
+    },
+    {
+      "word": "them.",
+      "start": 38.82,
+      "end": 39.0,
+      "probability": 1.0
+    },
+    {
+      "word": "Word",
+      "start": 39.4,
+      "end": 39.56,
+      "probability": 0.86
+    },
+    {
+      "word": "-timed",
+      "start": 39.56,
+      "end": 39.96,
+      "probability": 0.77
+    },
+    {
+      "word": "kinetic",
+      "start": 39.96,
+      "end": 40.26,
+      "probability": 0.75
+    },
+    {
+      "word": "captions",
+      "start": 40.26,
+      "end": 40.68,
+      "probability": 0.98
+    },
+    {
+      "word": "where",
+      "start": 40.68,
+      "end": 40.96,
+      "probability": 0.67
+    },
+    {
+      "word": "the",
+      "start": 40.96,
+      "end": 41.04,
+      "probability": 0.98
+    },
+    {
+      "word": "keyword",
+      "start": 41.04,
+      "end": 41.42,
+      "probability": 0.77
+    },
+    {
+      "word": "lands",
+      "start": 41.42,
+      "end": 41.74,
+      "probability": 0.94
+    },
+    {
+      "word": "a",
+      "start": 41.74,
+      "end": 41.92,
+      "probability": 0.92
+    },
+    {
+      "word": "beat",
+      "start": 41.92,
+      "end": 42.08,
+      "probability": 0.89
+    },
+    {
+      "word": "before",
+      "start": 42.08,
+      "end": 42.4,
+      "probability": 0.98
+    },
+    {
+      "word": "it's",
+      "start": 42.4,
+      "end": 42.68,
+      "probability": 0.92
+    },
+    {
+      "word": "said.",
+      "start": 42.68,
+      "end": 42.84,
+      "probability": 0.96
+    },
+    {
+      "word": "A",
+      "start": 43.1,
+      "end": 43.16,
+      "probability": 0.97
+    },
+    {
+      "word": "multi",
+      "start": 43.16,
+      "end": 43.4,
+      "probability": 0.9
+    },
+    {
+      "word": "-step",
+      "start": 43.4,
+      "end": 43.64,
+      "probability": 0.98
+    },
+    {
+      "word": "audio",
+      "start": 43.64,
+      "end": 43.92,
+      "probability": 0.99
+    },
+    {
+      "word": "chain",
+      "start": 43.92,
+      "end": 44.22,
+      "probability": 0.97
+    },
+    {
+      "word": "on",
+      "start": 44.22,
+      "end": 44.44,
+      "probability": 0.98
+    },
+    {
+      "word": "top",
+      "start": 44.44,
+      "end": 44.68,
+      "probability": 0.99
+    },
+    {
+      "word": "of",
+      "start": 44.68,
+      "end": 44.84,
+      "probability": 0.98
+    },
+    {
+      "word": "11",
+      "start": 44.84,
+      "end": 45.02,
+      "probability": 0.86
+    },
+    {
+      "word": "labs",
+      "start": 45.02,
+      "end": 45.32,
+      "probability": 0.79
+    },
+    {
+      "word": "mastered",
+      "start": 45.32,
+      "end": 45.92,
+      "probability": 0.83
+    },
+    {
+      "word": "for",
+      "start": 45.92,
+      "end": 46.14,
+      "probability": 0.99
+    },
+    {
+      "word": "Instagram.",
+      "start": 46.14,
+      "end": 46.54,
+      "probability": 0.96
+    },
+    {
+      "word": "And",
+      "start": 46.98,
+      "end": 47.04,
+      "probability": 0.93
+    },
+    {
+      "word": "before",
+      "start": 47.04,
+      "end": 47.24,
+      "probability": 0.99
+    },
+    {
+      "word": "you",
+      "start": 47.24,
+      "end": 47.42,
+      "probability": 1.0
+    },
+    {
+      "word": "ever",
+      "start": 47.42,
+      "end": 47.66,
+      "probability": 0.98
+    },
+    {
+      "word": "see",
+      "start": 47.66,
+      "end": 47.92,
+      "probability": 1.0
+    },
+    {
+      "word": "the",
+      "start": 47.92,
+      "end": 48.08,
+      "probability": 0.99
+    },
+    {
+      "word": "reel,",
+      "start": 48.08,
+      "end": 48.28,
+      "probability": 0.79
+    },
+    {
+      "word": "it",
+      "start": 48.54,
+      "end": 48.56,
+      "probability": 0.98
+    },
+    {
+      "word": "scores",
+      "start": 48.56,
+      "end": 48.84,
+      "probability": 0.95
+    },
+    {
+      "word": "its",
+      "start": 48.84,
+      "end": 49.08,
+      "probability": 0.84
+    },
+    {
+      "word": "own",
+      "start": 49.08,
+      "end": 49.26,
+      "probability": 1.0
+    },
+    {
+      "word": "motion",
+      "start": 49.26,
+      "end": 49.6,
+      "probability": 0.99
+    },
+    {
+      "word": "and",
+      "start": 49.6,
+      "end": 49.84,
+      "probability": 0.96
+    },
+    {
+      "word": "fixes",
+      "start": 49.84,
+      "end": 50.18,
+      "probability": 1.0
+    },
+    {
+      "word": "the",
+      "start": 50.18,
+      "end": 50.38,
+      "probability": 1.0
+    },
+    {
+      "word": "weak",
+      "start": 50.38,
+      "end": 50.52,
+      "probability": 0.76
+    },
+    {
+      "word": "moments.",
+      "start": 50.52,
+      "end": 50.88,
+      "probability": 0.96
+    },
+    {
+      "word": "You",
+      "start": 51.2,
+      "end": 51.28,
+      "probability": 0.91
+    },
+    {
+      "word": "type",
+      "start": 51.28,
+      "end": 51.48,
+      "probability": 1.0
+    },
+    {
+      "word": "one",
+      "start": 51.48,
+      "end": 51.7,
+      "probability": 0.78
+    },
+    {
+      "word": "line",
+      "start": 51.7,
+      "end": 51.92,
+      "probability": 0.99
+    },
+    {
+      "word": "into",
+      "start": 51.92,
+      "end": 52.16,
+      "probability": 1.0
+    },
+    {
+      "word": "Claude",
+      "start": 52.16,
+      "end": 52.5,
+      "probability": 0.92
+    },
+    {
+      "word": "code,",
+      "start": 52.5,
+      "end": 52.72,
+      "probability": 0.58
+    },
+    {
+      "word": "cursor,",
+      "start": 52.98,
+      "end": 53.16,
+      "probability": 0.65
+    },
+    {
+      "word": "or",
+      "start": 53.38,
+      "end": 53.42,
+      "probability": 0.86
+    },
+    {
+      "word": "codex,",
+      "start": 53.42,
+      "end": 53.9,
+      "probability": 0.84
+    },
+    {
+      "word": "and",
+      "start": 54.1,
+      "end": 54.14,
+      "probability": 0.99
+    },
+    {
+      "word": "it",
+      "start": 54.14,
+      "end": 54.24,
+      "probability": 1.0
+    },
+    {
+      "word": "writes,",
+      "start": 54.24,
+      "end": 54.44,
+      "probability": 0.98
+    },
+    {
+      "word": "voices,",
+      "start": 54.78,
+      "end": 55.08,
+      "probability": 0.97
+    },
+    {
+      "word": "animates,",
+      "start": 55.42,
+      "end": 55.74,
+      "probability": 0.99
+    },
+    {
+      "word": "and",
+      "start": 55.88,
+      "end": 55.98,
+      "probability": 1.0
+    },
+    {
+      "word": "renders",
+      "start": 55.98,
+      "end": 56.36,
+      "probability": 1.0
+    },
+    {
+      "word": "the",
+      "start": 56.36,
+      "end": 56.54,
+      "probability": 0.99
+    },
+    {
+      "word": "whole",
+      "start": 56.54,
+      "end": 56.78,
+      "probability": 1.0
+    },
+    {
+      "word": "reel.",
+      "start": 56.78,
+      "end": 57.1,
+      "probability": 0.97
+    },
+    {
+      "word": "That's",
+      "start": 57.1,
+      "end": 57.48,
+      "probability": 0.94
+    },
+    {
+      "word": "what",
+      "start": 57.48,
+      "end": 57.56,
+      "probability": 0.98
+    },
+    {
+      "word": "got",
+      "start": 57.56,
+      "end": 57.68,
+      "probability": 0.97
+    },
+    {
+      "word": "this",
+      "start": 57.68,
+      "end": 57.84,
+      "probability": 0.98
+    },
+    {
+      "word": "account",
+      "start": 57.84,
+      "end": 58.08,
+      "probability": 0.99
+    },
+    {
+      "word": "almost",
+      "start": 58.08,
+      "end": 58.36,
+      "probability": 0.89
+    },
+    {
+      "word": "5",
+      "start": 58.36,
+      "end": 58.82,
+      "probability": 0.75
+    },
+    {
+      "word": "million",
+      "start": 58.82,
+      "end": 59.18,
+      "probability": 0.91
+    },
+    {
+      "word": "views",
+      "start": 59.18,
+      "end": 59.5,
+      "probability": 1.0
+    },
+    {
+      "word": "in",
+      "start": 59.5,
+      "end": 59.66,
+      "probability": 0.98
+    },
+    {
+      "word": "a",
+      "start": 59.66,
+      "end": 59.74,
+      "probability": 0.97
+    },
+    {
+      "word": "month,",
+      "start": 59.74,
+      "end": 60.04,
+      "probability": 1.0
+    },
+    {
+      "word": "and",
+      "start": 60.26,
+      "end": 60.3,
+      "probability": 0.98
+    },
+    {
+      "word": "over",
+      "start": 60.3,
+      "end": 60.46,
+      "probability": 0.99
+    },
+    {
+      "word": "$2",
+      "start": 60.46,
+      "end": 60.66,
+      "probability": 0.66
+    },
+    {
+      "word": ",500",
+      "start": 60.66,
+      "end": 61.38,
+      "probability": 0.72
+    },
+    {
+      "word": "in",
+      "start": 61.38,
+      "end": 61.84,
+      "probability": 0.97
+    },
+    {
+      "word": "brand",
+      "start": 61.84,
+      "end": 62.0,
+      "probability": 0.93
+    },
+    {
+      "word": "deals.",
+      "start": 62.0,
+      "end": 62.32,
+      "probability": 1.0
+    },
+    {
+      "word": "Comment",
+      "start": 62.58,
+      "end": 62.74,
+      "probability": 0.83
+    },
+    {
+      "word": "skill,",
+      "start": 62.74,
+      "end": 63.14,
+      "probability": 0.65
+    },
+    {
+      "word": "and",
+      "start": 63.44,
+      "end": 63.48,
+      "probability": 0.99
+    },
+    {
+      "word": "I'll",
+      "start": 63.48,
+      "end": 63.6,
+      "probability": 0.98
+    },
+    {
+      "word": "send",
+      "start": 63.6,
+      "end": 63.74,
+      "probability": 1.0
+    },
+    {
+      "word": "you",
+      "start": 63.74,
+      "end": 63.9,
+      "probability": 1.0
+    },
+    {
+      "word": "the",
+      "start": 63.9,
+      "end": 64.02,
+      "probability": 0.98
+    },
+    {
+      "word": "exact",
+      "start": 64.02,
+      "end": 64.3,
+      "probability": 0.85
+    },
+    {
+      "word": "system.",
+      "start": 64.3,
+      "end": 64.74,
+      "probability": 0.98
+    }
+  ]
+}

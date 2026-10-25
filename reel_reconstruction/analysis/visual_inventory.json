@@ -1,0 +1,167 @@
+{
+  "design_system": {
+    "background": {
+      "base_color": "#F4F1EA",
+      "texture": "subtle paper grain with 32px dot grid matrix",
+      "dot_color": "rgba(0, 0, 0, 0.05)"
+    },
+    "color_palette": {
+      "off_white_paper": "#F4F1EA",
+      "card_white": "#FFFFFF",
+      "card_dark": "#121417",
+      "card_dark_terminal": "#0B0D0F",
+      "accent_coral_red": "#E11D48",
+      "accent_red_bright": "#EF4444",
+      "text_primary": "#0F1115",
+      "text_secondary": "#525866",
+      "text_muted": "#868C98",
+      "border_light": "#E2E0D8",
+      "border_dark": "#23262D",
+      "badge_green": "#10B981"
+    },
+    "typography": {
+      "headline_font": "Inter, Montserrat, sans-serif, font-weight 800",
+      "emphasis_font": "Playfair Display, Georgia, serif, italic, font-weight 700",
+      "monospace_font": "Fira Code, JetBrains Mono, monospace, font-weight 600",
+      "annotation_font": "Inter, sans-serif, font-weight 600, uppercase"
+    }
+  },
+  "character_specification": {
+    "source_type": "User photo reference (young man, short dark hair, trimmed beard/mustache, dark checkered shirt)",
+    "target_style": "Illustrated clean cutout matching reference vector/outline aesthetic",
+    "clothing": "Dark checkered button-down shirt over crewneck or illustrated stylized counterpart",
+    "anchor": "Bottom-center / bottom-right, occupying lower 35% (y: 820px - 1280px)",
+    "key_poses": [
+      {
+        "pose_id": "pose_neutral_speak",
+        "action": "Hands resting at chest/waist level, speaking"
+      },
+      {
+        "pose_id": "pose_point_up_right",
+        "action": "Right hand pointing index finger up-right toward cards"
+      },
+      {
+        "pose_id": "pose_both_hands_point",
+        "action": "Both hands pointing up toward central graphic"
+      },
+      {
+        "pose_id": "pose_chin_think",
+        "action": "Hand on chin / whisper gesture"
+      },
+      {
+        "pose_id": "pose_shrug_palms",
+        "action": "Both palms open in shrug/explaining gesture"
+      },
+      {
+        "pose_id": "pose_direct_point",
+        "action": "Finger pointing forward toward viewer for CTA"
+      }
+    ]
+  },
+  "graphic_assets": {
+    "scene_01": [
+      "phone_notifications_card",
+      "profile_card_adlet",
+      "follower_counter_pill",
+      "red_badge_18"
+    ],
+    "scene_02": [
+      "calendar_now_card",
+      "the_system_pill",
+      "red_sealed_ribbon",
+      "padlock_icon",
+      "diagram_line"
+    ],
+    "scene_03": [
+      "phone_mockup_reel",
+      "trajectory_line_graph",
+      "target_pin_marker"
+    ],
+    "scene_04": [
+      "isometric_layers_stack",
+      "red_prompt_bubble",
+      "voiceover_pill",
+      "motion_pill"
+    ],
+    "scene_05": [
+      "audience_crowd_heads",
+      "phone_screen_tiktok"
+    ],
+    "scene_06": [
+      "theater_seating_diagram",
+      "red_full_badge",
+      "occupancy_dots"
+    ],
+    "scene_07": [
+      "ticket_2481",
+      "red_dot_transition_matrix",
+      "badge_001"
+    ],
+    "scene_08": [
+      "ai_slop_video_grid_6",
+      "small_red_badges",
+      "play_icons"
+    ],
+    "scene_09": [
+      "dark_system_221_files_card",
+      "file_counter_large",
+      "folder_stack"
+    ],
+    "scene_10": [
+      "patterns_md_window",
+      "checklist_items_3",
+      "phone_trio_bottom"
+    ],
+    "scene_11": [
+      "zoom_kick_software_card",
+      "target_crosshairs",
+      "spring_graph_dial"
+    ],
+    "scene_12": [
+      "caption_word_preview_key",
+      "audio_waveform_strip",
+      "timeline_playhead",
+      "timecode_clock"
+    ],
+    "scene_13": [
+      "audio_rack_4_knobs",
+      "knob_cut",
+      "knob_speed",
+      "knob_loud",
+      "knob_peak",
+      "elevenlabs_pill"
+    ],
+    "scene_14": [
+      "film_strip_cell",
+      "red_score_stamp_2_9",
+      "eye_review_reticle"
+    ],
+    "scene_15": [
+      "claude_code_terminal_window",
+      "code_cursor_prompt",
+      "keyboard_keys_layout"
+    ],
+    "scene_16": [
+      "workflow_pipeline_card",
+      "step_script",
+      "step_voice",
+      "step_motion",
+      "mobile_preview"
+    ],
+    "scene_17": [
+      "analytics_4_9m_card",
+      "growth_spline_chart",
+      "follower_card_39k"
+    ],
+    "scene_18": [
+      "brand_deals_card",
+      "red_rubber_stamp_brand_deals",
+      "dollar_metric_2500"
+    ],
+    "scene_19": [
+      "red_speech_bubble_skill",
+      "comments_interface",
+      "direct_message_card"
+    ]
+  }
+}

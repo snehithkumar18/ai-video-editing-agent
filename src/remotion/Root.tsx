@@ -3,6 +3,7 @@ import { Composition, staticFile } from 'remotion';
 import { ZoomReelComposition } from './templates/ZoomReelComposition';
 import { SplitScreenReelComposition } from './templates/SplitScreenReelComposition';
 import { WhiteMinimalReelComposition } from './templates/WhiteMinimalReelComposition';
+import { ReelComposition } from '../../reel_reconstruction/src/ReelComposition';
 import timestampsData from '../../public/timestamps_female.json';
 
 export const RemotionRoot: React.FC = () => {
@@ -59,6 +60,16 @@ export const RemotionRoot: React.FC = () => {
           timestamps: timestampsData,
           topicTag: 'AI VIRAL ENGINE 2026',
         }}
+      />
+
+      {/* 4. Complete Reconstruction of Reference Instagram Reel */}
+      <Composition
+        id="ReelReconstruction"
+        component={ReelComposition}
+        durationInFrames={1974}
+        fps={30}
+        width={720}
+        height={1280}
       />
     </>
   );

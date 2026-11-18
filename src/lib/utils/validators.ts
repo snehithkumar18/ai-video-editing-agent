@@ -6,8 +6,11 @@ export const createProjectSchema = z.object({
   script_raw: z.string().optional().nullable(),
   platform: z.enum(PLATFORMS),
   style_template: z.enum(STYLE_TEMPLATES),
-  voice_profile_id: z.string().uuid().optional().nullable(),
-  avatar_profile_id: z.string().uuid().optional().nullable(),
+  voice_profile_id: z.string().optional().nullable(),
+  avatar_profile_id: z.string().optional().nullable(),
+  presenter_mode: z.enum(['sadtalker_avatar', 'video_upload']).optional().nullable(),
+  talking_video_url: z.string().optional().nullable(),
+  metadata: z.record(z.string(), z.any()).optional().nullable(),
 });
 
 export const uploadVoiceSchema = z.object({

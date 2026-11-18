@@ -11,29 +11,26 @@ export const Scene03Workflow: React.FC = () => {
     config: { damping: 14, stiffness: 100, mass: 0.8 },
   });
 
-  const promptSpring = spring({
-    frame: frame - 10,
+  const card1Spring = spring({
+    frame: frame - 15,
     fps,
-    config: { damping: 12, stiffness: 110, mass: 0.8 },
+    config: { damping: 13, stiffness: 110, mass: 0.8 },
   });
 
-  const step1Spring = spring({
-    frame: frame - 25,
+  const card2Spring = spring({
+    frame: frame - 32,
+    fps,
+    config: { damping: 13, stiffness: 115, mass: 0.8 },
+  });
+
+  const energySpring = spring({
+    frame: frame - 55,
     fps,
     config: { damping: 12, stiffness: 130, mass: 0.6 },
   });
 
-  const step2Spring = spring({
-    frame: frame - 45,
-    fps,
-    config: { damping: 12, stiffness: 130, mass: 0.6 },
-  });
-
-  const step3Spring = spring({
-    frame: frame - 65,
-    fps,
-    config: { damping: 12, stiffness: 130, mass: 0.6 },
-  });
+  // Pulse animation along connector
+  const pulseOffset = (frame * 5) % 300;
 
   return (
     <div
@@ -43,160 +40,191 @@ export const Scene03Workflow: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        paddingTop: 180,
+        paddingTop: 160,
         pointerEvents: 'none',
       }}
     >
       {/* Headline */}
       <div
         style={{
-          transform: `translateY(${(1 - titleSpring) * -50}px) scale(${0.9 + titleSpring * 0.1})`,
+          transform: `translateY(${(1 - titleSpring) * -45}px) scale(${0.9 + titleSpring * 0.1})`,
           opacity: titleSpring,
           textAlign: 'center',
           maxWidth: 950,
-          marginBottom: 40,
+          marginBottom: 35,
         }}
       >
-        <div
+        <span
           style={{
             fontFamily: "'Inter', sans-serif",
-            fontSize: 54,
+            fontSize: 60,
             fontWeight: 900,
             color: '#0D0F12',
             letterSpacing: '-0.04em',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 20,
+            display: 'block',
           }}
         >
-          <span>IDEA</span>
-          <span style={{ color: '#F95738', fontSize: 44 }}>→</span>
-          <span>SCENES</span>
-          <span style={{ color: '#F95738', fontSize: 44 }}>→</span>
-          <span style={{ color: '#F95738' }}>ANIMATION</span>
-        </div>
+          NOT A VIDEO AI, CODE.
+        </span>
+        <span
+          style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontStyle: 'italic',
+            fontSize: 66,
+            fontWeight: 800,
+            color: '#F95738',
+            letterSpacing: '-0.02em',
+            display: 'block',
+            marginTop: 6,
+          }}
+        >
+          No Video Credits To Burn
+        </span>
       </div>
 
-      {/* Input Prompt Box */}
+      {/* Comparison Grid: Old Way vs Code Way */}
       <div
         style={{
-          width: 860,
-          backgroundColor: '#111418',
-          borderRadius: 24,
-          padding: '18px 28px',
-          border: '1px solid rgba(255,255,255,0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 16,
-          boxShadow: '0 20px 50px rgba(0,0,0,0.18)',
-          transform: `translateY(${(1 - promptSpring) * 40}px)`,
-          opacity: promptSpring,
-          marginBottom: 40,
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 24,
+          width: 880,
+          marginBottom: 30,
         }}
       >
-        <span style={{ color: '#F95738', fontFamily: "'Fira Code', monospace", fontSize: 24, fontWeight: 800 }}>
-          ❯
-        </span>
-        <span style={{ color: '#F8FAFC', fontFamily: "'Fira Code', monospace", fontSize: 20, fontWeight: 600 }}>
-          claude "create a 50s explainer about my AI app"
-        </span>
+        {/* Card 1: Traditional Video AI (Crossed Out) */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: 28,
+            padding: '28px 26px',
+            border: '2px solid #FCA5A5',
+            boxShadow: '0 20px 50px rgba(239, 68, 68, 0.08)',
+            transform: `translateY(${(1 - card1Spring) * 50}px)`,
+            opacity: card1Spring,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <span
+              style={{
+                backgroundColor: '#FEE2E2',
+                color: '#EF4444',
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 13,
+                fontWeight: 800,
+                padding: '6px 14px',
+                borderRadius: 20,
+              }}
+            >
+              TRADITIONAL AI VIDEO
+            </span>
+            <span style={{ fontSize: 20 }}>❌</span>
+          </div>
+
+          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 800, color: '#1E293B', marginBottom: 16 }}>
+            Pay-Per-Generation
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#64748B', fontSize: 15, fontFamily: "'Inter', sans-serif" }}>
+              <span style={{ color: '#EF4444', fontWeight: 900 }}>✕</span>
+              <span>Burn $50–$100 in API credits</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#64748B', fontSize: 15, fontFamily: "'Inter', sans-serif" }}>
+              <span style={{ color: '#EF4444', fontWeight: 900 }}>✕</span>
+              <span>Inconsistent character faces</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#64748B', fontSize: 15, fontFamily: "'Inter', sans-serif" }}>
+              <span style={{ color: '#EF4444', fontWeight: 900 }}>✕</span>
+              <span>Cloud queues & blurry 720p text</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 2: Claude Skill + Code Engine (Winner) */}
+        <div
+          style={{
+            backgroundColor: '#0F172A',
+            borderRadius: 28,
+            padding: '28px 26px',
+            border: '2px solid #10B981',
+            boxShadow: '0 25px 60px rgba(16, 185, 129, 0.22)',
+            transform: `translateY(${(1 - card2Spring) * 50}px)`,
+            opacity: card2Spring,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <span
+              style={{
+                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                color: '#10B981',
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 13,
+                fontWeight: 800,
+                padding: '6px 14px',
+                borderRadius: 20,
+              }}
+            >
+              CLAUDE SKILL (HYPERFRAMES)
+            </span>
+            <span style={{ fontSize: 20 }}>✅</span>
+          </div>
+
+          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, fontWeight: 800, color: '#FFFFFF', marginBottom: 16 }}>
+            100% Free & Unlimited
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#E2E8F0', fontSize: 15, fontFamily: "'Inter', sans-serif" }}>
+              <span style={{ color: '#10B981', fontWeight: 900 }}>✓</span>
+              <span>Zero credit cost — purely local</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#E2E8F0', fontSize: 15, fontFamily: "'Inter', sans-serif" }}>
+              <span style={{ color: '#10B981', fontWeight: 900 }}>✓</span>
+              <span>Crisp vector SVG & typography</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#E2E8F0', fontSize: 15, fontFamily: "'Inter', sans-serif" }}>
+              <span style={{ color: '#10B981', fontWeight: 900 }}>✓</span>
+              <span>Exact 30 FPS deterministic sync</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* 3 Structured Workflow Cards with Orange Connectors */}
-      <div style={{ position: 'relative', width: 860, display: 'flex', justifyContent: 'space-between' }}>
-        {/* Connector Line Behind */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 60,
-            left: 100,
-            right: 100,
-            height: 4,
-            backgroundColor: '#E5E1D8',
-            zIndex: 5,
-          }}
-        >
-          <div
-            style={{
-              height: '100%',
-              width: `${interpolate(frame, [25, 80], [0, 100], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })}%`,
-              backgroundColor: '#F95738',
-              boxShadow: '0 0 12px #F95738',
-            }}
-          />
+      {/* Step 3: Interactive Energy Flow Bar */}
+      <div
+        style={{
+          width: 880,
+          backgroundColor: '#FFFFFF',
+          borderRadius: 24,
+          padding: '16px 28px',
+          border: '1.5px solid #E2E8F0',
+          boxShadow: '0 15px 40px rgba(0,0,0,0.06)',
+          transform: `scale(${energySpring})`,
+          opacity: energySpring,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 22 }}>⚡</span>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 16, fontWeight: 800, color: '#0F172A' }}>
+            EXECUTION PIPELINE:
+          </span>
         </div>
-
-        {/* Stage 1: Idea Card */}
-        <div
-          style={{
-            width: 260,
-            backgroundColor: '#FFFFFF',
-            borderRadius: 24,
-            padding: '24px 20px',
-            border: '2px solid #E5E1D8',
-            boxShadow: '0 15px 35px rgba(0,0,0,0.06)',
-            zIndex: 10,
-            transform: `scale(${step1Spring})`,
-            opacity: step1Spring,
-            textAlign: 'center',
-          }}
-        >
-          <div style={{ fontSize: 36, marginBottom: 8 }}>💡</div>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, fontSize: 20, color: '#0D0F12' }}>
-            01. Prompt Idea
-          </div>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: '#6B7280', marginTop: 4 }}>
-            Topic & target audience
-          </div>
-        </div>
-
-        {/* Stage 2: Storyboard Card */}
-        <div
-          style={{
-            width: 260,
-            backgroundColor: '#FFFFFF',
-            borderRadius: 24,
-            padding: '24px 20px',
-            border: '2px solid #E5E1D8',
-            boxShadow: '0 15px 35px rgba(0,0,0,0.06)',
-            zIndex: 10,
-            transform: `scale(${step2Spring})`,
-            opacity: step2Spring,
-            textAlign: 'center',
-          }}
-        >
-          <div style={{ fontSize: 36, marginBottom: 8 }}>📋</div>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, fontSize: 20, color: '#0D0F12' }}>
-            02. Scene Storyboard
-          </div>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: '#6B7280', marginTop: 4 }}>
-            Exact timing & cues
-          </div>
-        </div>
-
-        {/* Stage 3: Animation Card */}
-        <div
-          style={{
-            width: 260,
-            backgroundColor: '#F95738',
-            borderRadius: 24,
-            padding: '24px 20px',
-            boxShadow: '0 20px 45px rgba(249, 87, 56, 0.35)',
-            zIndex: 10,
-            transform: `scale(${step3Spring})`,
-            opacity: step3Spring,
-            textAlign: 'center',
-            color: '#FFFFFF',
-          }}
-        >
-          <div style={{ fontSize: 36, marginBottom: 8 }}>⚡</div>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, fontSize: 20 }}>
-            03. Motion Engine
-          </div>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, opacity: 0.9, marginTop: 4 }}>
-            Spring curves & render
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 14, fontWeight: 700, color: '#F95738' }}>
+            IDEA
+          </span>
+          <span style={{ color: '#94A3B8' }}>➔</span>
+          <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 14, fontWeight: 700, color: '#38BDF8' }}>
+            REMOTION CODE
+          </span>
+          <span style={{ color: '#94A3B8' }}>➔</span>
+          <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 14, fontWeight: 700, color: '#10B981' }}>
+            1080p MP4
+          </span>
         </div>
       </div>
     </div>

@@ -12,12 +12,18 @@ export interface KineticCaptionsProps {
   words: WordItem[];
   color?: string;
   activeColor?: string;
+  bottomOffset?: number;
+  positionMode?: 'middle' | 'bottom';
+  pillStyle?: boolean;
 }
 
 export const KineticCaptions: React.FC<KineticCaptionsProps> = ({
   words,
-  color = '#0D0F12',
+  color = '#FFFFFF',
   activeColor = '#F95738',
+  bottomOffset = 80,
+  positionMode = 'middle',
+  pillStyle = true,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -46,45 +52,64 @@ export const KineticCaptions: React.FC<KineticCaptionsProps> = ({
     <div
       style={{
         position: 'absolute',
-        top: 1140,
+        ...(positionMode === 'middle'
+          ? { top: '50%', transform: 'translateY(-50%)' }
+          : { bottom: bottomOffset }),
         left: 0,
         right: 0,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '12px 18px',
-        padding: '0 60px',
-        zIndex: 50,
+        padding: '0 40px',
+        zIndex: 60,
         pointerEvents: 'none',
       }}
     >
-      {visibleWords.map((item, idx) => {
-        const isCurrent = currentTime >= item.start && currentTime <= item.end;
-        const isPast = currentTime > item.end;
+      <div
+        style={
+          pillStyle
+            ? {
+                backgroundColor: 'rgba(0, 0, 0, 0.88)',
+                border: '1.5px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: 16,
+                padding: '10px 22px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px 14px',
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.6)',
+                backdropFilter: 'blur(10px)',
+              }
+            : {
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '12px 18px',
+              }
+        }
+      >
+        {visibleWords.map((item, idx) => {
+          const isCurrent = currentTime >= item.start && currentTime <= item.end;
+          const isPast = currentTime > item.end;
 
-        return (
-          <span
-            key={`${item.word}-${item.start}-${idx}`}
-            style={{
-              fontFamily: "'Inter', 'Montserrat', -apple-system, sans-serif",
-              fontSize: isCurrent ? '56px' : '50px',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '-0.02em',
-              color: isCurrent ? activeColor : isPast ? '#6B7280' : color,
-              transform: isCurrent ? 'scale(1.12)' : 'scale(1.0)',
-              transition: 'transform 0.08s ease, color 0.08s ease',
-              display: 'inline-block',
-              textShadow:
-                '0 3px 6px rgba(255, 255, 255, 0.95), 0 4px 14px rgba(0, 0, 0, 0.08)',
-              background: 'transparent', // Explicit zero background box requirement
-            }}
-          >
-            {item.word}
-          </span>
-        );
-      })}
+          return (
+            <span
+              key={`${item.word}-${item.start}-${idx}`}
+              style={{
+                fontFamily: "'Inter', 'Montserrat', -apple-system, sans-serif",
+                fontSize: pillStyle ? (isCurrent ? '38px' : '34px') : (isCurrent ? '56px' : '50px'),
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: isCurrent ? activeColor : isPast ? '#94A3B8' : '#FFFFFF',
+                transform: isCurrent ? 'scale(1.08)' : 'scale(1.0)',
+                transition: 'transform 0.08s ease, color 0.08s ease',
+                display: 'inline-block',
+                textShadow: isCurrent ? '0 0 20px rgba(249, 87, 56, 0.6)' : 'none',
+              }}
+            >
+              {item.word}
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 };

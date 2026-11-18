@@ -27,15 +27,16 @@ def generate_sadtalker_video(
     then falls back to community spaces if needed.
     """
     space_candidates = [
-        "Snehith1826/SadTalker",
-        "John6666/SadTalker"
+        "John6666/SadTalker",
+        "Snehith1826/SadTalker"
     ]
 
     last_error = None
     for space_id in space_candidates:
         try:
             print(f"[SadTalker] Attempting connection to {space_id}...", flush=True)
-            client = Client(space_id, token=HF_TOKEN)
+            headers = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
+            client = Client(space_id, headers=headers)
             print(f"[SadTalker] Connected to {space_id}. Submitting inference job...", flush=True)
 
             job = client.submit(
@@ -58,11 +59,15 @@ def generate_sadtalker_video(
                 api_name="/test"
             )
 
+            start_time = time.time()
+            max_wait_seconds = 300  # 5 minute timeout to accommodate public GPU/CPU queues
             while not job.done():
+                if time.time() - start_time > max_wait_seconds:
+                    raise TimeoutError(f"SadTalker space {space_id} timed out after {max_wait_seconds}s in queue or processing")
                 status = job.status()
                 rank_str = f" (Queue rank: {status.rank})" if getattr(status, 'rank', None) is not None else ""
                 print(f"[SadTalker] Status: {status.code}{rank_str}", flush=True)
-                time.sleep(3)
+                time.sleep(4)
 
             result = job.result()
             print(f"[SadTalker] Generation complete! Result: {result}", flush=True)

@@ -1,0 +1,13 @@
+{
+  "id": "claude_reel_creator",
+  "name": "Claude Reel Creator (Instagram @De5Ur0HNvIt)",
+  "kind": "clone",
+  "language": "English",
+  "ref_text": "Did you know one Claude skill can make unlimited animated reels? Let me show you how it works. You give Claude one idea and it writes the whole reel in code.",
+  "ref_audio_path": "reference_sample.wav",
+  "full_audio_path": "full_reel_voice.wav",
+  "description": "Warm, engaging, conversational creator voice extracted from Instagram Reel De5Ur0HNvIt.",
+  "sample_rate": 24000,
+  "channels": 1,
+  "source_url": "https://www.instagram.com/reels/De5Ur0HNvIt/"
+}

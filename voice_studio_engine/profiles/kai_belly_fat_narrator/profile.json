@@ -1,0 +1,13 @@
+{
+  "id": "kai_belly_fat_narrator",
+  "name": "Kai Benchmark Narrator (Video 29)",
+  "kind": "clone",
+  "language": "English",
+  "ref_text": "You cannot target belly fat. I know, annoying, but your body does not care. You can do 500 crunches, your belly will not panic and leave.",
+  "ref_audio_path": "reference_sample.wav",
+  "full_audio_path": "full_reel_voice.wav",
+  "description": "Authentic narrator voice from reference video https://youtube.com/shorts/xA0uXOc3iGI",
+  "sample_rate": 24000,
+  "channels": 1,
+  "source_url": "https://youtube.com/shorts/xA0uXOc3iGI"
+}

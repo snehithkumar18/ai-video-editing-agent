@@ -5,6 +5,11 @@ import { SplitScreenReelComposition } from './templates/SplitScreenReelCompositi
 import { WhiteMinimalReelComposition } from './templates/WhiteMinimalReelComposition';
 import { ReelComposition } from '../../reel_reconstruction/src/ReelComposition';
 import { ClaudeSkillReelComposition } from '../../claude_skill_reel/src/ClaudeSkillReelComposition';
+import { SplitScreenMasterComposition } from './templates/SplitScreenMasterComposition';
+import {
+  AestheticBeatSyncReelComposition,
+  ULTRA_REALISTIC_REEL_SLOTS,
+} from './templates/AestheticBeatSyncReelComposition';
 import timestampsData from '../../public/timestamps_female.json';
 
 export const RemotionRoot: React.FC = () => {
@@ -81,6 +86,83 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+        defaultProps={{
+          presenterVideoUrl: '',
+          voiceoverAudioUrl: '',
+        }}
+      />
+      {/* 6. Split-Screen Master Composition (Top Motion Graphics + Bottom Spider-Man) */}
+      <Composition
+        id="SplitScreenMaster"
+        component={SplitScreenMasterComposition}
+        durationInFrames={1162}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{
+          timeline: {
+            duration: 38.72,
+            fps: 30,
+            width: 1080,
+            height: 1920,
+            tracks: [
+              {
+                id: 'avatar-track',
+                type: 'video',
+                visible: true,
+                clips: [{ id: 'avatar-1', assetUrl: '/spiderman_video.mp4', start: 0, end: 38.72, duration: 38.72 }]
+              },
+              {
+                id: 'broll-track',
+                type: 'video',
+                visible: true,
+                clips: [
+                  { id: 'broll-0', assetUrl: 'https://videos.pexels.com/video-files/8100345/8100345-hd_720_1366_25fps.mp4', start: 0, end: 6.5, duration: 6.5 }
+                ]
+              },
+              {
+                id: 'audio-track',
+                type: 'audio',
+                visible: true,
+                clips: [
+                  { id: 'voice-1', assetUrl: '/project-assets/local-1793704545009-c8d9gi/voice_audio_1793708159643.mp3', start: 0, end: 38.72, duration: 38.72 }
+                ]
+              },
+              {
+                id: 'music-track',
+                type: 'music',
+                visible: true,
+                clips: [
+                  { id: 'music-1', assetUrl: '/audio/music/chill_lofi.wav', start: 0, end: 38.72, duration: 38.72 }
+                ]
+              }
+            ]
+          }
+        }}
+      />
+
+      {/* 7. Aesthetic Beat-Sync Reel Template (Extracted from @nandu_ramisetty reference) */}
+      <Composition
+        id="AestheticBeatSyncReel"
+        component={AestheticBeatSyncReelComposition}
+        durationInFrames={393}
+        fps={24}
+        width={1080}
+        height={1920}
+      />
+
+      {/* 8. Aesthetic Beat-Sync Reel - Ultra Realistic Skin & Colors Edition (Zero Shake, Smooth Long Clips) */}
+      <Composition
+        id="AestheticBeatSyncReelUltraRealistic"
+        component={AestheticBeatSyncReelComposition}
+        durationInFrames={393}
+        fps={24}
+        width={1080}
+        height={1920}
+        defaultProps={{
+          slots: ULTRA_REALISTIC_REEL_SLOTS,
+          applyVintageGrade: false,
+        }}
       />
     </>
   );

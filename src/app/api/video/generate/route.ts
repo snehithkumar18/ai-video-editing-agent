@@ -85,7 +85,33 @@ async function runInlineVideoGeneration(projectId: string) {
     let audioDuration = 15; // fallback
     try {
       const { generateSpeech } = await import('@/lib/services/voiceService');
-      const voiceProfile = project.voice_profiles || { sample_url: 'af_bella', provider_voice_id: null };
+      
+      let voiceProfile = project.voice_profiles;
+      if (!voiceProfile && project.voice_profile_id) {
+        if (project.voice_profile_id === 'default-male-adam') {
+          voiceProfile = {
+            id: 'default-male-adam',
+            name: 'Adam (Natural Male)',
+            provider: 'kokoro',
+            provider_voice_id: 'am_adam',
+            sample_url: 'am_adam',
+          };
+        } else if (project.voice_profile_id === 'default-female-bella') {
+          voiceProfile = {
+            id: 'default-female-bella',
+            name: 'Bella (Natural Female)',
+            provider: 'kokoro',
+            provider_voice_id: 'af_bella',
+            sample_url: 'af_bella',
+          };
+        } else {
+          const { data: vp } = await supabase.from('voice_profiles').select('*').eq('id', project.voice_profile_id).single();
+          voiceProfile = vp;
+        }
+      }
+      if (!voiceProfile) {
+        voiceProfile = { sample_url: 'am_adam', provider_voice_id: 'am_adam' };
+      }
 
       let audioBuffer: Buffer;
       let providerUsed = 'kokoro_tts';
@@ -142,72 +168,32 @@ async function runInlineVideoGeneration(projectId: string) {
     await supabase.from('projects').update({ render_progress: 20 }).eq('id', projectId);
     await delay(1500);
 
-    // ===== STEP 2: Fetch B-Roll (50%) =====
-    logger.info(`[Inline Flow] Step 2/4: Fetching B-roll for project ${projectId}`);
-    await supabase.from('projects').update({ render_progress: 30 }).eq('id', projectId);
-    await delay(1500);
-
-    const brollClips: any[] = [];
-    try {
-      // Extract scene keywords from script
-      const scenes = script
-        .split(/[.!?\n]+/)
-        .map((s: string) => s.trim())
-        .filter((s: string) => s.length > 8)
-        .slice(0, 5);
-
-      const searchTerms = scenes.length > 0 ? scenes : ['cinematic background', 'workspace', 'technology'];
-
-      if (process.env.PEXELS_API_KEY) {
-        for (const scene of searchTerms.slice(0, 3)) {
-          try {
-            const res = await fetch(
-              `https://api.pexels.com/videos/search?query=${encodeURIComponent(scene)}&per_page=2&orientation=portrait`,
-              { headers: { Authorization: process.env.PEXELS_API_KEY } }
-            );
-            if (res.ok) {
-              const data = await res.json();
-              if (data.videos?.length > 0) {
-                const video = data.videos[0];
-                const file = video.video_files.find((f: any) => f.quality === 'hd') || video.video_files[0];
-                const clip = { keyword: scene, url: file.link, thumbnailUrl: video.image, duration: video.duration, source: 'pexels' };
-                brollClips.push(clip);
-
-                await supabase.from('project_assets').insert({
-                  project_id: projectId,
-                  type: 'broll_clip',
-                  url: file.link,
-                  metadata: clip
-                });
-              }
-            }
-          } catch (err) {
-            logger.warn(`[Inline Flow] Pexels failed for: ${scene}`, err);
-          }
-        }
-      }
-    } catch (brollErr) {
-      logger.warn('[Inline Flow] B-roll fetch failed', brollErr);
-    }
-    await supabase.from('projects').update({ render_progress: 50 }).eq('id', projectId);
-    await delay(1500);
-
-    // ===== STEP 3: Generate Captions (70%) =====
-    logger.info(`[Inline Flow] Step 3/4: Generating captions for project ${projectId}`);
-    await supabase.from('projects').update({ render_progress: 55 }).eq('id', projectId);
-    await delay(1500);
+    // ===== STEP 2: Generate Captions & Timestamps with Groq Whisper (50%) =====
+    logger.info(`[Inline Flow] Step 2/4: Transcribing speech with Whisper for project ${projectId}`);
+    await supabase.from('projects').update({ render_progress: 35 }).eq('id', projectId);
+    await delay(1000);
 
     let captionsData: any[] = [];
     try {
       if (process.env.GROQ_API_KEY && audioUrl && !audioUrl.includes('soundhelix')) {
-        // Download audio and transcribe with Groq Whisper
-        const audioRes = await fetch(audioUrl);
-        if (audioRes.ok) {
-          const audioBuffer = Buffer.from(await audioRes.arrayBuffer());
+        let audioBuffer: Buffer | null = null;
+        if (audioUrl.startsWith('/')) {
+          const fs = await import('fs/promises');
+          const path = await import('path');
+          const localPath = path.join(process.cwd(), 'public', audioUrl.replace(/^\//, ''));
+          audioBuffer = await fs.readFile(localPath);
+        } else {
+          const audioRes = await fetch(audioUrl);
+          if (audioRes.ok) {
+            audioBuffer = Buffer.from(await audioRes.arrayBuffer());
+          }
+        }
+
+        if (audioBuffer) {
           const Groq = (await import('groq-sdk')).default;
           const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-          const file = new File([audioBuffer], 'audio.mp3', { type: 'audio/mpeg' });
-          
+          const file = new File([new Uint8Array(audioBuffer)], 'audio.mp3', { type: 'audio/mpeg' });
+
           const transcription = await groq.audio.transcriptions.create({
             file,
             model: 'whisper-large-v3',
@@ -223,27 +209,53 @@ async function runInlineVideoGeneration(projectId: string) {
             end: w.end || 0,
             duration: (w.end || 0) - (w.start || 0),
             locked: false,
-            style: { fontSize: 48, fontWeight: 'bold', color: '#FFFFFF', backgroundColor: 'rgba(0,0,0,0.6)', animation: 'fadeIn', position: 'bottom' }
+            style: { fontSize: 52, fontWeight: 'bold', color: '#FFFFFF', backgroundColor: 'transparent', animation: 'pop', position: 'middle' }
           }));
+          if (words.length > 0) {
+            audioDuration = words[words.length - 1].end || audioDuration;
+          }
         }
       }
     } catch (captionErr) {
-      logger.warn('[Inline Flow] Caption generation failed, using script-based fallback', captionErr);
+      logger.warn('[Inline Flow] Caption transcription failed, using script fallback', captionErr);
     }
 
-    // Fallback: generate captions from script text
     if (captionsData.length === 0) {
       const words = script.split(/\s+/).filter(Boolean);
       let currentTime = 0;
       captionsData = words.map((word: string, i: number) => {
-        const dur = 0.4;
-        const caption = { id: `caption-${i}`, word, start: currentTime, end: currentTime + dur, duration: dur, locked: false, style: { fontSize: 48, fontWeight: 'bold', color: '#FFFFFF', backgroundColor: 'rgba(0,0,0,0.6)', animation: 'fadeIn', position: 'bottom' } };
+        const dur = 0.38;
+        const caption = { id: `caption-${i}`, word, start: currentTime, end: currentTime + dur, duration: dur, locked: false, style: { fontSize: 52, fontWeight: 'bold', color: '#FFFFFF', backgroundColor: 'transparent', animation: 'pop', position: 'middle' } };
         currentTime += dur;
         return caption;
       });
       audioDuration = currentTime;
     }
 
+    await supabase.from('projects').update({ render_progress: 55 }).eq('id', projectId);
+    await delay(1000);
+
+    // ===== STEP 3: Intelligent Scene Direction & Pexels B-Roll (75%) =====
+    logger.info(`[Inline Flow] Step 3/4: Directing multi-scene visual timeline for project ${projectId}`);
+    await supabase.from('projects').update({ render_progress: 65 }).eq('id', projectId);
+
+    const { directVideoScenes } = await import('@/lib/services/sceneDirectorService');
+    const wordTimestamps = captionsData.map((c: any) => ({ word: c.word, start: c.start, end: c.end }));
+    const pexelsKey = process.env.PEXELS_API_KEY || '';
+
+    const directedScenes = await directVideoScenes(script, wordTimestamps, audioDuration, pexelsKey);
+    logger.info(`[Inline Flow] Generated ${directedScenes.length} directed visual scenes`);
+
+    const brollClips = directedScenes
+      .filter((s) => s.stockVideoUrl)
+      .map((s, idx) => ({
+        id: `broll-${idx}`,
+        url: s.stockVideoUrl!,
+        start: s.start,
+        end: s.end,
+        duration: s.duration,
+        keyword: s.stockKeywords.join(', '),
+      }));
     // Upload captions
     try {
       const { uploadBuffer } = await import('@/lib/services/storageService');
@@ -259,21 +271,30 @@ async function runInlineVideoGeneration(projectId: string) {
     } catch (uploadErr) {
       logger.warn('[Inline Flow] Caption upload failed', uploadErr);
     }
-    await supabase.from('projects').update({ render_progress: 70 }).eq('id', projectId);
-    await delay(1500);
+    await supabase.from('projects').update({ render_progress: 75 }).eq('id', projectId);
+    await delay(1000);
 
     // ===== STEP 4: Assemble Timeline (100%) =====
     logger.info(`[Inline Flow] Step 4/4: Assembling timeline for project ${projectId}`);
     await supabase.from('projects').update({ render_progress: 85 }).eq('id', projectId);
     await delay(1500);
 
-    let avatarUrl = project.avatar_profiles?.processed_asset_url || 
-      'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-smartphone-talking-to-camera-40156-large.mp4';
+    const presenterMode = project.metadata?.presenter_mode || 'sadtalker_avatar';
+    const uploadedTalkingVideo = project.metadata?.talking_video_url;
 
-    // If avatar is an image and audio is available, generate animated talking character video
-    if (avatarUrl && avatarUrl.match(/\.(png|jpg|jpeg|webp)/i) && audioUrl) {
+    // Resolve avatar video with full background
+    let avatarUrl = uploadedTalkingVideo;
+    if (!avatarUrl && project.avatar_profiles?.processed_asset_url && project.avatar_profiles.processed_asset_url.match(/\.(mp4|webm)/i)) {
+      avatarUrl = project.avatar_profiles.processed_asset_url;
+    }
+    if (!avatarUrl) {
+      avatarUrl = '/spiderman_video.mp4';
+    }
+
+    // In SadTalker AI Avatar mode, if avatar is an image and audio is available, generate neural talking character video
+    if (presenterMode === 'sadtalker_avatar' && avatarUrl && avatarUrl.match(/\.(png|jpg|jpeg|webp)/i) && audioUrl) {
       try {
-        logger.info(`[Inline Flow] Animating character image into talking video for project ${projectId}...`);
+        logger.info(`[Inline Flow] Synthesizing SadTalker neural talking character video for project ${projectId}...`);
         const { generateTalkingCharacterVideo } = await import('@/lib/services/talkingCharacterService');
         const [imgRes, audioRes] = await Promise.all([fetch(avatarUrl), fetch(audioUrl)]);
         if (imgRes.ok && audioRes.ok) {
@@ -288,22 +309,31 @@ async function runInlineVideoGeneration(projectId: string) {
             imageBuffer: imgBuf,
             audioBuffer: audioBuf,
             timestamps,
+            mode: 'neural',
           });
           const { uploadBuffer } = await import('@/lib/services/storageService');
-          const videoKey = `project-assets/${projectId}/talking_character_${Date.now()}.mp4`;
+          const videoKey = `project-assets/${projectId}/sadtalker_${Date.now()}.mp4`;
           avatarUrl = await uploadBuffer(talkingVideoBuf, videoKey, 'video/mp4');
-          logger.info(`[Inline Flow] Generated and uploaded talking character video: ${avatarUrl}`);
+          logger.info(`[Inline Flow] SadTalker talking character video ready: ${avatarUrl}`);
 
           await supabase.from('project_assets').insert({
             project_id: projectId,
             type: 'avatar_video',
             url: avatarUrl,
-            metadata: { generated: true }
+            metadata: { generated: true, engine: 'sadtalker' }
           });
         }
       } catch (animErr) {
         logger.warn('[Inline Flow] Talking character video generation fallback to client-side animation', animErr);
       }
+    } else if (presenterMode === 'video_upload' && uploadedTalkingVideo) {
+      logger.info(`[Inline Flow] Using user-uploaded talking video for project ${projectId}: ${uploadedTalkingVideo}`);
+      await supabase.from('project_assets').insert({
+        project_id: projectId,
+        type: 'avatar_video',
+        url: uploadedTalkingVideo,
+        metadata: { uploaded: true, mode: 'video_upload' }
+      });
     }
 
     const timelineJson = {
@@ -312,6 +342,9 @@ async function runInlineVideoGeneration(projectId: string) {
       fps: 30,
       width: 1080,
       height: 1920,
+      metadata: {
+        directedScenes,
+      },
       tracks: [
         {
           id: 'avatar-track', type: 'video', label: 'Avatar', visible: true, locked: false,
@@ -319,11 +352,15 @@ async function runInlineVideoGeneration(projectId: string) {
         },
         {
           id: 'broll-track', type: 'video', label: 'B-Roll', visible: true, locked: false,
-          clips: brollClips.map((clip, i) => ({
-            id: `broll-${i}`, assetUrl: clip.url,
-            start: Math.min(i * 8, Math.max(0, audioDuration - 5)),
-            end: Math.min(i * 8 + 8, audioDuration),
-            duration: 8, opacity: 1.0, locked: false
+          clips: brollClips.map((clip) => ({
+            id: clip.id,
+            assetUrl: clip.url,
+            start: clip.start,
+            end: clip.end,
+            duration: clip.duration,
+            opacity: 1.0,
+            locked: false,
+            keyword: clip.keyword,
           }))
         },
         {
@@ -336,7 +373,7 @@ async function runInlineVideoGeneration(projectId: string) {
         },
         {
           id: 'music-track', type: 'music', label: 'Background Music', visible: true, locked: false,
-          clips: []
+          clips: [{ id: 'music-1', assetUrl: '/audio/music/chill_lofi.wav', start: 0, end: audioDuration, duration: audioDuration, volume: 0.14, locked: true }]
         }
       ]
     };
@@ -346,7 +383,7 @@ async function runInlineVideoGeneration(projectId: string) {
       status: 'editing',
       render_progress: 100,
       timeline_json: timelineJson,
-      final_video_url: avatarUrl, // Use avatar as preview until full render
+      final_video_url: (avatarUrl && avatarUrl.match(/\.(mp4|webm)/i)) ? avatarUrl : null,
       duration_seconds: audioDuration
     }).eq('id', projectId);
 
@@ -440,10 +477,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Voice and avatar profiles must be selected' }, { status: 400 });
     }
 
-    // Check profiles are ready
-    const { data: avatar } = await adminSupabase.from('avatar_profiles').select('status').eq('id', project.avatar_profile_id).single();
-    if (avatar?.status !== 'ready') {
-      return NextResponse.json({ success: false, error: 'Avatar profile is not ready' }, { status: 400 });
+    // Check profiles are ready (treat system default avatars as ready)
+    if (!project.avatar_profile_id.startsWith('default-')) {
+      const { data: avatar } = await adminSupabase.from('avatar_profiles').select('status').eq('id', project.avatar_profile_id).single();
+      if (avatar?.status && avatar.status !== 'ready') {
+        return NextResponse.json({ success: false, error: 'Avatar profile is not ready' }, { status: 400 });
+      }
     }
 
     const script = project.script_optimized || project.script_raw;
@@ -451,8 +490,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Project script is empty' }, { status: 400 });
     }
 
-    // 4. Atomically check and deduct 1 credit — skip if re-generating a stuck project
-    if (project.status === 'draft') {
+    // 4. Atomically check and deduct 1 credit — skip if re-generating or local mock mode
+    if (project.status === 'draft' && process.env.LOCAL_DEV_BYPASS !== 'true') {
       const { data: deductResult, error: deductError } = await adminSupabase
         .rpc('deduct_render_credits', { p_user_id: user.id, p_cost: 1 });
 
@@ -470,7 +509,7 @@ export async function POST(request: Request) {
     // 6. Update project status
     await adminSupabase
       .from('projects')
-      .update({ status: 'generating', render_progress: 0, metadata: {} })
+      .update({ status: 'generating', render_progress: 0 })
       .eq('id', projectId);
 
     // 7. Add jobs using FlowProducer (inline or BullMQ)
@@ -512,8 +551,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true, data: { message: 'Generation started', projectId } });
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Generate Video Error:', error);
-    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: error?.message || 'Internal Server Error' }, { status: 500 });
   }
 }

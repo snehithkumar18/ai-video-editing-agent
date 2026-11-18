@@ -51,6 +51,23 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* Primary New Project Action */}
+      <div className="bg-gradient-to-r from-[#7C3AED] via-[#6D28D9] to-[#F95738] p-[1.5px] rounded-3xl shadow-lg shadow-purple-500/10">
+        <div className="bg-white rounded-[23px] p-5 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-[#1E1B4B]">Create New Viral Video</h2>
+            <p className="text-xs text-[#78767B] mt-0.5">Paste a script, use SadTalker AI avatar or upload video</p>
+          </div>
+          <CreateProjectModal
+            trigger={
+              <button className="h-11 px-6 rounded-xl btn-gradient text-white font-bold text-sm inline-flex items-center gap-2 shadow-md shadow-purple-500/25 hover:opacity-95 transition-opacity">
+                <Plus size={18} /> New Project
+              </button>
+            }
+          />
+        </div>
+      </div>
+
       {/* Quick Actions */}
       <div>
         <h2 className="text-xs font-semibold text-[#78767B] uppercase tracking-wider mb-3">Quick Actions</h2>

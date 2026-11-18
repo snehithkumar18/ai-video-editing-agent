@@ -19,6 +19,7 @@ CREATE TABLE users (
   render_credits INTEGER DEFAULT 5,
   stripe_customer_id TEXT UNIQUE,
   stripe_subscription_id TEXT UNIQUE,
+  creator_kit JSONB DEFAULT '{"primary_color":"#F95738","secondary_color":"#2D3142","background_style":"warm_cream","caption_font":"Plus Jakarta Sans","caption_highlight_color":"#FFE600","caption_animation":"pop","music_genre":"chill_lofi"}'::jsonb,
   onboarding_completed BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL

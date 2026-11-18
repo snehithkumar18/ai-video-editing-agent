@@ -3,6 +3,8 @@ import { createClient as createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import GenerationProgress from '@/components/project/GenerationProgress';
 import StartGenerationButton from '@/components/project/StartGenerationButton';
+import ProjectQuickEditPrompt from '@/components/project/ProjectQuickEditPrompt';
+import ProjectVideoPlayer from '@/components/project/ProjectVideoPlayer';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
@@ -41,7 +43,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl mx-auto w-full space-y-6 overflow-x-hidden">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-[#1E1B4B]">{project.title}</h2>
@@ -66,25 +68,18 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {(project.status === 'editing' || project.status === 'complete') && project.final_video_url && (
-        <Card className="bg-white border-[#E5E3EB] rounded-3xl overflow-hidden shadow-sm">
-          <div className="aspect-video bg-black relative flex items-center justify-center">
-            {project.final_video_url.match(/\.(png|jpg|jpeg|webp)/i) ? (
-              <img 
-                src={project.final_video_url} 
-                className="w-full h-full max-h-[60vh] object-contain"
-                alt="Project preview"
-              />
-            ) : (
-              <video 
-                src={project.final_video_url} 
-                controls 
-                className="w-full h-full max-h-[60vh] object-contain"
-                poster={project.thumbnail_url || undefined}
-              />
-            )}
-          </div>
-        </Card>
+      {(project.status === 'editing' || project.status === 'complete') && (
+        <ProjectVideoPlayer 
+          timeline={project.timeline_json}
+          fallbackVideoUrl={project.final_video_url}
+          thumbnailUrl={project.thumbnail_url}
+          template={project.style_template}
+          title={project.title}
+        />
+      )}
+
+      {(project.status === 'editing' || project.status === 'complete') && (
+        <ProjectQuickEditPrompt projectId={project.id} />
       )}
 
       {project.status === 'draft' && (

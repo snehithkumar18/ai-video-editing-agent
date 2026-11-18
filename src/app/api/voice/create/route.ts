@@ -31,7 +31,7 @@ async function getRatelimit() {
 }
 
 const createVoiceSchema = z.object({
-  storageUrl: z.string().url(),
+  storageUrl: z.string().min(1),
   voiceName: z.string().trim().min(1),
   description: z.string().trim().optional(),
 });

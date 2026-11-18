@@ -93,11 +93,11 @@ export async function POST(
 
     return NextResponse.json({ success: true, data: aiEditResponse });
 
-  } catch (error) {
+  } catch (error: any) {
     logger.error('AI Edit API Route Error:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Could not process your request. Please try again.' 
+      error: error?.message || 'Could not process your request. Please try again.' 
     }, { status: 500 });
   }
 }

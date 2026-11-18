@@ -33,7 +33,7 @@ async function getRatelimit() {
 }
 
 const createAvatarSchema = z.object({
-  storageUrl: z.string().url(),
+  storageUrl: z.string().min(1),
   avatarName: z.string().trim().min(1),
   fileType: z.enum(['image', 'video']),
 });

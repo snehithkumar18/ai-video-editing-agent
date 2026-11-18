@@ -17,7 +17,7 @@ export default function DashboardLayout({
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col h-screen w-full bg-[#F8F7FC] overflow-hidden">
         <DashboardHeader />
-        <main className="flex-1 overflow-y-auto px-4 md:px-6 py-5 pb-24 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-6 py-5 pb-24 custom-scrollbar">
           {children}
         </main>
         <BottomNav />

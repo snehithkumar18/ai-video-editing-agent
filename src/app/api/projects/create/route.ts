@@ -23,11 +23,21 @@ export async function POST(request: Request) {
       )
     }
 
+    const { presenter_mode, talking_video_url, metadata = {}, ...projectFields } = validatedData.data
+
+    const mergedMetadata = {
+      ...(metadata || {}),
+      ...(presenter_mode ? { presenter_mode } : {}),
+      ...(talking_video_url ? { talking_video_url } : {}),
+    }
+
     const { data: newProject, error } = await supabase
       .from('projects')
       .insert({
         user_id: user.id,
-        ...validatedData.data
+        status: 'draft',
+        ...projectFields,
+        metadata: mergedMetadata,
       })
       .select()
       .single()

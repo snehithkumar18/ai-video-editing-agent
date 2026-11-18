@@ -27,7 +27,17 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-8 px-4">
+    <div className="min-h-[80vh] flex items-center justify-center py-8 px-4 relative">
+      {/* Quick Skip to Dashboard */}
+      <div className="absolute top-4 right-6">
+        <button
+          onClick={handleComplete}
+          className="text-xs font-semibold text-[#78767B] hover:text-[#7C3AED] bg-white border border-[#E5E3EB] px-3.5 py-1.5 rounded-full shadow-sm hover:shadow transition-all"
+        >
+          Skip All to Dashboard →
+        </button>
+      </div>
+
       <div className="max-w-md w-full">
         
         {/* Progress Dots */}

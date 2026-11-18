@@ -25,18 +25,26 @@ export async function POST(request: Request) {
 
     if (groq) {
       const response = await groq.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+        model: 'qwen/qwen3.8-27b',
         messages: [
           {
             role: 'system',
-            content: 'You are an expert short-form video scriptwriter. Your task is to optimize the user-provided script to make it highly engaging, add structural hooks, remove unnecessary words, and format it clearly with line breaks for natural speech flow. Keep it punchy and under 600 characters if possible. Output ONLY the optimized script.'
+            content: `You are an expert short-form viral video scriptwriter. 
+Your task is to transform and compress the user's raw script into an ultra-high retention vertical reel script that speaks in STRICTLY UNDER 50 SECONDS (Target: 110 to 130 spoken words).
+
+Strict Rules:
+1. Hook the viewer in the first 3 seconds with a bold problem, controversy, or surprising insight.
+2. Structure the core message into 3 fast, punchy actionable steps or insights (e.g., "Step One...", "Step Two...", "Step Three...").
+3. End with a sharp 1-sentence call to action.
+4. Keep the pacing punchy, concise, and energetic.
+5. Output ONLY the spoken narration text. Absolutely NO stage directions, NO speaker tags (like [Voiceover:] or Narrator:), NO timestamps, and NO emojis.`
           },
           {
             role: 'user',
             content: script
           }
         ],
-        temperature: 0.7,
+        temperature: 0.4,
       });
 
       const content = response.choices[0]?.message?.content;

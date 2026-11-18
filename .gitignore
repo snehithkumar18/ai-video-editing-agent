@@ -45,5 +45,21 @@ scratch/
 
 # rendered test media
 public/*.mp4
+public/renders/
 public/test_still_frame_*.png
+public/test_*.png
+public/*.wav
+public/*.mp3
+public/video_galleries/
+test_voice_*.mp3
+kokoro_weights/
+claude_skill_reel/assets/audio/temp_segments_andrew/
+*.trf
+test_*.mp4
+test_*.jpg
+debug_*/
+user_raw_assets/
+video_action_analysis/
+.local_dev_db/
+voice_studio/
 

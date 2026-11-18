@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import logger from '@/lib/logger';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Film, Layers, Video, SlidersHorizontal, Settings } from 'lucide-react';
 import EditorTopBar from './EditorTopBar';
 
@@ -33,6 +32,8 @@ export default function EditorLayout({ project }: { project: any }) {
   const currentFrame = useTimelineStore(s => s.currentFrame);
   const setCurrentFrame = useTimelineStore(s => s.setCurrentFrame);
   const selectClip = useTimelineStore(s => s.selectClip);
+  const selectedClipId = useTimelineStore(s => s.selectedClipId);
+  const selectedTrackId = useTimelineStore(s => s.selectedTrackId);
   const isDirty = useTimelineStore(s => s.isDirty);
   const setIsDirty = useTimelineStore(s => s.setIsDirty);
   const setIsSaving = useTimelineStore(s => s.setIsSaving);
@@ -41,13 +42,20 @@ export default function EditorLayout({ project }: { project: any }) {
   const { undo, redo } = useTimelineHistory();
   const autosaveTimerRef = useRef<any>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('editor');
+  const [sidebarTab, setSidebarTab] = useState<'assets' | 'inspector'>('assets');
 
   useEffect(() => {
     if (project.timeline_json) {
       loadTimeline(project.timeline_json);
     }
   }, [project.timeline_json, loadTimeline]);
+
+  // When a clip is selected, auto-focus the inspector tab
+  useEffect(() => {
+    if (selectedClipId) {
+      setSidebarTab('inspector');
+    }
+  }, [selectedClipId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,7 +77,6 @@ export default function EditorLayout({ project }: { project: any }) {
           redo();
         } else {
           undo();
-          // Find the last non-undone AI Edit History item and mark it undone
           const history = useAIEditStore.getState().history;
           const lastApplied = history.find(h => !h.undone);
           if (lastApplied) {
@@ -138,51 +145,86 @@ export default function EditorLayout({ project }: { project: any }) {
   );
 
   return (
-    <div className="editor-dark flex flex-col h-screen w-screen overflow-hidden">
+    <div className="editor-dark flex flex-col h-screen w-screen overflow-hidden bg-[#0A0A12]">
       {/* Top Bar */}
       <EditorTopBar project={project} onSave={saveTimeline} />
 
-      {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Col: Preview + Inspector */}
-        <div className="flex-1 flex flex-col border-r border-white/[0.06] min-w-0">
-          <div className="flex-1 bg-[#080810] flex items-center justify-center p-4 relative min-h-0">
-            <VideoPreview />
-          </div>
-          <div className="h-64 border-t border-white/[0.06] bg-[#111118] overflow-y-auto">
-            <InspectorPanel />
-          </div>
+      {/* Main Content Area (Preview Stage + Sidebar) */}
+      <div className="flex flex-1 overflow-hidden min-h-0">
+        {/* Center Stage: Video Preview */}
+        <div className="flex-1 flex flex-col bg-[#07070D] min-w-0 min-h-0 relative overflow-hidden">
+          <VideoPreview />
         </div>
 
-        {/* Right Col: Asset Library */}
-        <div className="w-[320px] bg-[#111118] flex-shrink-0 flex flex-col">
-          <AssetLibrary />
+        {/* Right Sidebar: Tabbed Media Assets & Clip Inspector */}
+        <div className="w-[360px] bg-[#0F0F18] border-l border-white/[0.08] flex-shrink-0 flex flex-col overflow-hidden">
+          {/* Sidebar Tab Header */}
+          <div className="flex items-center border-b border-white/[0.08] bg-[#12121C] px-2 pt-1 shrink-0">
+            <button
+              onClick={() => setSidebarTab('assets')}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all ${
+                sidebarTab === 'assets'
+                  ? 'border-[#7C3AED] text-white bg-[#7C3AED]/10 rounded-t-lg'
+                  : 'border-transparent text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <Layers size={13} className={sidebarTab === 'assets' ? 'text-[#A78BFA]' : ''} />
+              <span>Media Assets</span>
+            </button>
+            <button
+              onClick={() => setSidebarTab('inspector')}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all relative ${
+                sidebarTab === 'inspector'
+                  ? 'border-[#7C3AED] text-white bg-[#7C3AED]/10 rounded-t-lg'
+                  : 'border-transparent text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <SlidersHorizontal size={13} className={sidebarTab === 'inspector' ? 'text-[#A78BFA]' : ''} />
+              <span>Clip Inspector</span>
+              {selectedClipId && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] animate-pulse" />
+              )}
+            </button>
+          </div>
+
+          {/* Sidebar Tab Body */}
+          <div className="flex-1 overflow-y-auto min-h-0">
+            {sidebarTab === 'assets' ? <AssetLibrary /> : <InspectorPanel />}
+          </div>
         </div>
       </div>
 
       {/* AI Edit Bar */}
-      <AIEditBar projectId={project.id} onOpenHistory={() => setIsHistoryOpen(true)} />
+      <AIEditBar projectId={project.id} onOpenHistory={() => setIsHistoryOpen(false)} />
 
       {/* Timeline Area */}
-      <div className="h-[220px] bg-[#0E0E18] border-t border-white/[0.06] flex-shrink-0">
+      <div className="h-[210px] bg-[#0B0B14] border-t border-white/[0.08] flex-shrink-0">
         <Timeline />
       </div>
 
       {/* Editor Bottom Tab Bar */}
-      <div className="h-14 bg-[#0A0A12] border-t border-white/[0.06] flex items-center justify-around px-2 shrink-0">
+      <div className="h-12 bg-[#080810] border-t border-white/[0.06] flex items-center justify-around px-2 shrink-0">
         {editorTabs.map((tab) => {
-          const isActive = activeTab === tab.id;
+          const isActive = (tab.id === 'inspector' && sidebarTab === 'inspector') ||
+                           (tab.id === 'assets' && sidebarTab === 'assets') ||
+                           (tab.id === 'editor' && !selectedClipId);
+
+          const handleClick = () => {
+            if (tab.id === 'assets') setSidebarTab('assets');
+            if (tab.id === 'inspector') setSidebarTab('inspector');
+          };
+
           const content = (
             <div
               key={tab.id}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all cursor-pointer ${
                 isActive 
-                  ? 'text-[#7C3AED] bg-[#7C3AED]/10' 
+                  ? 'text-[#A78BFA] bg-[#7C3AED]/15' 
                   : 'text-gray-500 hover:text-gray-300'
               }`}
-              onClick={() => !tab.href && setActiveTab(tab.id)}
+              onClick={!tab.href ? handleClick : undefined}
             >
-              <tab.icon size={18} strokeWidth={isActive ? 2.2 : 1.6} />
+              <tab.icon size={16} strokeWidth={isActive ? 2.2 : 1.6} />
               <span className="text-[10px] font-medium">{tab.label}</span>
             </div>
           );

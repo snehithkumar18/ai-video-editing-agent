@@ -132,7 +132,7 @@ USER'S EDITING INSTRUCTION:
 Return the JSON operations to fulfill this request.`
 
   const response = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
+    model: 'qwen/qwen3.8-27b',
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMessage }

@@ -1,3 +1,13 @@
+export interface CreatorKit {
+  primary_color: string;
+  secondary_color: string;
+  background_style: 'warm_cream' | 'dark_cyber' | 'studio_white' | 'minimalist_slate';
+  caption_font: string;
+  caption_highlight_color: string;
+  caption_animation: 'pop' | 'bounce' | 'fade';
+  music_genre: 'chill_lofi' | 'tech_phonk' | 'ambient_minimal';
+}
+
 export interface User {
   id: string;
   email: string;
@@ -7,6 +17,7 @@ export interface User {
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   render_credits: number;
+  creator_kit?: CreatorKit;
   onboarding_completed: boolean;
   created_at: string;
   updated_at: string;
@@ -47,7 +58,7 @@ export interface Project {
   script_optimized: string | null;
   hook_selected: string | null;
   platform: 'youtube_shorts' | 'instagram_reels' | 'tiktok' | 'youtube' | 'linkedin';
-  style_template: 'split_screen' | 'video_call' | 'podcast' | 'news_anchor' | 'reaction_cam';
+  style_template: 'split_screen' | 'software_walkthrough' | 'creator_motion_graphics' | 'clean_tech' | 'warm_canvas' | 'chalk_talk' | 'data_story' | 'pop_info' | 'paper_doc' | 'zoom_circle' | 'solo_studio' | 'video_call' | 'podcast' | 'news_anchor' | 'reaction_cam';
   voice_profile_id: string | null;
   avatar_profile_id: string | null;
   status: 'draft' | 'generating' | 'editing' | 'rendering' | 'complete' | 'failed';

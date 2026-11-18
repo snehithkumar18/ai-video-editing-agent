@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Send, History, Check, X, Loader2 } from 'lucide-react';
+import { Sparkles, Send, History, Check, X, Loader2, Mic, MicOff } from 'lucide-react';
 import { useTimelineStore } from '@/store/useTimelineStore';
 import { useAIEditStore } from '@/store/useAIEditStore';
 import { TimelineOperation } from '@/lib/types/aiEdit';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { cn } from '@/lib/utils';
 import logger from '@/lib/logger';
 
 interface AIEditBarProps {
@@ -36,6 +37,66 @@ export default function AIEditBar({ projectId, onOpenHistory }: AIEditBarProps) 
     clearPending,
     addToHistory,
   } = useAIEditStore();
+
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const toggleListening = () => {
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition = typeof window !== 'undefined' && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+    if (!SpeechRecognition) {
+      toast.error('Voice input is not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        toast.info('Listening... speak your edit instructions');
+      };
+
+      recognition.onresult = (event: any) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (transcript) {
+          setPromptInput(transcript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        logger.warn('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error !== 'no-speech') {
+          toast.error(`Microphone error: ${event.error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      logger.error('Failed to initialize speech recognition:', err);
+      setIsListening(false);
+      toast.error('Could not access microphone');
+    }
+  };
 
   // Handle escape to cancel pending confirmation
   useEffect(() => {
@@ -342,17 +403,32 @@ export default function AIEditBar({ projectId, onOpenHistory }: AIEditBarProps) 
                 </span>
               </div>
             ) : (
-              <input
-                type="text"
-                placeholder="Tell me what to change... e.g. 'make all captions yellow and bigger'"
-                value={promptInput}
-                onChange={(e) => {
-                  setPromptInput(e.target.value);
-                  setError(null);
-                }}
-                onFocus={() => setIsFocused(true)}
-                className="flex-1 h-8 bg-black border border-border rounded-md px-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition duration-150"
-              />
+              <div className="flex-1 flex items-center relative">
+                <input
+                  type="text"
+                  placeholder="Tell me what to change (type or click mic to talk)..."
+                  value={promptInput}
+                  onChange={(e) => {
+                    setPromptInput(e.target.value);
+                    setError(null);
+                  }}
+                  onFocus={() => setIsFocused(true)}
+                  className="w-full h-8 bg-black border border-border rounded-md pl-3 pr-9 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-violet-500 transition duration-150"
+                />
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  title={isListening ? "Stop listening" : "Talk your edit (voice input)"}
+                  className={cn(
+                    "absolute right-1 w-6 h-6 rounded flex items-center justify-center transition-all cursor-pointer",
+                    isListening 
+                      ? "bg-red-500 text-white animate-pulse shadow-sm shadow-red-500/40" 
+                      : "text-gray-400 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {isListening ? <MicOff size={13} /> : <Mic size={13} />}
+                </button>
+              </div>
             )}
 
             {error && (

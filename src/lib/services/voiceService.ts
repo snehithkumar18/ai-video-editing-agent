@@ -1,5 +1,5 @@
 import Groq from 'groq-sdk';
-import { VoiceProfile } from '../types';
+import { VoiceProfile } from '@/lib/types';
 import logger from '@/lib/logger';
 
 function getGroq(): Groq {

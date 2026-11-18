@@ -23,6 +23,9 @@ export interface Clip {
   end: number;
   duration: number;
   word?: string;
+  keyword?: string;
+  prompt?: string;
+  title?: string;
   style?: CaptionStyle;
   opacity?: number;
   volume?: number;

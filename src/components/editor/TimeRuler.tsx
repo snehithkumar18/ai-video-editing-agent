@@ -47,10 +47,10 @@ export default function TimeRuler({ duration, zoom, currentFrame, fps, onSeek }:
   }, [duration, zoom]);
 
   return (
-    <div className="h-8 bg-[#1A1A1A] border-b border-border sticky top-0 z-20 overflow-hidden flex">
+    <div className="h-8 bg-[#10101A] border-b border-white/[0.08] sticky top-0 z-20 overflow-hidden flex select-none">
       {/* Left spacer for track headers */}
-      <div className="w-[160px] flex-shrink-0 bg-[#1A1A1A] border-r border-border z-30 flex items-center px-4">
-        <span className="text-[10px] text-muted-foreground uppercase font-semibold">Timeline</span>
+      <div className="w-[180px] flex-shrink-0 bg-[#12121C] border-r border-white/[0.08] z-30 flex items-center px-3">
+        <span className="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">Timeline Tracks</span>
       </div>
 
       {/* Ruler area */}

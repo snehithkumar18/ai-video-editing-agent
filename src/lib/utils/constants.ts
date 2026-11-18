@@ -8,6 +8,16 @@ export const PLATFORMS = [
 
 export const STYLE_TEMPLATES = [
   'split_screen',
+  'software_walkthrough',
+  'creator_motion_graphics',
+  'clean_tech',
+  'warm_canvas',
+  'chalk_talk',
+  'data_story',
+  'pop_info',
+  'paper_doc',
+  'zoom_circle',
+  'solo_studio',
   'video_call',
   'podcast',
   'news_anchor',

@@ -35,7 +35,7 @@ export default function Timeline() {
         ref={containerRef}
         className="flex-1 overflow-x-auto overflow-y-auto relative custom-scrollbar"
       >
-        <div style={{ minWidth: `${(duration * zoom) + 160}px` }}>
+        <div style={{ minWidth: `${(duration * zoom) + 180}px` }}>
           {/* Top Ruler (Sticky) */}
           <TimeRuler 
             duration={duration} 
@@ -51,7 +51,7 @@ export default function Timeline() {
           {/* Tracks Area */}
           <div 
             ref={trackAreaRef}
-            className="relative flex flex-col pt-2 pb-10"
+            className="relative flex flex-col pb-4"
             onClick={handleBackgroundClick}
           >
             {(timeline.tracks || []).map(track => (
@@ -64,7 +64,7 @@ export default function Timeline() {
             ))}
 
             {/* Global Playhead */}
-            <div className="absolute top-0 bottom-0 pointer-events-none z-40" style={{ left: '160px' }}>
+            <div className="absolute top-0 bottom-0 pointer-events-none z-40" style={{ left: '180px' }}>
               <PlayheadLine 
                 currentFrame={currentFrame} 
                 fps={fps} 

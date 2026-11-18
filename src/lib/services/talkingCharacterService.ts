@@ -53,17 +53,18 @@ export async function generateTalkingCharacterVideo(
   } = options;
 
   if (mode === 'neural') {
+    // Primary Neural Engine: SadTalker (audio-driven talking character video)
     try {
       logger.info('[TalkingCharacter] Attempting Neural Talking Character generation via SadTalker...');
       const neuralBuffer = await generateNeuralTalkingCharacterVideo({
         imageBuffer,
         audioBuffer,
-        size: '256',
-        enhance: false,
+        size: '512',
+        enhance: true,
       });
       return neuralBuffer;
     } catch (err: any) {
-      logger.warn(`[TalkingCharacter] Neural generation failed (${err.message}). Falling back to local dynamic engine.`);
+      logger.warn(`[TalkingCharacter] SadTalker generation failed (${err.message}). Falling back to local dynamic engine.`);
     }
   }
 
